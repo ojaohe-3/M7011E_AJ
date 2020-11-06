@@ -1,10 +1,7 @@
 # M7011E_AJ
-1. a
-1. b
-1. c
-* 1
-* 2
-* 3
 
-[this is a link](https://github.com/)</br>
-![somestuff](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+### Introduction
+We are two students who work on the course Design of dynamic webbsystems in ltu designated M7011E
+
+### The Project
+The course work is about simulating a small scaled energy energy market
