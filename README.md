@@ -1,12 +1,12 @@
 # M7011E_AJ
 
 ### Introduction
-We are two students who work on the course "Design of dynamic web systems" in LTU designated M7011E.
+We are two students who work on the course "Design of Dynamic Web Systems" (M7011E) in LTU.
 
 ### The Project
-The course work is about simulating a small scaled electricity market. Three kind of actors are to be taken in account in the similation:
+The course work is about simulating a small scaled electricity market. Three kind of actors are to be taken in account in the simulation:
 * Consumers: these houses consume electricity from the market.
-* Prosumers: these houses produce energy thanks to there own a little wind turbine. The inhabitants can store this energy in a battery and use it for there own consumption. They can sell the leftover to the market. They can also buy electricity from market if there wind turbine is not sufficient.
+* Prosumers: these houses produce energy thanks to there own a little wind turbine. The inhabitants can store this energy in a battery and use it for there own consumption. They can sell the leftover to the market. They can also buy electricity from market if their wind turbine is not sufficient.
 * Manager: there is one manager for the whole electrical grid. It produces electricity thanks to a coal plant, and manages the market. He fixes the price of electricity, buys electricity from prosumers, provides energy to every consumer/prosumer demanding, and fixes the amount of electricity produced per hour.
 
 ### Our Design
