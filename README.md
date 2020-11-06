@@ -14,3 +14,4 @@ For optimization of the app, consumers will be in consumer groups (organized in 
 We are going to take real time wind pressure.
 There is going to be only one type of small wind turbine (WT). It can be multiple WT per prosumer.
 In the graph, manager has an energy production, a real time price and a carbon emission.
+The prosumer has to know if he is currently consuming from his battery (so his own energy) or from the market.
