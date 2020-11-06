@@ -1,4 +1,10 @@
 # M7011E_AJ
-Course project in M7011E Dynamic Webbsystems  for Luleå technical university
+1. a
+1. b
+1. c
+* 1
+* 2
+* 3
 
-Hello
+[this is a link](https://github.com/)</br>
+![somestuff](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
