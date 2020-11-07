@@ -8,6 +8,8 @@ Friday 06 November: 1PM - 3,5PM </br>
 * Definition of the project in the readme.md file
 * Begining to think about our design
 
+</br>
+
 Saturday 07 November: 10,5AM - 12AM </br>
 * Reading of https://javascript.info/intro
 * Reading of https://javascript.info/code-editors
@@ -15,6 +17,7 @@ Saturday 07 November: 10,5AM - 12AM </br>
 * Reading of https://javascript.info/devtools
 * Reading of https://javascript.info/first-steps
 
+</br>
 
 ## Total amount of time
 
