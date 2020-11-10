@@ -15,4 +15,5 @@ Tuesday 10 november: 7am - 11am </br>
 * setup node.js
 * project structure
 * simulator diagram general structure
+* workshop with teacher, discussed ideas regarding framework and other server platform related technologies. 
 ---
