@@ -19,6 +19,10 @@ Saturday 07 November: 10,5AM - 12AM </br>
 
 </br>
 
+Tuesday 10 November: 9AM - </br>
+* Mockups of the interface
+* 
+
 ## Total amount of time
 
 2,5 + 1,5 = 4h
