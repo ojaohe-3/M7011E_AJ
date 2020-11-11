@@ -19,10 +19,15 @@ Saturday 07 November: 10,5AM - 12AM </br>
 
 </br>
 
-Tuesday 10 November: 9AM - </br>
+Tuesday 10 November: 9AM - 11AM </br>
 * Mockups of the interface
-* 
+* Workshop
+
+</br>
+
+Wednesday 11 November: 1PM - </br>
+* Mockups of the interface
 
 ## Total amount of time
 
-2,5 + 1,5 = 4h
+2,5 + 1,5 + 2 = 6h
