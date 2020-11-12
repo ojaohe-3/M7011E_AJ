@@ -30,6 +30,11 @@ Wednesday 11 November: 1PM - 3PM </br>
 
 ---
 
+Thursday 12 November: 10AM - 1PM </br>
+* Mockups of the interface
+
+---
+
 ## Total amount of time
 
 2,5 + 1,5 + 2 + 2 = 8h
