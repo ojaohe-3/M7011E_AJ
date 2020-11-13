@@ -35,6 +35,11 @@ Thursday 12 November: 10AM - 1PM </br>
 
 ---
 
+Friday 13 November: 12,5AM - </br>
+* Looking at Visual Studio Community
+* Sprint meeting
+
+
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 = 8h
+2,5 + 1,5 + 2 + 2 + 3h = 11h
