@@ -17,11 +17,13 @@ class Procumer extends Consumer{
         batteries.forEach((e)=>{this.totalCapacity+=e.capacity});
         
     }
+
     tick(speed: number, ratio: number){
         this.sources.forEach((turbine) => this.totalProduction += turbine.profile(speed));
         this.batteries.forEach((b) => {
-            this.b.Input(this.totalProduction*(ratio/this.batteries.length));
-            this.totalCapacity += b.Output(1);//always output 100% power from batteries
+            let tot = this.totalProduction;
+            this.totalProduction -= b.Input(tot*(ratio/this.batteries.length));
+            this.totalProduction += b.Output(1);//always output 100% power from batteries
         });
 
     }
@@ -74,12 +76,14 @@ class Battery{
     }
 
     Output(ratio : number): number{
-        let power = this.maxOutput*ratio ;
-        let actual = power < this.maxOutput ? power : this.maxOutput;
-        this.current -= actual*1.1; //10% inefficency
+        const power = this.maxOutput*ratio ;
+        const actual = power < this.maxOutput ? power : this.maxOutput;
+        const dp = actual - this.current;
+        
+        this.current -= actual;
         if(this.current < 0){
             this.current = 0;
-            return 0;
+            return dp < actual ? dp : 0;
         }
         return actual;
         

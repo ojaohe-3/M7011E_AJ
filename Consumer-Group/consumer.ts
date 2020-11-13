@@ -11,7 +11,7 @@ export class Consumer{
         const lamba =  new NormalDistribution(0,1);
         const profile = size*2.7 + lamba;
         this.consumption = (temp, timefn) => {
-            return profile * (1/(100+temp)+timefn());
+            return profile * (1/(100+temp)+timefn(Date.now()));
         }
     }
 }
