@@ -35,11 +35,11 @@ Thursday 12 November: 10AM - 1PM </br>
 
 ---
 
-Friday 13 November: 12,5AM - </br>
+Friday 13 November: 12,5AM - 2,5PM </br>
 * Reading of https://javascript.info/first-steps
 * Sprint meeting
 
 
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3h = 11h
+2,5 + 1,5 + 2 + 2 + 3 + 2 = 13h
