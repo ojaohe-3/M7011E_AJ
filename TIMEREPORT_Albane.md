@@ -36,7 +36,7 @@ Thursday 12 November: 10AM - 1PM </br>
 ---
 
 Friday 13 November: 12,5AM - </br>
-* Looking at Visual Studio Community
+* Reading of https://javascript.info/first-steps
 * Sprint meeting
 
 
