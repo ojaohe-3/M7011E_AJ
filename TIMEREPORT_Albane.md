@@ -42,7 +42,12 @@ Friday 13 November: 12,5AM - 2,5PM </br>
 ---
 
 Saturday 14 November: 12AM - 3PM </br>
-* Learning Vue.js (https://vuejs.org/v2/guide/)
+</br>
+Learning Vue.js
+* Reading https://vuejs.org/v2/guide/)
+* Reading https://vuejs.org/v2/guide/instance.html
+
+---
 
 ## Total amount of time
 
