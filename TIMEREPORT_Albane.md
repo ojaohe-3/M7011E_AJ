@@ -39,7 +39,11 @@ Friday 13 November: 12,5AM - 2,5PM </br>
 * Reading of https://javascript.info/first-steps
 * Sprint meeting
 
+---
+
+Saturday 14 November: 12AM - 3PM </br>
+* Learning Vue.js (https://vuejs.org/v2/guide/)
 
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3 + 2 = 13h
+2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 = 16h
