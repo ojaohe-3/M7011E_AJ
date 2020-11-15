@@ -49,7 +49,7 @@ Learning Vue.js
 
 ---
 
-Sunday 15 November: 12AM - </br>
+Sunday 15 November: 12AM - 1PM</br>
 </br>
 Learning Vue.js
 * Reading https://vuejs.org/v2/guide/syntax.html
@@ -59,4 +59,4 @@ Learning Vue.js
 
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 = 16h
+2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 = 17h
