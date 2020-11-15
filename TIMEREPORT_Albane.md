@@ -49,6 +49,13 @@ Learning Vue.js
 
 ---
 
+Sunday 15 November: 12AM - </br>
+</br>
+Learning Vue.js
+* Reading https://vuejs.org/v2/guide/instance.html
+
+---
+
 ## Total amount of time
 
 2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 = 16h
