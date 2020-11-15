@@ -52,7 +52,8 @@ Learning Vue.js
 Sunday 15 November: 12AM - </br>
 </br>
 Learning Vue.js
-* Reading https://vuejs.org/v2/guide/instance.html
+* Reading https://vuejs.org/v2/guide/syntax.html
+* Reading https://vuejs.org/v2/guide/computed.html
 
 ---
 
