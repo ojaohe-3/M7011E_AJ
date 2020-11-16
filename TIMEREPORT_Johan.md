@@ -17,3 +17,11 @@ Tuesday 10 november: 7am - 11am </br>
 * simulator diagram general structure
 * workshop with teacher, discussed ideas regarding framework and other server platform related technologies. 
 ---
+
+Wednesday 11 November: 1PM - 3PM </br>
+* Setup typescript
+* Restructuring
+* Wrote the consumer - producer simulation
+* Statless simulation ground work.
+
+---

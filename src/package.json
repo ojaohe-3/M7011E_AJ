@@ -4,7 +4,8 @@
   "description": "School project in distributed dynamic websites",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/ojaohe-3/M7011E_AJ#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "graphql": "^15.4.0",
     "normal-distribution": "0.0.9",
     "uuid": "^8.3.1"
