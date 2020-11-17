@@ -35,11 +35,36 @@ Thursday 12 November: 10AM - 1PM </br>
 
 ---
 
-Friday 13 November: 12,5AM - </br>
-* Looking at Visual Studio Community
+Friday 13 November: 12,5AM - 2,5PM </br>
+* Reading https://javascript.info/first-steps
 * Sprint meeting
 
+---
+
+Saturday 14 November: 12AM - 3PM </br>
+* Reading https://javascript.info/first-steps
+* Reading https://vuejs.org/v2/guide/index.html (Learning Vue.js)
+* Reading https://vuejs.org/v2/guide/instance.html
+
+---
+
+Sunday 15 November: 12AM - 1PM</br>
+</br>
+Learning Vue.js
+* Reading https://vuejs.org/v2/guide/syntax.html
+* Reading https://vuejs.org/v2/guide/computed.html
+
+---
+
+Tuesday 17 November: 11AM - 1PM ; 2PM - </br>
+</br>
+Learning Vue.js
+* Reading https://vuejs.org/v2/guide/class-and-style.html
+* Reading https://vuejs.org/v2/guide/conditional.html
+* Reading https://vuejs.org/v2/guide/list.html
+
+---
 
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3h = 11h
+2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 2 = 19h
