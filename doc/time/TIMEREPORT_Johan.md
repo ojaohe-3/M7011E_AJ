@@ -25,3 +25,7 @@ Wednesday 11 November: 1PM - 3PM </br>
 * Statless simulation ground work.
 
 ---
+Friday 13 November: 1PM - 3PM </br>
+* 
+*
+*
