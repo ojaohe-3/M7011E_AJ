@@ -36,12 +36,13 @@ Thursday 12 November: 10AM - 1PM </br>
 ---
 
 Friday 13 November: 12,5AM - 2,5PM </br>
-* Reading of https://javascript.info/first-steps
+* Reading https://javascript.info/first-steps
 * Sprint meeting
 
 ---
 
 Saturday 14 November: 12AM - 3PM </br>
+* Reading https://javascript.info/first-steps
 </br>
 Learning Vue.js
 * Reading https://vuejs.org/v2/guide/)
@@ -62,6 +63,7 @@ Tuesday 17 November: 11AM - 1PM ; 2PM - </br>
 Learning Vue.js
 * Reading https://vuejs.org/v2/guide/class-and-style.html
 * Reading https://vuejs.org/v2/guide/conditional.html
+* Reading https://vuejs.org/v2/guide/list.html
 
 ---
 
