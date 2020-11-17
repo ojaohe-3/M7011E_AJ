@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import { NormalDistribution } from "normal-distribution";
 import {Consumer} from './consumer';
 uuidv4();
 
