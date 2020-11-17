@@ -18,9 +18,13 @@
   },
   "homepage": "https://github.com/ojaohe-3/M7011E_AJ#readme",
   "dependencies": {
+    "@types/express": "^4.17.9",
     "express": "^4.17.1",
     "graphql": "^15.4.0",
     "normal-distribution": "0.0.9",
     "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "@types/uuid": "^8.3.0"
   }
 }

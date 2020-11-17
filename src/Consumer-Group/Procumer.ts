@@ -4,11 +4,16 @@ import {Consumer} from './consumer';
 uuidv4();
 
 class Procumer extends Consumer{
-    totalProduction : number;
-    totalCapacity: number;
-    sources: Turbine[];
-    batteries: Battery[];
+    totalProduction!: number;
+    totalCapacity!: number;
+    sources!: Turbine[];
+    batteries!: Battery[];
 
+    /**
+     * A smarter consumer, requires input from user
+     * @param turbines 
+     * @param batteries 
+     */
     Procumer(turbines: Turbine[], batteries: Battery[]){
         this.sources = turbines;
         this.batteries = batteries;
@@ -18,11 +23,16 @@ class Procumer extends Consumer{
         
     }
 
+    /**
+     * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
+     * @param speed 
+     * @param ratio 
+     */
     tick(speed: number, ratio: number){
         this.sources.forEach((turbine) => this.totalProduction += turbine.profile(speed));
         this.batteries.forEach((b) => {
             let tot = this.totalProduction;
-            this.totalProduction -= b.Input(tot*(ratio/this.batteries.length));
+            this.totalProduction -= b.Input(tot*(ratio/this.batteries.length)); //distribute input equally among all batteries
             this.totalProduction += b.Output(1);//always output 100% power from batteries
         });
 
@@ -30,10 +40,15 @@ class Procumer extends Consumer{
 }
 
 class Turbine{
-    maxPower: number;//for display only
-    profile: (speed: number) => number;//speed in kph
+    maxPower!: number; 
+    profile!: (speed: number) => number; //speed in kph, outputs current power, does not take into consideration time to spin with change of wind speed
 
+    /**
+     * Windturbine, simulates windturbine with input windspeed (in kph) to kwh
+     * @param maxPower maximum Power possible for the turbine to produce
+     */
     Turbine(maxPower: number){
+        
         this.profile = (speed) => {
             let ratio = 0.0;
             if(speed > 12.6 && speed < 90){
@@ -49,10 +64,13 @@ class Turbine{
     }
 }
 class Battery{
-    capacity: number; // in kwh
-    current: number;
-    maxOutput: number; // maximum output in kwh
-    maxCharge: number; // maximum accepted input to chage in kwh
+    capacity!: number; // in kwh
+ // in kwh
+    current!: number;
+    maxOutput!: number; // maximum output in kwh
+ // maximum output in kwh
+    maxCharge!: number; // maximum accepted input to chage in kwh
+ // maximum accepted input to chage in kwh
     Battery(capacity: number, maxOutput: number, maxCharge: number){
         this.capacity = capacity;
         this.maxOutput = maxOutput;
