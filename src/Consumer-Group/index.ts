@@ -31,7 +31,7 @@ consumers.set(t5.id,t5);
 //todo make a checkout and cach requests
 
 
-//todo api get consumer(s) by query parameters
+//api get consumer(s) by query parameters
 app.get("/api/consumers", (req, res) => {
     let id = req.query.id? req.query.id: "";
     let data: Array<Consumer> = [];
@@ -43,14 +43,14 @@ app.get("/api/consumers", (req, res) => {
 });
 
 app.get("/api/consumers/:id", (req, res) => {
-    let data: Array<Consumer> = [];
+
     consumers.forEach((v, k) => {
-        if(k.includes(req.params.id))
-            data.push(v);
+        if(k === req.params.id)
+            res.json(v);
     });
-    res.json(data);
+    
 });
-//todo api get procumers
+//api get procumers
 app.get("/api/procumers", (req, res)=>{
     let id = req.query.id? req.query.id: "";
     let data: Array<Consumer> = [];
@@ -60,12 +60,18 @@ app.get("/api/procumers", (req, res)=>{
     });
     res.json(data);
 });
-//todo api get procumer
-//todo api get get total production and total consumption with query
+//api get procumer
+app.get("/api/procumers/:id", (req, res) => {
 
-app.get("/", function (req, res) {
-    res.send("Hello World!");
+    consumers.forEach((v, k) => {
+        if(k === req.params.id)
+            res.json(v as Procumer);
+    });
+    
 });
+//api get get total production and total consumption with query
+
+
 
 app.listen(5000, function () {
     console.log("App is listening on port 5000!");
