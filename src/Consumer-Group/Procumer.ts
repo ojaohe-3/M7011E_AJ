@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {Consumer} from './consumer';
 uuidv4();
 
-class Procumer extends Consumer{
+export class Procumer extends Consumer{
     totalProduction!: number;
     totalCapacity!: number;
     sources!: Turbine[];
@@ -13,12 +13,14 @@ class Procumer extends Consumer{
      * @param turbines 
      * @param batteries 
      */
-    Procumer(turbines: Turbine[], batteries: Battery[]){
+    constructor(id: String, timefn : (time: Date) => number, turbines: Turbine[], batteries: Battery[]){
+        super(id, timefn);
         this.sources = turbines;
         this.batteries = batteries;
         this.totalProduction = 0;
         this.totalCapacity = 0;
         batteries.forEach((e)=>{this.totalCapacity+=e.capacity});
+        
         
     }
 
@@ -38,7 +40,7 @@ class Procumer extends Consumer{
     }
 }
 
-class Turbine{
+export class Turbine{
     maxPower!: number; 
     profile!: (speed: number) => number; //speed in kph, outputs current power, does not take into consideration time to spin with change of wind speed
 
@@ -46,7 +48,7 @@ class Turbine{
      * Windturbine, simulates windturbine with input windspeed (in kph) to kwh
      * @param maxPower maximum Power possible for the turbine to produce
      */
-    Turbine(maxPower: number){
+    constructor(maxPower: number){
         
         this.profile = (speed) => {
             let ratio = 0.0;
@@ -62,15 +64,13 @@ class Turbine{
         this.maxPower = maxPower;
     }
 }
-class Battery{
+export class Battery{
     capacity!: number; // in kwh
- // in kwh
-    current!: number;
+    current!: number; // current power in batteries 
     maxOutput!: number; // maximum output in kwh
- // maximum output in kwh
     maxCharge!: number; // maximum accepted input to chage in kwh
- // maximum accepted input to chage in kwh
-    Battery(capacity: number, maxOutput: number, maxCharge: number){
+
+    constructor(capacity: number, maxOutput: number, maxCharge: number){
         this.capacity = capacity;
         this.maxOutput = maxOutput;
         this.maxCharge = maxCharge;
