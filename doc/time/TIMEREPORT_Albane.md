@@ -62,6 +62,8 @@ Learning Vue.js
 * Reading https://vuejs.org/v2/guide/class-and-style.html
 * Reading https://vuejs.org/v2/guide/conditional.html
 * Reading https://vuejs.org/v2/guide/list.html
+* Set up git repository on local
+* Create branches
 
 ---
 
