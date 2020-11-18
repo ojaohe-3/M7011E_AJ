@@ -26,6 +26,13 @@ Wednesday 11 November: 1PM - 3PM </br>
 
 ---
 Friday 13 November: 1PM - 3PM </br>
-* 
-*
-*
+* Simulator Syntax 
+* API setup
+* Re-engineering database
+
+---
+Friday 16 November: 2PM - 6PM </br>
+* Simulator Syntax 
+* API setup
+* Group Discution
+
