@@ -67,9 +67,9 @@ Learning Vue.js
 
 ---
 
-Wednesday 18 November: 11,5AM - </br>
+Wednesday 18 November: 11,5AM - 5PM</br>
 * Implementing loggin interface
 
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 = 21h30
+2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 = 27h
