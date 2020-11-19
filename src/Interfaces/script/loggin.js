@@ -10,7 +10,7 @@ const loggin = new Vue ({
     },
     methods: {
         valuesIntoJson: function(username, password){
-            tghis.myJson = {
+            this.myJson = {
                 "username": username,
                 "password": saltedSha256(password)
             }

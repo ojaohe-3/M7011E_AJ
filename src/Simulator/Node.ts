@@ -5,16 +5,26 @@ export interface Position{
 
 export class Node{
 
-    id : String;
-    pos : Position;
-    nodes: Map<String, Node>;
-    value : any;
+    id! : String;
+    pos! : Position;
+    connections!: Map<String, Edge>;
 
-    Node(value){
-        this.value = value;
+    constructor(){
     }
     
     addNode(n : Node){
-        this.nodes.set(n.id, n);
+        this.connections.set(n.id, new Edge(this, n)); 
+
+    }
+}
+
+class Edge{
+    id!: String;
+    disc!: String;
+    start!: Node;
+    end!: Node;
+    constructor(start: Node, end: Node){
+        this.start = start;
+        this.end = end;
     }
 }
