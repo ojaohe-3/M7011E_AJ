@@ -1,5 +1,12 @@
+/* general style */
+
 body {
     background-color: #34495e;
+}
+
+h3 {
+    font-size: 28px;    
+    font-family: 'Dosis', sans-serif;
 }
 
 /* header part*/
@@ -38,66 +45,4 @@ header {
     position: absolute;
     top: 160px;
     left: 17.5%;
-}
-
-
-
-
-/*loggin block*/
-
-#loggin {
-    display: block;
-    width: 25%;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: #ecf0f1;
-    color: #34495e;
-    padding: 25px;
-    padding-top: 10px;
-}
-
-#loggin h3 {
-    font-size: 28px;    
-    font-family: 'Dosis', sans-serif;
-}
-
-#loggin input {
-    width: 96%;
-    color: #34495e;
-    font-size: 20px;
-    height: 35px;
-    border-color: #34495e;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-#loggin button {
-    margin: 30px;
-    padding: 10px;
-    width: 30%;
-    position: relative;
-    left: 23%;
-    font-size: 28px;
-    color: #34495e;
-    font-family: 'Dosis', sans-serif;
-}
-
-#loggin .yellowLine {
-    width: 8px;
-    height: 450px;
-    background-color: #f1c40f;
-    position: absolute;
-    top: 215px;
-    left: 550px;
-    border-radius: 25px;
-}
-
-#loggin .blueLine {
-    width: 470px;
-    height: 8px;
-    background-color: #3498db;
-    position: absolute;
-    top: 645px;
-    left: 530px;
-    border-radius: 25px;
 }
