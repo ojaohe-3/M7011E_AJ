@@ -70,6 +70,13 @@ Learning Vue.js
 Wednesday 18 November: 11,5AM - 5PM</br>
 * Implementing loggin interface
 
+---
+
+Tuesday 19 November: 1PM - 3PM </br>
+* Working on the design
+* Trying to fix loggin interface
+* Starting implementing simulator interface
+
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 = 27h
+2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 + 2 = 29h
