@@ -3,10 +3,10 @@ import {Consumer} from './consumer';
 uuidv4();
 
 export class Procumer extends Consumer{
-    totalProduction!: number;
-    totalCapacity!: number;
-    sources!: Turbine[];
-    batteries!: Battery[];
+    totalProduction: number;
+    totalCapacity: number;
+    sources: Turbine[];
+    batteries: Battery[];
 
     /**
      * A smarter consumer, requires input from user
@@ -20,10 +20,7 @@ export class Procumer extends Consumer{
         this.totalProduction = 0;
         this.totalCapacity = 0;
         batteries.forEach((e)=>{this.totalCapacity+=e.capacity});
-        
-        
     }
-
     /**
      * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
      * @param speed 
@@ -41,8 +38,8 @@ export class Procumer extends Consumer{
 }
 
 export class Turbine{
-    maxPower!: number; 
-    profile!: (speed: number) => number; //speed in kph, outputs current power, does not take into consideration time to spin with change of wind speed
+    maxPower: number; 
+    profile: (speed: number) => number; //speed in kph, outputs current power, does not take into consideration time to spin with change of wind speed
 
     /**
      * Windturbine, simulates windturbine with input windspeed (in kph) to kwh
@@ -65,10 +62,10 @@ export class Turbine{
     }
 }
 export class Battery{
-    capacity!: number; // in kwh
-    current!: number; // current power in batteries 
-    maxOutput!: number; // maximum output in kwh
-    maxCharge!: number; // maximum accepted input to chage in kwh
+    capacity: number; // in kwh
+    current: number; // current power in batteries 
+    maxOutput: number; // maximum output in kwh
+    maxCharge: number; // maximum accepted input to chage in kwh
 
     constructor(capacity: number, maxOutput: number, maxCharge: number){
         this.capacity = capacity;

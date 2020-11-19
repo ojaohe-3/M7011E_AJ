@@ -1,8 +1,7 @@
-
 export class Consumer{
-    id!: String;
-    timefn!: (time: Date) => number;
-    consumption!: (temp: number) => number;
+    id: String;
+    timefn: (time: Date) => number;
+    consumption: (temp: number) => number;
 
     constructor(id : String, timefn : (time: Date) => number){
         this.id = id;
