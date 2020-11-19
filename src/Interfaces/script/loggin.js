@@ -1,4 +1,7 @@
-var loggin = new Vue ({
+import Vue from 'vue';
+const saltedSha256 = require('salted-sha256');
+
+const loggin = new Vue ({
     el: '#loggin',
     data: {
         username: '',
