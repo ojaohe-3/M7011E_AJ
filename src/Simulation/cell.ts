@@ -1,10 +1,7 @@
 import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
-export interface Position{
-    lat : number;
-    lon : number;
-}
+
 export class Cell{
     id: String;
     name: String;

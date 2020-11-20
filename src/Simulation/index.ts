@@ -70,13 +70,25 @@ app.get("/api/managers", (req, res) => {//todo fetch from producer source
 });
 
 //api get get total production and total consumption todo with query
-app.get("api/totalProduction", (req, res)=>{
-    let data = await simulation.getTotalDemand(temp);
-    res.json({data:});
+app.get("api/totalProduction", async (req, res)=>{
+    try {
+        const data = await simulation.getTotalSupply();
+        res.json({data:data});
+        
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({message:"could not evaluate", err: error});
+    }
 });
 
-app.get("api/totalConsumption", (req, res)=>{
-    res.json({data: getTotalConsumption()});
+app.get("api/totalConsumption", async (req, res)=>{
+    try {
+        const data = await simulation.getTotalDemand(temp);
+        res.json({data: data});
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({message:"could not evaluate", err: error});
+    }
 });
 
 //todo api
@@ -88,11 +100,20 @@ app.post("api/consumers",(req,res) =>{
 
     //look if all enforced key exists
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        consumers.set(data.id, new Consumer(data.id, data.timefn));
-        //todo put in db
-        res.json({msg: "memeber added!", data: data});
+        if(data.timefn.length !== 24){
+            res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, diviation)"});  
+        }
+        else{   
+            const timefn = (time : Date) => {
+                const dt = data.timefn[time.getHours()];
+                return Math.random()*dt[0]+Math.random()*dt[1]/2 - Math.random()*dt[1]/2 + (dt[0]-dt[1])^2/2;
+            };
+            simulation.consumers.set(data.id, new Consumer(data.id, timefn));
+            //todo put in db
+            res.json({message: "memeber added!", data: data});
+        }
     }else
-        res.status(400).json({msg:"Invalid format", required: format});  
+        res.status(400).json({message:"Invalid format", required: format});  
 });
 
 
@@ -102,7 +123,7 @@ app.post("api/manager",(req,res) =>{
 
     //look if all enforced key exists
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        consumers.set(data.id, new Consumer(data.id, data.timefn));
+        simulation.consumers.set(data.id, new Consumer(data.id, data.timefn));
         //todo put in db
         res.json({msg: "memeber added!", data: data});
     }else
@@ -110,14 +131,25 @@ app.post("api/manager",(req,res) =>{
 });
 
 app.post("api/procumer",(req,res) =>{
-    const format = ["id","timefn","production","capacity","current","dest"] //enforced members
+    const format = ["id","timefn","production","capacity","current","dest", "status"] //enforced members
     const data= req.body;
 
     //look if all enforced key exists
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        consumers.set(data.id, new Procumer(data.id, data.timefn,data.production, data.capacity,data.current, data.dest));
-        //todo put in db
-        res.json({msg: "memeber added!", data: data});
+        if(data.timefn.length !== 24){
+            res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, diviation)"});  
+        }
+        else{   
+            const timefn = (time : Date) : number => {
+                const dt = data.timefn[time.getHours()];
+                return Math.random()*dt[0]+Math.random()*dt[1]/2 - Math.random()*dt[1]/2 + (dt[0]-dt[1])^2/2; 
+            };
+
+            simulation.consumers.set(data.id, new Consumer(data.id, timefn));
+            simulation.proumers.set(data.id, new Procumer(data.id, data.production, data.capacity,data.current, data.status, data.dest));
+            //todo put in db
+            res.json({msg: "memeber added!", data: data});
+        }
     }else
         res.status(400).json({msg:"Invalid format", required: format});  
 });
