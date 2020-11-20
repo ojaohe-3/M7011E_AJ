@@ -2,36 +2,41 @@ import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
 export interface Position{
-    x : number;
-    y : number;
+    lat : number;
+    lon : number;
 }
 export class Cell{
     id: String;
     name: String;
     // display_data: String; //placeholder
-    consumers: Map<String, Consumer>;
-    procumers: Map<String, Procumer>;
-    managers: Map<String, Manager>;
-    pos! : Position;
+    destination: String;
+    pos : Position;
 
-    constructor(id: String, name: String){
-        this.consumers = new Map<String, Consumer>();
-        this.procumers = new Map<String, Procumer>();
+    
+
+    constructor(id: String, name: String, position: Position, dest: String){
         this.name = name;
         this.id = id;   
+        this.pos = position;
+        this.destination = dest;
+
     }
 
-    getSupply(): number{
-        let acc : number = 0;
-        this.procumers.forEach(v => acc += v.totalProduction);
-        this.managers.forEach(v => v.production);
-        return acc;
+
+
+    async getSupply(): Promise<number>{
+        const req  = await fetch(this.destination +"/api/totalProduction");
+        const data  = await req.json();
+        if(Object.keys(data).some(v => "data"))
+            return data.data;
+        return 0;
     }
-    getDemand(temp: number): number{
-        let acc : number = 0;
-        this.procumers.forEach(v => acc += v.consumption(temp));
-        this.consumers.forEach(v => v.consumption(temp));
-        return acc;
+    async getDemand(): Promise<number>{
+        const req  = await fetch(this.destination +"/api/totalConsumption");
+        const data  = await req.json();
+        if(Object.keys(data).some(v => "data"))
+            return data.data;
+        return 0;
+        
     }
-    
 }

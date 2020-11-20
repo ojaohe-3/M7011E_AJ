@@ -10,8 +10,8 @@ export class Turbine{
         
         this.profile = (speed) => {
             let ratio = 0.0;
-            if(speed > 12.6 && speed < 90){
-                if(speed >= 36 && speed <= 54){
+            if(speed > 6.6 && speed < 50){
+                if(speed >= 36){
                     ratio = 1.0;
                 }else{
                     ratio = 0.028*speed;
