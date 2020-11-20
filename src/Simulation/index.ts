@@ -72,14 +72,23 @@ app.get("/api/procumers/:id", (req, res) => {
 //api get get total production and total consumption with query
 
 
+//todo api
+//todo post req add, consumer, manager and procumer
+//todo post 
+
 
 app.listen(5000, function () {
     console.log("App is listening on port 5000!");
 });
 
+
+//todo fetch simulation data from managers
+//todo fetch siumlation data from procumers
+
 //todo publish change to database async
 //todo async get weather module data and simulate tick.
 
+//keep profiles updates
 
 function getTotalConsumption() : number{
     let acc = 0;

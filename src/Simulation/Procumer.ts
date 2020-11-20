@@ -36,7 +36,7 @@ export class Procumer extends Consumer{
 
     }
 }
-
+//turbines and batteries might be moved to a diffrent module
 export class Turbine{
     maxPower: number; 
     profile: (speed: number) => number; //speed in kph, outputs current power, does not take into consideration time to spin with change of wind speed
