@@ -1,7 +1,10 @@
 import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
-
+export interface Position{
+    x : number;
+    y : number;
+}
 export class Cell{
     id: String;
     name: String;
@@ -9,6 +12,7 @@ export class Cell{
     consumers: Map<String, Consumer>;
     procumers: Map<String, Procumer>;
     managers: Map<String, Manager>;
+    pos! : Position;
 
     constructor(id: String, name: String){
         this.consumers = new Map<String, Consumer>();

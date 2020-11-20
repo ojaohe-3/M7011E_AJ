@@ -1,0 +1,48 @@
+/* general style */
+
+body {
+    background-color: #34495e;
+}
+
+h3 {
+    font-size: 28px;    
+    font-family: 'Dosis', sans-serif;
+}
+
+/* header part*/
+
+header {
+    color: #ecf0f1;
+    display: block;
+    width: 100%;
+    margin-bottom:  80px;
+    text-align: center;
+    font-size: 38px;
+    font-weight: bold;
+    font-family: 'Dosis', sans-serif;
+}
+
+#logo {
+    height: 130px;
+    position: absolute;
+    left: 100px;
+    top: 30px;
+}
+
+#exit {
+    height: 50px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.headerLine {
+    display: block;
+    background-color: #ecf0f1;
+    height: 10px;
+    width: 65%;
+    border-radius: 25px;
+    position: absolute;
+    top: 160px;
+    left: 17.5%;
+}
