@@ -48,7 +48,7 @@ Thursday 19 1PM-6PM
 * Group meeting
 
 ---
-Friday 20 6AM-6PM
+Friday 20 6AM-2PM
 * finallizing simulation api and simulation modules designed
 * procumer simulation and api
 * Weather module
