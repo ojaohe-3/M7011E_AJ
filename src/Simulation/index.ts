@@ -5,6 +5,7 @@ import { Manager } from "./manager";
 import { Procumer } from "./procumer";
 import { Simulator } from "./simulation";
 
+//todo create modules to clean this file
 const app: express.Application = express();
 app.use(express.json());
 
@@ -141,7 +142,7 @@ app.post("api/procumer",(req,res) =>{
         }
         else{   
             const timefn = () : number => {
-                const dt = data.timefn[(new Date())..getHours()];
+                const dt = data.timefn[(new Date()).getHours()];
                 return Math.random()*dt[0]+Math.random()*dt[1]/2 - Math.random()*dt[1]/2 + (dt[0]-dt[1])^2/2; 
             };
 
