@@ -47,7 +47,8 @@ Thursday 19 1PM-6PM
 * Vue setup
 * Group meeting
 
-friday 19 6AM-6PM
+---
+Friday 20 6AM-6PM
 * finallizing simulation api and simulation modules designed
 * procumer simulation and api
 * Weather module
