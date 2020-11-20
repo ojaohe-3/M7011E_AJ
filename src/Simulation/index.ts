@@ -104,8 +104,8 @@ app.post("api/consumers",(req,res) =>{
             res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, diviation)"});  
         }
         else{   
-            const timefn = (time : Date) => {
-                const dt = data.timefn[time.getHours()];
+            const timefn = () => {
+                const dt = data.timefn[(new Date()).getHours()];
                 return Math.random()*dt[0]+Math.random()*dt[1]/2 - Math.random()*dt[1]/2 + (dt[0]-dt[1])^2/2;
             };
             simulation.consumers.set(data.id, new Consumer(data.id, timefn));
@@ -140,8 +140,8 @@ app.post("api/procumer",(req,res) =>{
             res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, diviation)"});  
         }
         else{   
-            const timefn = (time : Date) : number => {
-                const dt = data.timefn[time.getHours()];
+            const timefn = () : number => {
+                const dt = data.timefn[(new Date())..getHours()];
                 return Math.random()*dt[0]+Math.random()*dt[1]/2 - Math.random()*dt[1]/2 + (dt[0]-dt[1])^2/2; 
             };
 

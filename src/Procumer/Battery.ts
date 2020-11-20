@@ -10,7 +10,10 @@ export class Battery{
         this.maxCharge = maxCharge;
         this.current = 0;
     }
-
+    /**
+     * convert input power, and return the actual that was used up
+     * @param power input
+     */
     Input(power: number): number{
         const p = power < this.maxCharge ? power : this.maxCharge;
         this.current += p;
@@ -25,7 +28,10 @@ export class Battery{
             return dp;
         }
     }
-
+    /**
+     * output, up until maximum output
+     * @param ratio output ratio
+     */
     Output(ratio : number): number{
         const power = this.maxOutput*ratio ;
         const actual = power < this.maxOutput ? power : this.maxOutput;
