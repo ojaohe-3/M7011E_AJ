@@ -81,7 +81,8 @@ Thursday 19 November: 1PM - 3PM ; 4PM - 5PM </br>
 ---
 
 Monday 23 November: 10AM - </br>
-* Implementing loggin interface
+* Making loggin interface responsive
+* Implementing simulator interface
 
 ## Total amount of time
 
