@@ -72,11 +72,16 @@ Wednesday 18 November: 11,5AM - 5PM</br>
 
 ---
 
-Tuesday 19 November: 1PM - 3PM ; 4PM - 5PM </br>
+Thursday 19 November: 1PM - 3PM ; 4PM - 5PM </br>
 * Working on the design
 * Trying to fix loggin interface
 * Starting implementing simulator interface
 * Learning Vue.js
+
+---
+
+Monday 23 November: 10AM - </br>
+* Implementing loggin interface
 
 ## Total amount of time
 
