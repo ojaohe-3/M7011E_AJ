@@ -8,6 +8,7 @@
     "test_cons": "jest consumer_test",
     "test_mang": "jest manager_test",
     "test_grid": "jest grid_test",
+    "test_procumer": "jest procumer_test",
     "tsc": "tsc",
     "dev_all": "npm run dev_cons ",
     "dev_cons": "npx tsc -w | nodemon ./build/src/Consumer-Group/index.js ",
