@@ -15,7 +15,7 @@ header {
     color: #ecf0f1;
     display: block;
     width: 100%;
-    margin-bottom:  80px;
+    margin-bottom: 50px;
     text-align: center;
     font-size: 38px;
     font-weight: bold;
@@ -24,9 +24,17 @@ header {
 
 #logo {
     height: 130px;
-    position: absolute;
-    left: 100px;
+    /*display: inline-block;*/
+    float: left;
+    position: relative;
     top: 30px;
+    left: 30px;
+}
+
+header h1 {
+    display: inline-block;
+    position: relative;
+    right: 60px;
 }
 
 #exit {
@@ -34,6 +42,7 @@ header {
     position: absolute;
     right: 20px;
     top: 20px;
+    display: inline-block;
 }
 
 .headerLine {
@@ -43,6 +52,37 @@ header {
     width: 65%;
     border-radius: 25px;
     position: absolute;
-    top: 160px;
+    /*top: 160px;*/
     left: 17.5%;
+}
+
+@media screen and (max-width: 1150px) {
+    header {
+        font-size: 30px;
+    }
+
+    #logo {
+        height: 100px;
+    }
+
+    #exit {
+        height: 40px;
+    }
+}
+@media screen and (max-width: 950px) {
+    header {
+        font-size: 28px;
+    }
+
+    header h1 {
+        margin-left: 100px;
+    }
+
+    #logo {
+        height: 80px;
+    }
+
+    #exit {
+        height: 30px;
+    }
 }

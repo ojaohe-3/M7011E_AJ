@@ -17,17 +17,46 @@
 <body>
     <header>
         <img src="../image/logo.png" alt="logo" id="logo">
-        <h1>Green Lean Electric, loggin</h1>
-        <!--<img src="../image/exit.png" alt="exit" id="exit">-->   <!--We don't need this, because it's web and not mobile app-->
+        <h1>Green Lean Electric, simulator</h1>
+        <img src="../image/exit.png" alt="exit" id="exit">
         <div class="headerLine"></div>
     </header>
 
     <div id="simulator">
         <h3>Electricity grid</h3>
-        <div><img src="../image/lightBlueDot.png" alt="lightBlueDot" class="colorDot"> Consumer</div>
-        <div><img src="../image/yellowDot.png" alt="yellowDot" class="colorDot"> Manager</div>
-        <div><img src="../image/darkBlueDot.png" alt="darkBlueDot" class="colorDot"> Prosumer</div>
+        <div id="legend">
+            <div class="legendBlock"><img src="../image/lightBlueDot.png" alt="lightBlueDot" class="colorDot"> Consumer</div>
+            <div class="legendBlock"><img src="../image/yellowDot.png" alt="yellowDot" class="colorDot"> Manager</div>
+            <div class="legendBlock"><img src="../image/darkBlueDot.png" alt="darkBlueDot" class="colorDot"> Prosumer</div>
+        </div>
+        <div>
+            <img src="../image/simulatorMap.png" id="simulatorMap" width="950" height="499" usemap="#simulatorMap">
+            <map name="simulatorMap">
+                <area shape="circle" coords="50, 150, 35, 35" href="./loggin.html" class="consumer">
+                <area shape="circle" coords="140, 395, 35, 35" href="./loggin.html" class="prosumer">
+                <area shape="circle" coords="260, 240, 35, 35" href="./loggin.html" class="prosumer">
+                <area shape="circle" coords="377, 85, 35, 35" href="./loggin.html" class="consumer">
+                <area shape="circle" coords="425, 330, 35, 35" href="./loggin.html" class="consumer">
+                <area shape="circle" coords="620, 205, 35, 35" href="./loggin.html" class="prosumer">
+                <area shape="circle" coords="690, 55, 35, 35" href="./loggin.html" class="prosumer">
+                <area shape="circle" coords="720, 395, 35, 35" href="./loggin.html" class="manager">
+                <area shape="circle" coords="895, 120, 35, 35" href="./loggin.html" class="consumer">
+                <area shape="circle" coords="900, 280, 35, 35" href="./loggin.html" class="consumer">
+            </map>
+        </div>
     </div>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="jquery.rwdImageMaps.min.js"></script>
+    <script>
+    $(document).ready(function(e) {
+	    $('img[usemap]').rwdImageMaps();
+	
+	    $('area').on('click', function() {
+		    alert($(this).attr('alt') + ' clicked');
+	    });
+    });
+    </script>
 </body>
 
 </html>

@@ -10,8 +10,26 @@
     padding: 15px;
 }
 
+#legend {
+    float: left;
+}
+
 .colorDot {
     height: 30px;
     position: relative;
     top: 10px;
+}
+
+#simulatorMap {
+    width: 80%;
+}
+
+@media screen and (max-width: 800px) {
+    #simulatorMap {
+        width: 95%;
+    }
+
+    .legendBlock {
+        display: inline;
+    }
 }
