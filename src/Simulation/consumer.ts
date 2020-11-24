@@ -11,9 +11,10 @@ export class Consumer{
         const rd = Math.random();
         const size = r*4- r*2+ rd*2 + 2; //pseudo normal distro random
         const lamba =  r- r/2+ rd/2;
-        const profile = size*2.7 + lamba;
+        const profile = size*.027 + lamba*0.2;
         this.consumption = (temp) => {
-            return profile * ((273-temp)^2)+timefn();
+            console.log(profile * (0.00001*(273-temp)^2)+timefn());
+            return profile * (0.00001*(273-temp)^2)+timefn();
         }
     }
 }
