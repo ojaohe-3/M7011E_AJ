@@ -26,6 +26,31 @@ Wednesday 11 November: 1PM - 3PM </br>
 
 ---
 Friday 13 November: 1PM - 3PM </br>
-* 
-*
-*
+* Simulator Syntax 
+* API setup
+* Re-engineering database
+
+---
+Friday 16 November: 2PM - 6PM </br>
+* Simulator Syntax 
+* API setup
+* Group Discution
+
+---
+Wednesday 18 4PM-6PM
+* finallizing simulation
+* Vue setup
+---
+Thursday 19 1PM-6PM
+* finallizing simulation api
+* procumer simulation
+* Vue setup
+* Group meeting
+
+---
+Friday 20 6AM-2PM
+* finallizing simulation api and simulation modules designed
+* procumer simulation and api
+* Weather module
+* Weather api
+* mucking again with dust. Trying to set up db and docker services.
