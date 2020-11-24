@@ -22,6 +22,7 @@
 
 #simulatorMap {
     width: 80%;
+    height: auto;
 }
 
 @media screen and (max-width: 800px) {
