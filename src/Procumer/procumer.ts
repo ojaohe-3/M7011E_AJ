@@ -8,21 +8,26 @@ export class Procumer{
     batteries: Array<Battery>;
     turbines: Array<Turbine>;
 
+    input_ratio: number
+    output_ratio: number;
+
     constructor(batteries: Array<Battery>, turbines: Array<Turbine>){
         this.totalProduction = 0;
         this.totalCapacity = 0;
+        this.input_ratio = 0.5;
+        this.output_ratio = 0.5;
     }
      /**
      * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
      * @param speed 
      * @param ratio 
      */
-    tick(speed: number, in_ratio: number, out_ratio: number){
+    tick(speed: number){
         this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(speed));
         this.batteries.forEach((b) => {
             let tot = this.totalProduction;
-            this.totalProduction -= b.Input(tot*(in_ratio/this.batteries.length)); //distribute input equally among all batteries
-            this.totalProduction += b.Output(out_ratio);
+            this.totalProduction -= b.Input(tot*(this.input_ratio/this.batteries.length)); //distribute input equally among all batteries
+            this.totalProduction += b.Output(this.output_ratio);
         });
     }
 }

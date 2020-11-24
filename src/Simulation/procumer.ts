@@ -1,4 +1,3 @@
-import {Consumer} from './consumer';
 
 export class Procumer{
     totalProduction: number;
