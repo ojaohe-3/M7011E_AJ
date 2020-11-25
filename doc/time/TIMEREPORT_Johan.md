@@ -61,3 +61,8 @@ Tuesday 24 12AM-8PM
 * Manager API (Has to be redone due to errors)
 * Manager Simulation
 * Oppend an ngnx server for api hosting.
+
+---
+
+Total:
+2.5 + 4 + 2 + 2 + 4 + 2 + 5 + 8 + 8 = 37h30 (till tuesday 24)
