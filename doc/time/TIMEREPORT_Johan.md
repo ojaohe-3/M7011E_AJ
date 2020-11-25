@@ -54,3 +54,18 @@ Friday 20 6AM-2PM
 * Weather module
 * Weather api
 * mucking again with dust. Trying to set up db and docker services.
+<<<<<<< HEAD
+=======
+---
+Tuesday 24 12AM-8PM
+* fixed database
+* tested and finished procumer and consumer simulation
+* Manager API (Has to be redone due to errors)
+* Manager Simulation
+* Oppend an ngnx server for api hosting.
+
+---
+
+Total:
+2.5 + 4 + 2 + 2 + 4 + 2 + 5 + 8 + 8 = 37h30 (till tuesday 24)
+>>>>>>> 847b3ca983c314d8df9224b5184d5d6c89455e24
