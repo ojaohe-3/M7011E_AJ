@@ -1,4 +1,8 @@
 node_modules
+<<<<<<< HEAD
 .vs
 build
 .prettierrc
+=======
+.vs
+>>>>>>> 6754e0c (ignore .vs)

@@ -11,6 +11,7 @@ export class Simulator{
     proumers: Map<String, Procumer>;
     managers: Map<String, Manager>;
     weather: Weather;
+    
     Simulator(pos: Position){
         this.connected = new Map<String, Cell>();
         this.consumers = new Map<String, Consumer>();
