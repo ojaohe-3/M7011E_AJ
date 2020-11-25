@@ -1,20 +1,19 @@
-import { Consumer } from "./consumer";
-import { Manager } from "./manager";
-import { Procumer } from "./procumer";
+import { Consumer } from "../Simulation/consumer";
+import { Manager } from "../Simulation/manager";
+import { Procumer } from "../Simulation/procumer";
 
 export class Cell{
     id: String;
     name: String;
-    // display_data: String; //placeholder
     destination: String;
-    pos : Position;
-
+    consumers: Map<String, Consumer>;
+    proumers: Map<String, Procumer>;
+    managers: Map<String, Manager>;
     
 
-    constructor(id: String, name: String, position: Position, dest: String){
+    constructor(id: String, name: String, dest: String){
         this.name = name;
         this.id = id;   
-        this.pos = position;
         this.destination = dest;
 
     }
