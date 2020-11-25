@@ -82,21 +82,19 @@ Thursday 19 November: 1PM - 3PM ; 4PM - 5PM </br>
 
 Monday 23 November: 10AM - 12AM ; 1PM - 6PM </br>
 * Making loggin interface responsive
-<<<<<<< HEAD
 * Implementing simulator interface
-=======
 * Implementation of the simulator interface
 * Implementation of an interactive map in the simulator interface
 
 ---
 
-Wednesday 25 November: 10AM - </br>
+Wednesday 25 November: 10AM - 2PM </br>
 * Implementation of the consumer interface
 * Implementation of the prosumer interface
+* Implementation of the manager interface
 
 ---
->>>>>>> 847b3ca983c314d8df9224b5184d5d6c89455e24
 
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 + 3 + 7= 37h
+2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 + 3 + 7 + 4 = 41h
