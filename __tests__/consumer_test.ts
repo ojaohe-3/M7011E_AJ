@@ -31,3 +31,6 @@ test("consumption_test", () => {
     console.log(min);
 
 });
+
+test("consumer_api_test",()=>{
+});
