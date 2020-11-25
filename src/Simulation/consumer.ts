@@ -1,19 +1,19 @@
 
 export class Consumer{
-    id!: String;
-    timefn!: (time: Date) => number;
-    consumption!: (temp: number) => number;
+    id: String;
+    timefn: () => number;
+    consumption: (temp: number) => number;
 
-    constructor(id : String, timefn : (time: Date) => number){
+    constructor(id : String, timefn : () => number){
         this.id = id;
         this.timefn = timefn;
-        const size = Math.random()*4 + 1;
-        const lamba =  Math.random();
+        const r = Math.random();
+        const rd = Math.random();
+        const size = r*4- r*2+ rd*2 + 2; //pseudo normal distro random
+        const lamba =  r- r/2+ rd/2;
         const profile = size*2.7 + lamba;
-        let date = new Date();
-        date.setDate(Date.now());
         this.consumption = (temp) => {
-            return profile * (1/(100+temp)+timefn(date));
+            return profile * ((273-temp)^2)+timefn();
         }
     }
 }
