@@ -9,6 +9,11 @@ h3 {
     font-family: 'Dosis', sans-serif;
 }
 
+h4 {
+    font-size: 24px;    
+    font-family: 'Dosis', sans-serif;
+}
+
 /* header part*/
 
 header {
@@ -24,7 +29,6 @@ header {
 
 #logo {
     height: 130px;
-    /*display: inline-block;*/
     float: left;
     position: relative;
     top: 30px;
@@ -34,7 +38,6 @@ header {
 header h1 {
     display: inline-block;
     position: relative;
-    right: 60px;
 }
 
 #exit {
@@ -52,8 +55,7 @@ header h1 {
     width: 65%;
     border-radius: 25px;
     position: absolute;
-    /*top: 160px;*/
-    left: 17.5%;
+    left: 23%;
 }
 
 @media screen and (max-width: 1150px) {
@@ -69,6 +71,7 @@ header h1 {
         height: 40px;
     }
 }
+
 @media screen and (max-width: 950px) {
     header {
         font-size: 28px;

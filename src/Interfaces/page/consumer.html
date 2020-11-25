@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Green lean electric - consumer</title>
+    <meta charset="utf-8">
+    <link rel="icon" href="../image/build.png">
+    <link href="../style/style.css" rel="stylesheet" type="text/css">
+    <link href="../style/consumer.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="../script/consumer.js"></script>
+    <!--links for the title font-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@743&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <img src="../image/logo.png" alt="logo" id="logo">
+        <h1>Green Lean Electric, consumer</h1>
+        <img src="../image/exit.png" alt="exit" id="exit">
+        <div class="headerLine"></div>
+    </header>
+
+    <table id="consumer">
+        <tr>
+            <td v-bind="consumption">
+                <h3>My Consumption</h3>
+                <h4>{{ consumption }} kw/h</h4>
+            </td>
+            <td v-bind="elecPrice">
+                <h3>Price of Electricity</h3>
+                <h4>{{ elecPrice }} kr/kw</h4>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
