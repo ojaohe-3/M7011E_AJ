@@ -2,12 +2,17 @@
 import express = require("express");
 
 import uuid = require("uuid");
-import { Cell } from "./cell";
+import { Procumer } from "../Simulation/procumer";
+import { Consumer } from "../Simulation/consumer";
+import { Cell, Stats } from "./cell";
 
 
 const app = express();
 const cells = new Map<String, Cell>();
 const id = process.env.ID || uuid.v4();
+let price = (supply, demand)=>{
+    return 0.0001*(demand-supply)/2+0.15;
+};
 
 
 app.get('/api/members/',(req, res)=>{
@@ -30,7 +35,25 @@ app.post('/api/member/', (req, res)=>{
     }else
         res.status(400).json({message: "invalid format!", format:format});
 });
+
+app.get('/api/price',async (req, res)=>{
+    const stats = await totalStats();//handle errors
+    res.json(stats);
+});
+
 let PORT =  process.env.PORT || 5000;
 app.listen(PORT, function () {
-    console.log("App is listening on port ${PORT}");
+    console.log(`App is listening on port ${PORT}`);
 });
+
+
+async function totalStats() : Promise<Stats>{
+    const data = Array.from(cells.values());
+    let acc: Stats;
+    await Promise.all(data.map(async c => {
+        const body = await c.getStats();
+        acc.totalDemand += body.totalDemand;
+        acc.totalProduction += body.totalProduction;
+    }));
+    return acc;
+}

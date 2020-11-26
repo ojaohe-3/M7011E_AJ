@@ -10,7 +10,7 @@ const app: express.Application = express();
 app.use(express.json());
 
 const simulation = new Simulator();//todo fetch this from db. if new, push to db new default instance.
-
+setInterval(simulation.tick, 1000);//update every second
 //todo get simulation data from db
 //todo make a checkout and cach requests
 let temp = 0;
@@ -71,21 +71,11 @@ app.get("/api/managers", (req, res) => {//todo fetch from producer source
 });
 
 //api get get total production and total consumption todo with query
-app.get("api/totalProduction", async (req, res)=>{
+app.get("/api/stats", async (req, res)=>{
     try {
-        const data = simulation.getTotalSupply();
-        res.json({data:data});
-        
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({message:"could not evaluate", err: error});
-    }
-});
-
-app.get("api/totalConsumption", async (req, res)=>{
-    try {
-        const data = simulation.getTotalDemand(temp);
-        res.json({data: data});
+        const supply = simulation.getTotalSupply();
+        const demand = simulation.getTotalDemand(temp);
+        res.json({totalProduction: supply, totalDemand: demand});
     } catch (error) {
         console.log(error);
         res.status(400).json({message:"could not evaluate", err: error});
@@ -162,7 +152,7 @@ app.post("api/procumer",(req,res) =>{
 
 let PORT =  process.env.PORT || 5000;
 app.listen(PORT, function () {
-    console.log("App is listening on port ${PORT}");
+    console.log(`App is listening on port ${PORT}`);
 });
 
 

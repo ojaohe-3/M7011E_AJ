@@ -35,7 +35,7 @@ app.get("/api",async (req, res)=>{ //todo limit this, cache result
     res.send("no location specified")
 });
 app.listen(PORT, function () {
-    console.log("App is listening on port ${PORT}");
+    console.log(`App is listening on port ${PORT}`);
 });
 
 
