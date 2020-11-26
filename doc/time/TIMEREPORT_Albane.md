@@ -95,7 +95,7 @@ Wednesday 25 November: 10AM - 2PM </br>
 
 ---
 
-Thursday 26 November: 10AM - </br>
+Thursday 26 November: 10AM - 2PM </br>
 * Merge between my branch (interface) and the main
 * Learning Vue.js
 
@@ -103,4 +103,4 @@ Thursday 26 November: 10AM - </br>
 
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 + 3 + 7 + 4 = 41h
+2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 + 3 + 7 + 4 + 4 = 45h
