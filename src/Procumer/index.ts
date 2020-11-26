@@ -1,7 +1,7 @@
 import express = require("express");
 import { Procumer } from "./procumer";
 import uuid = require("uuid");
-import { Weather } from "../Weather-Module/weather";
+import { Weather } from "./weather";
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
 

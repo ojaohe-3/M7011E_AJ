@@ -1,51 +1,65 @@
 import { Procumer } from './procumer';
 import { Consumer } from './consumer';
 import { Manager } from './manager';
-import { Weather, Position} from '../Weather-Module/weather';
+import { Weather, Position} from './weather';
+const fetch = require("node-fetch");
 
 export class Simulator{
     consumers: Map<String, Consumer>;
-    proumers: Map<String, Procumer>;
+    prosumers: Map<String, Procumer>;
     managers: Map<String, Manager>;
     weather: Weather;
     pos : Position;
 
 
-    Simulator(pos: Position){
+    constructor(pos: Position){
         this.consumers = new Map<String, Consumer>();
-        this.proumers = new Map<String, Procumer>();
+        this.prosumers = new Map<String, Procumer>();
         this.managers = new Map<String, Manager>();
         this.weather = new Weather(pos);
         this.pos = pos;
     }
 
     async tick(){
-        const pr = Array.from(this.proumers.values());
-        const mr = Array.from(this.managers.values());
+        console.log(this.prosumers.size);
+        if(this.prosumers.size){
+            const pr = Array.from(this.prosumers.values());
 
-        //fetch all procumers and consumers their current data
-        await Promise.all(pr.map(async p => {
-            const req = await fetch(p.destination+'/api/member/'+p.id);
-            const data = await req.json();
+            try {
+                //fetch all procumers and consumers their current data
+                await Promise.all(pr.map(async p => {
+                    const req = await fetch(p.destination+'/api/member/'+p.id);
+                    const data = await req.json();
 
-            const old = this.proumers.get(p.id);
+                    const old = this.prosumers.get(p.id);
 
-            old.totalProduction = data.production.totalProduction;
-            old.totalCapacity = data.totalCapacity;
-            old.currentCapacity = data.currentCapacity;
-            old.status = data.status;
-        }));
-
-        await Promise.all(mr.map(async m => {
-            const req = await fetch(m.destination+'/api/member/'+m.id);
-            const data = await req.json();
-
-            const old = this.managers.get(m.id);
-
-            old.max_production = data.max_production;
-            old.production = data.production;
-            old.running = data.running;
-        }));
+                    old.totalProduction = data.production.totalProduction;
+                    old.totalCapacity = data.totalCapacity;
+                    old.currentCapacity = data.currentCapacity;
+                    old.status = data.status;
+                }));
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        if(this.managers.size !== 0){
+            const mr = Array.from(this.managers.values());
+            try {
+                await Promise.all(mr.map(async m => {
+                    const req = await fetch(m.destination+'/api/member/'+m.id);
+                    const data = await req.json();
+        
+                    const old = this.managers.get(m.id);
+        
+                    old.max_production = data.max_production;
+                    old.production = data.production;
+                    old.running = data.running;
+                }));
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        
     }
     totalLocalDemand(temp: number): number{
         let acc = 0;
@@ -55,7 +69,7 @@ export class Simulator{
     totalLocalSupply(): number{
         let acc = 0;
         this.managers.forEach(m => acc += m.production);
-        this.proumers.forEach(p => acc += p.totalProduction);
+        this.prosumers.forEach(p => acc += p.totalProduction);
         return acc;
     }
     getTotalDemand(temp: number) : number{
@@ -66,7 +80,7 @@ export class Simulator{
 
     getTotalSupply() : number{
         let acc = 0;
-        this.proumers.forEach(e => acc += e.totalProduction);
+        this.prosumers.forEach(e => acc += e.totalProduction);
         this.managers.forEach(e => acc += e.production);
         return acc;
     }

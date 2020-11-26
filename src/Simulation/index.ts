@@ -4,12 +4,13 @@ import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
 import { Simulator } from "./simulation";
+const fetch = require("node-fetch");
 
 //todo create modules to clean this file
 const app: express.Application = express();
 app.use(express.json());
 
-const simulation = new Simulator();//todo fetch this from db. if new, push to db new default instance.
+const simulation = new Simulator({lat: 65.58415, lon: 22.15465});//todo fetch this from db. if new, push to db new default instance.
 setInterval(simulation.tick, 1000);//update every second
 //todo get simulation data from db
 //todo make a checkout and cach requests
@@ -46,7 +47,7 @@ app.get("/api/procumers", (req, res)=>{//todo fetch from producer source
 //api get procumer
 app.get("/api/procumer/:id", (req, res) => {//todo fetch from producer source
 
-    simulation.proumers.forEach((v, k) => {
+    simulation.prosumers.forEach((v, k) => {
         if(k === req.params.id )
             res.json(v);
     });
@@ -137,7 +138,7 @@ app.post("api/procumer",(req,res) =>{
             };
 
             simulation.consumers.set(data.id, new Consumer(data.id, timefn));
-            simulation.proumers.set(data.id, new Procumer(data.id, data.production, data.capacity,data.current, data.status, data.dest));
+            simulation.prosumers.set(data.id, new Procumer(data.id, data.production, data.capacity,data.current, data.status, data.dest));
             //todo put in db
             res.json({msg: "memeber added!", data: data});
         }

@@ -42,7 +42,7 @@ app.listen(PORT, function () {
 
 
 async function getWeather(lat: number, lon: number){ //todo bulk download
-    const req = await fetch("api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.WAPI}");
+    const req = await fetch(`api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.WAPI}`);
     const data = await req.json();
     temp = data.main.temp;
     speed = data.wind.speed;
