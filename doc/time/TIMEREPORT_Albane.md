@@ -19,7 +19,7 @@ Saturday 07 November: 10,5AM - 12AM </br>
 
 ---
 
-Tuesday 10 November: 9AM - 11AM </br>
+Tuesday 10 November: 9AM - 12AM </br>
 * Mockups of the interface
 * Workshop
 
@@ -30,18 +30,19 @@ Wednesday 11 November: 1PM - 3PM </br>
 
 ---
 
-Thursday 12 November: 10AM - 1PM </br>
+Thursday 12 November: 10AM - 3PM </br>
 * Mockups of the interface
 
 ---
 
-Friday 13 November: 12,5AM - 2,5PM </br>
+Friday 13 November: 10,5AM - 3,5PM </br>
 * Reading https://javascript.info/first-steps
 * Sprint meeting
 
 ---
 
-Saturday 14 November: 12AM - 3PM </br>
+Saturday 14 November: 12AM - 5PM </br>
+* Watching https://www.youtube.com/watch?v=Wy9q22isx3U&t=2746s
 * Reading https://javascript.info/first-steps
 * Reading https://vuejs.org/v2/guide/index.html (Learning Vue.js)
 * Reading https://vuejs.org/v2/guide/instance.html
@@ -56,7 +57,7 @@ Learning Vue.js
 
 ---
 
-Tuesday 17 November: 11AM - 1PM ; 2PM - 4,5PM</br>
+Tuesday 17 November: 10AM - 1PM ; 2PM - 4,5PM</br>
 </br>
 Learning Vue.js
 * Reading https://vuejs.org/v2/guide/class-and-style.html
@@ -67,12 +68,12 @@ Learning Vue.js
 
 ---
 
-Wednesday 18 November: 11,5AM - 5PM</br>
+Wednesday 18 November: 10,5AM - 5PM</br>
 * Implementing loggin interface
 
 ---
 
-Thursday 19 November: 1PM - 3PM ; 4PM - 5PM </br>
+Thursday 19 November: 10AM - 3PM ; 4PM - 6PM </br>
 * Working on the design
 * Trying to fix loggin interface
 * Starting implementing simulator interface
@@ -88,7 +89,7 @@ Monday 23 November: 10AM - 12AM ; 1PM - 6PM </br>
 
 ---
 
-Wednesday 25 November: 10AM - 2PM </br>
+Wednesday 25 November: 10AM - 3PM </br>
 * Implementation of the consumer interface
 * Implementation of the prosumer interface
 * Implementation of the manager interface
@@ -103,4 +104,4 @@ Thursday 26 November: 10AM - 2PM </br>
 
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 + 3 + 7 + 4 + 4 = 45h
+2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 4 = 60h
