@@ -1,0 +1,38 @@
+#prosumer {
+    width: 100%;
+    text-align: center;
+    border-spacing: 70px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#prosumer td {
+    background-color: #ecf0f1;
+    padding: 30px;
+    width: 180px;
+}
+
+.smallScreen {
+    display: none;
+}
+
+@media screen and (max-width: 1000px) {
+    #prosumer {
+        border-spacing: 40px;
+    }
+}
+
+@media screen and (max-width: 860px) {
+    #prosumer {
+        border-spacing: 10px;
+    }
+}
+
+@media screen and (max-width: 780px) {
+    .largeScreen {display: none;}
+    .smallScreen {display: block;}
+    #prosumer td {
+        width: 350px;
+        padding: 10px;
+    }
+}
