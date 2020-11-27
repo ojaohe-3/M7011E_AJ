@@ -21,8 +21,7 @@ export class Simulator{
     }
 
     async tick(){
-        console.log(this.prosumers.size);
-        if(this.prosumers.size){
+        if(this.prosumers){
             const pr = Array.from(this.prosumers.values());
 
             try {
@@ -42,7 +41,7 @@ export class Simulator{
                 console.log(error);
             }
         }
-        if(this.managers.size !== 0){
+        if(this.managers){
             const mr = Array.from(this.managers.values());
             try {
                 await Promise.all(mr.map(async m => {

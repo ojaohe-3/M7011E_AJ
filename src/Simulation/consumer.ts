@@ -3,6 +3,7 @@ export class Consumer{
     id: String;
     timefn: () => number;
     consumption: (temp: number) => number;
+    demand : number;
 
     constructor(id : String, timefn : () => number){
         this.id = id;
@@ -15,5 +16,6 @@ export class Consumer{
         this.consumption = (temp) => {
             return profile * (0.002*Math.pow(294.15-temp,2))+timefn();
         }
+        this.demand = 0;
     }
 }

@@ -1,31 +1,34 @@
 
 import express = require("express");
+import { Weather } from "../Procumer/weather";
 import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
 import { Simulator } from "./simulation";
-const fetch = require("node-fetch");
+// const fetch = require("node-fetch");
+
+// const weather = new Weather({lat:0, lon:0});
 
 //todo create modules to clean this file
 const app: express.Application = express();
 app.use(express.json());
-
+let logger = (req, res, next) =>{
+    console.log(`${req.protocol}://${req.get("host")}${req.originalUrl}: got request`)
+    next();
+}; 
 const simulation = new Simulator({lat: 65.58415, lon: 22.15465});//todo fetch this from db. if new, push to db new default instance.
 setInterval(simulation.tick, 1000);//update every second
 //todo get simulation data from db
 //todo make a checkout and cach requests
-let temp = 0;
+let temp = 270;
 let speed = 0;
 
 //api get consumer(s) by query parameters
 app.get("/api/consumers", (req, res) => {
-    let id = req.query.id? req.query.id: "";
-    let data: Array<Consumer> = [];
-    simulation.consumers.forEach((v, k) => {
-        if(k.includes(id.toString()))
-            data.push(v);
-    });
-    res.json(data);
+    console.log("get reqest")
+    console.log(simulation.consumers.size);
+    simulation.consumers.forEach(e=>e.demand = e.consumption(temp));
+    res.json(Array.from(simulation.consumers.values()));
 });
 
 app.get("/api/consumer/:id", (req, res) => {
@@ -86,10 +89,12 @@ app.get("/api/stats", async (req, res)=>{
 //todo api
 //todo post req add, consumer, manager and procumer
 //api add consumer
-app.post("api/consumers",(req,res) =>{
-    const format = ["id","timefn"] //enforced members
+app.post("/api/consumers",(req,res) =>{
+    console.log("post request");
+    const format = ["id","timefn"]; //enforced members
     const data= req.body;
 
+    console.log(data);
     //look if all enforced key exists
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
         if(data.timefn.length !== 24){
@@ -109,7 +114,7 @@ app.post("api/consumers",(req,res) =>{
 });
 
 
-app.post("api/manager",(req,res) =>{
+app.post("/api/managers",(req,res) =>{
     const format = ["id","max","current","status"] //enforced members
     const data= req.body;
 
@@ -122,12 +127,12 @@ app.post("api/manager",(req,res) =>{
         res.status(400).json({msg:"Invalid format", required: format});  
 });
 
-app.post("api/procumer",(req,res) =>{
+app.post("/api/procumers",(req,res) =>{
     const format = ["id","timefn","production","capacity","current","dest", "status"] //enforced members
     const data= req.body;
-
+    
     //look if all enforced key exists
-    if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
+    if(Object.keys(data).filter(k=>format.some(e => k === e))){
         if(data.timefn.length !== 24){
             res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, diviation)"});  
         }

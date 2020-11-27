@@ -34,11 +34,14 @@ export class Procumer{
      */
     tick(speed: number){
         this.totalProduction = 0;
-        this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(speed));
-        this.batteries.forEach((b) => {
-            let tot = this.totalProduction;
-            this.totalProduction -= b.Input(tot*(this.input_ratio/this.batteries.length)); //distribute input equally among all batteries
-            this.totalProduction += b.Output(this.output_ratio);
-        });
+        if(this.status){
+            this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(speed));
+            this.batteries.forEach((b) => {
+                let tot = this.totalProduction;
+                this.totalProduction -= b.Input(tot*(this.input_ratio/this.batteries.length)); //distribute input equally among all batteries
+                this.totalProduction += b.Output(1);
+            });
+            this.totalProduction*this.output_ratio;
+        }
     }
 }
