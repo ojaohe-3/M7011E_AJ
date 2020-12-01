@@ -11,6 +11,7 @@ export class Simulator{
     weather: Weather;
     pos : Position;
 
+    static singelton: Simulator;
 
     constructor(pos: Position){
         this.consumers = new Map<String, Consumer>();
@@ -18,7 +19,10 @@ export class Simulator{
         this.managers = new Map<String, Manager>();
         this.weather = new Weather(pos);
         this.pos = pos;
+        Simulator.singelton = this;
+        
     }
+
 
     async tick(){
         if(this.prosumers){

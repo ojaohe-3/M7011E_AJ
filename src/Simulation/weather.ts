@@ -9,12 +9,14 @@ export class Weather{
     speed: number;
     pos: Position;
     
+    static singleton: Weather;
     constructor(pos: Position){
         this.temp = 0;
         this.speed = 0;
         this.pos = pos;
         this.update();
         setImmediate(this.update,3600000);//update every hour
+        Weather.singleton = this;
     }
     
     async update(){
