@@ -1,18 +1,15 @@
 import Vue from 'vue';
-import App from './app';
+import loggin from './loggin.vue';
 
-// const saltedSha256 = require('salted-sha256');
 
 new Vue ({
-    render: h => h(App),
-}).$mount("#root");
+    render: h => h(loggin),
+}).$mount('#loggin');
 
 
 
 
-
-
-
+// const saltedSha256 = require('salted-sha256');
 
 // data: {
 //     username: '',

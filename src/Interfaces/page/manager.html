@@ -51,6 +51,27 @@
                 <h4>{{ totalAvailable }} kw/h</h4>
             </td>
         </tr>
+        <tr>
+            <td colspan="3">
+                <h3>My prosumers</h3>
+                <ul id="prosumers">
+                    <li v-for="prosumer in prosumers">
+                        Id : {{ prosumer.id }} ; 
+                        Consumption from the market : {{ prosumer.marketConsumption }} ; 
+                        Production to the market : {{ prosumer.marketProduction }}
+                        <img src="../image/thinArrow.png" width="20px">
+                        <input type="checkbox" id="disableMarketProd"> disabled
+                    </li>
+                </ul>
+                <h3>My consumers</h3>
+                <ul id="consumer">
+                    <li v-for="consumer in consumers">
+                        Id : {{ consumer.id }} ; 
+                        Consumption from the market : {{ consumer.marketConsumption }}
+                    </li>
+                </ul>
+            </td>
+        </tr>
     </table>
 
     <table id="manager" class="smallScreen">
@@ -75,13 +96,34 @@
             </td>
         </tr>
         <tr>
-            <td v-bind="elecDemand" rowspan="2">
+            <td v-bind="elecDemand">
                 <h3>Electricity Demand</h3>
                 <h4>{{ elecDemand }} kw/h</h4>
             </td>
             <td v-bind="totalAvailable">
                 <h3>Total Electicity Available</h3>
                 <h4>{{ totalAvailable }} kw/h</h4>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <h3>My prosumers</h3>
+                <ul id="prosumers">
+                    <li v-for="prosumer in prosumers">
+                        Id : {{ prosumer.id }} ; 
+                        Consumption from the market : {{ prosumer.marketConsumption }} ; 
+                        Production to the market : {{ prosumer.marketProduction }}
+                        <img src="../image/thinArrow.png" width="20px">
+                        <input type="checkbox" id="disableMarketProd"> disabled
+                    </li>
+                </ul>
+                <h3>My consumers</h3>
+                <ul id="consumer">
+                    <li v-for="consumer in consumers">
+                        Id : {{ consumer.id }} ; 
+                        Consumption from the market : {{ consumer.marketConsumption }}
+                    </li>
+                </ul>
             </td>
         </tr>
     </table>

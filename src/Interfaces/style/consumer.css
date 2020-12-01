@@ -6,9 +6,51 @@
     margin-right: auto;
 }
 
-#consumer td {
+#consumer .block {
     background-color: #ecf0f1;
     padding: 30px;
+}
+
+#yellowLine1 {
+    width: 135%;
+    height: 8px;
+    background-color: #f1c40f;
+    position: relative;
+    top: 30px;
+    right: 50px;
+    border-radius: 25px;
+}
+
+#blueLine1 {
+    width: 8px;
+    height: 260px;
+    background-color: #3498db;
+    float: left;
+    position: relative;
+    right: 30px;
+    bottom: 220px;
+    border-radius: 25px;
+}
+
+#yellowLine2 {
+    width: 8px;
+    height: 260px;
+    background-color: #f1c40f;
+    float: left;
+    position: relative;
+    right: 30px;
+    bottom: 220px;
+    border-radius: 25px;
+}
+
+#blueLine2 {
+    width: 135%;
+    height: 8px;
+    background-color: #3498db;
+    position: relative;
+    bottom: 30px;
+    right: 50px;
+    border-radius: 25px;
 }
 
 @media screen and (max-width: 1150px) {
@@ -28,5 +70,9 @@
     #consumer {
         width: 100%;
         border-spacing: 10px;
+    }
+
+    #yellowLine1 {
+        right: 32px;
     }
 }
