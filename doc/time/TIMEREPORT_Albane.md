@@ -107,11 +107,13 @@ Friday 27 November: 2.5PM - 4.5PM </br>
 
 ---
 
-Tuesday 01 December: 10AM - </br>
+Tuesday 01 December: 10AM - 3PM </br>
 * Improving manager's interface
+* Improving the general design of interfaces
+* Trying to learn Vue.js
 
 ---
 
 ## Total amount of time
 
-2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 = 63h
+2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 = 68h
