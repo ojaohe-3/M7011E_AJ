@@ -60,6 +60,7 @@ export class Simulator{
         }
         
     }
+
     totalLocalDemand(temp: number): number{
         let acc = 0;
         this.consumers.forEach(c => acc += c.consumption(temp));
