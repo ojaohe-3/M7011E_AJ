@@ -29,7 +29,7 @@ app.post("/",(req,res) =>{
     const format = ["id","max","current","dest","status"] //enforced members
     const data= JSON.parse(req.body);
 
-    data.body.array.forEach(item => {
+    data.body.forEach(item => {
         //look if all enforced key exists
         if(Object.keys(item).filter(k=>format.some(e => k === e)).length === format.length){
             sim.managers.set(item.id, new Manager(item.id, item.current, item.max, item.dest, item.status));

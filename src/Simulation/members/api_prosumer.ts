@@ -27,11 +27,11 @@ app.get("/:id", (req, res) => {//todo fetch from producer source
 
 app.post("/",(req,res) =>{
     const format = ["id","timefn","production","capacity","current","dest", "status"] //enforced members
-    const data= JSON.parse(req.body);
-    data.body.array.forEach(item => {
+    const data= req.body;
+    data.body.forEach(item => {
         //look if all enforced key exists
         if(Object.keys(item).filter(k=>format.some(e => k === e))){
-            if(data.timefn.length !== 24){
+            if(item.timefn.length !== 24){
                 res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, deviation)"});  
             }
             else{   

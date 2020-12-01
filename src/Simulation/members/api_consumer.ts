@@ -11,7 +11,8 @@ const weather = Weather.singleton
 
 app.get("/", (req, res) => {
     sim.consumers.forEach(e=>e.demand = e.consumption(weather.temp));
-    res.json(Array.from(sim.consumers.values()));
+    const data = Array.from(sim.consumers.values());
+    res.json(data);
 });
 
 app.get("/:id", (req, res) => {
@@ -24,13 +25,11 @@ app.get("/:id", (req, res) => {
 });
 
 app.post("/",(req,res) =>{
-    console.log("post request");
     const format = ["id","timefn"]; //enforced members
-    const data= JSON.parse(req.body);
 
-    console.log(data);
+    const data= req.body;
     //look if all enforced key exists
-    data.body.array.forEach(item => {      
+    data.body.forEach(item => {
         if(Object.keys(item).filter(k=>format.some(e => k === e)).length === format.length){
             if(item.timefn.length !== 24){
                 res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, diviation)"});  
@@ -40,7 +39,7 @@ app.post("/",(req,res) =>{
                     const dt = item.timefn[(new Date()).getHours()];
                     return Math.random()*dt[0]+Math.random()*dt[1]/2 - Math.random()*dt[1]/2 + (dt[0]-dt[1])^2/2;
                 };
-                sim.consumers.set(data.id, new Consumer(item.id, timefn));
+                sim.consumers.set(item.id, new Consumer(item.id, timefn));
                 //todo put in db
             }
         }else
