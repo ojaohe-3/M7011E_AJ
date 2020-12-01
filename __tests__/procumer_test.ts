@@ -32,6 +32,6 @@ test('procumer_test',()=>{
     }
 });
 
-test('api_procumer_test',()=>{
-
+test('api_procumer_test', async ()=>{
+    
 });
