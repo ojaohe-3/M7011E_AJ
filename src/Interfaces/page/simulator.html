@@ -32,17 +32,19 @@
         <div>
             <img src="../image/simulatorMap.png" id="simulatorMap" width="950" height="499" usemap="#simulatorMap">
             <map name="simulatorMap">
-                <area shape="circle" coords="50, 150, 35, 35" href="./loggin.html" class="consumer">
-                <area shape="circle" coords="140, 395, 35, 35" href="./loggin.html" class="prosumer">
-                <area shape="circle" coords="260, 240, 35, 35" href="./loggin.html" class="prosumer">
-                <area shape="circle" coords="377, 85, 35, 35" href="./loggin.html" class="consumer">
-                <area shape="circle" coords="425, 330, 35, 35" href="./loggin.html" class="consumer">
-                <area shape="circle" coords="620, 205, 35, 35" href="./loggin.html" class="prosumer">
-                <area shape="circle" coords="690, 55, 35, 35" href="./loggin.html" class="prosumer">
-                <area shape="circle" coords="720, 395, 35, 35" href="./loggin.html" class="manager">
-                <area shape="circle" coords="895, 120, 35, 35" href="./loggin.html" class="consumer">
-                <area shape="circle" coords="900, 280, 35, 35" href="./loggin.html" class="consumer">
+                <area shape="circle" coords="50, 150, 35, 35" href="./consumer.html" class="consumer">
+                <area shape="circle" coords="140, 395, 35, 35" href="./prosumer.html" class="prosumer">
+                <area shape="circle" coords="260, 240, 35, 35" href="./prosumer.html" class="prosumer">
+                <area shape="circle" coords="377, 85, 35, 35" href="./consumer.html" class="consumer">
+                <area shape="circle" coords="425, 330, 35, 35" href="./consumer.html" class="consumer">
+                <area shape="circle" coords="620, 205, 35, 35" href="./prosumer.html" class="prosumer">
+                <area shape="circle" coords="690, 55, 35, 35" href="./prosumer.html" class="prosumer">
+                <area shape="circle" coords="720, 395, 35, 35" href="./manager.html" class="manager">
+                <area shape="circle" coords="895, 120, 35, 35" href="./consumer.html" class="consumer">
+                <area shape="circle" coords="900, 280, 35, 35" href="./consumer.html" class="consumer">
             </map>
+            <div class="yellowLine"></div>
+            <div class="blueLine"></div>
         </div>
     </div>
 
@@ -51,10 +53,6 @@
     <script>
     $(document).ready(function(e) {
 	    $('img[usemap]').rwdImageMaps();
-	
-	    $('area').on('click', function() {
-		    alert($(this).attr('alt') + ' clicked');
-	    });
     });
     </script>
 </body>

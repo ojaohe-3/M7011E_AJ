@@ -16,7 +16,7 @@ let logger = (req, res, next) =>{
     console.log(`${req.protocol}://${req.get("host")}${req.originalUrl}: got request`)
     next();
 }; 
-const simulation = new Simulator({lat: 65.58415, lon: 22.15465});//todo fetch this from db. if new, push to db new default instance.
+const simulation = new Simulator({lat: 65.58415, lon: 22.15465});
 setInterval(simulation.tick, 1000);//update every second
 //todo get simulation data from db
 //todo make a checkout and cach requests

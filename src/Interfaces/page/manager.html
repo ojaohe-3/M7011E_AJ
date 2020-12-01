@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Green lean electric - manager</title>
+    <meta charset="utf-8">
+    <link rel="icon" href="../image/build.png">
+    <link href="../style/style.css" rel="stylesheet" type="text/css">
+    <link href="../style/manager.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="../script/manager.js"></script>
+    <!--links for the title font-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@743&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <img src="../image/logo.png" alt="logo" id="logo">
+        <h1>Green Lean Electric, manager</h1>
+        <img src="../image/exit.png" alt="exit" id="exit">
+        <div class="headerLine"></div>
+    </header>
+
+    <table id="manager" class="largeScreen">
+        <tr>
+            <td v-bind="elecPrice">
+                <h3>Price of Electricity</h3>
+                <h4>{{ elecPrice }} kr/kw</h4>
+                <input type="text" v-model="elecPrice" placeholder="1.5">
+                <button style="display: inline;">Submit</button>
+            </td>
+            <td v-bind="production">
+                <h3>My Production</h3>
+                <h4>{{ production }} kw/h</h4>
+                <input type="number" min="0" v-model="production" placeholder="3500">
+                <button style="display: inline;">Submit</button>
+            </td>
+            <td v-bind="elecDemand" rowspan="2">
+                <h3>Electricity Demand</h3>
+                <h4>{{ elecDemand }} kw/h</h4>
+            </td>
+        </tr>
+        <tr>
+            <td v-bind="income">
+                <h3>Income from prosumer</h3>
+                <h4>{{ income }} kw/h</h4>
+            </td>
+            <td v-bind="totalAvailable">
+                <h3>Total Electicity Available</h3>
+                <h4>{{ totalAvailable }} kw/h</h4>
+            </td>
+        </tr>
+    </table>
+
+    <table id="manager" class="smallScreen">
+        <tr>
+            <td v-bind="elecPrice" colspan="2">
+                <h3>Price of Electricity</h3>
+                <h4>{{ elecPrice }} kr/kw</h4>
+                <input type="text" v-model="elecPrice" placeholder="1.5">
+                <button style="display: inline;">Submit</button>
+            </td>
+        </tr>
+        <tr>
+            <td v-bind="production">
+                <h3>My Production</h3>
+                <h4>{{ production }} kw/h</h4>
+                <input type="number" min="0" v-model="production" placeholder="3500">
+                <button style="display: inline;">Submit</button>
+            </td>
+            <td v-bind="income">
+                <h3>Income from prosumer</h3>
+                <h4>{{ income }} kw/h</h4>
+            </td>
+        </tr>
+        <tr>
+            <td v-bind="elecDemand" rowspan="2">
+                <h3>Electricity Demand</h3>
+                <h4>{{ elecDemand }} kw/h</h4>
+            </td>
+            <td v-bind="totalAvailable">
+                <h3>Total Electicity Available</h3>
+                <h4>{{ totalAvailable }} kw/h</h4>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
