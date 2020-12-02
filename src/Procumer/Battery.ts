@@ -18,14 +18,12 @@ export class Battery{
         const p = power < this.maxCharge ? power : this.maxCharge;
         this.current += p;
         
-    
         if(this.current < this.capacity){
             return p;
         }
         else{
-            const  dp = this.current - this.capacity;
             this.current = this.capacity;
-            return dp;
+            return 0;
         }
     }
     /**

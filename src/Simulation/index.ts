@@ -73,7 +73,7 @@ app.get("/api/managers", (req, res) => {//todo fetch from producer source
 //api get get total production and total consumption todo with query
 app.get("api/totalProduction", async (req, res)=>{
     try {
-        const data = await simulation.getTotalSupply();
+        const data = simulation.getTotalSupply();
         res.json({data:data});
         
     } catch (error) {
@@ -84,7 +84,7 @@ app.get("api/totalProduction", async (req, res)=>{
 
 app.get("api/totalConsumption", async (req, res)=>{
     try {
-        const data = await simulation.getTotalDemand(temp);
+        const data = simulation.getTotalDemand(temp);
         res.json({data: data});
     } catch (error) {
         console.log(error);

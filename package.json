@@ -8,6 +8,7 @@
     "test_cons": "jest consumer_test",
     "test_mang": "jest manager_test",
     "test_grid": "jest grid_test",
+    "test_procumer": "jest procumer_test",
     "tsc": "tsc",
     "dev_all": "npm run dev_cons ",
     "dev_cons": "npx tsc -w | nodemon ./build/src/Consumer-Group/index.js ",
@@ -33,14 +34,18 @@
     "vue": "^2.6.12"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.12.7",
     "@types/jest": "^26.0.15",
     "@types/uuid": "^8.3.0",
+    "babel-jest": "^26.6.3",
     "jest": "^26.6.3",
     "nodemon": "^2.0.6",
-    "prettier": "2.2.0"
+    "prettier": "2.2.0",
+    "ts-jest": "^26.4.4"
   },
   "directories": {
     "doc": "doc",
     "test": "test"
-  }
+  },
+  "transform": {}
 }

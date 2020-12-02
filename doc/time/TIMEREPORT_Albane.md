@@ -56,7 +56,7 @@ Learning Vue.js
 
 ---
 
-Tuesday 17 November: 11AM - 1PM ; 2PM - </br>
+Tuesday 17 November: 11AM - 1PM ; 2PM - 4,5PM</br>
 </br>
 Learning Vue.js
 * Reading https://vuejs.org/v2/guide/class-and-style.html
@@ -67,6 +67,34 @@ Learning Vue.js
 
 ---
 
+Wednesday 18 November: 11,5AM - 5PM</br>
+* Implementing loggin interface
+
+---
+
+Thursday 19 November: 1PM - 3PM ; 4PM - 5PM </br>
+* Working on the design
+* Trying to fix loggin interface
+* Starting implementing simulator interface
+* Learning Vue.js
+
+---
+
+Monday 23 November: 10AM - 12AM ; 1PM - 6PM </br>
+* Making loggin interface responsive
+* Implementing simulator interface
+* Implementation of the simulator interface
+* Implementation of an interactive map in the simulator interface
+
+---
+
+Wednesday 25 November: 10AM - 2PM </br>
+* Implementation of the consumer interface
+* Implementation of the prosumer interface
+* Implementation of the manager interface
+
+---
+
 ## Total amount of time
 
-2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 2 = 19h
+2,5 + 1,5 + 2 + 2 + 3 + 2 + 3 + 1 + 4,5 + 5,5 + 3 + 7 + 4 = 41h
