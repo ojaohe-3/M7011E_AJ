@@ -114,13 +114,14 @@ Tuesday 01 December: 10AM - 3PM </br>
 
 ---
 
-Wednesday 02 December: 9AM - 11AM ; 1PM -  </br>
+Wednesday 02 December: 9AM - 11AM ; 1PM - 6PM </br>
 * Learning about cli vue.js
 * Debugging Git on visualStudioCode
 * Trying to set up cli vue.js
+* Translating interfaces from html and css to vue.js
 
 ---
 
 ## Total amount of time
 
-2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 2 = 70h
+2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 7 = 75h
