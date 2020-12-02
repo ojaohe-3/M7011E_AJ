@@ -1,20 +1,21 @@
 <template>
-  <div class="hello">
-    <img src="../image/logo.png" alt="logo" id="logo">
+  <header>
+    <img src="../assets/logo.png" alt="logo" id="logo">
     <h1>Green Lean Electric, loggin</h1>
     <div class="headerLine"></div>
-  </div>
+  </header>
 </template>
+
+
 
 
 <script>
 export default {
   name: 'Header',
-  props: {
-    msg: String
-  }
 }
 </script>
+
+
 
 
 <style scoped>
