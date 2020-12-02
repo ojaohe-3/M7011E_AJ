@@ -69,6 +69,7 @@ app.post('/api/member/control', (req, res)=>{
         if(procumer){   
             procumer.input_ratio = data.input_ratio;
             procumer.output_ratio = data.output_ratio;
+            procumer.status = data.status;
             res.json({"input_ratio": procumer.input_ratio, "output_ratio": procumer.output_ratio});
         }else{
             res.status(400).json({messsage:"No such memeber!"});

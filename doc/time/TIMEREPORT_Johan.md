@@ -54,8 +54,6 @@ Friday 20 6AM-2PM
 * Weather module
 * Weather api
 * mucking again with dust. Trying to set up db and docker services.
-<<<<<<< HEAD
-=======
 ---
 Tuesday 24 12AM-8PM
 * fixed database
@@ -65,7 +63,31 @@ Tuesday 24 12AM-8PM
 * Oppend an ngnx server for api hosting.
 
 ---
+Wednesday 25 12AM - 3PM
+* fixed consul
+* fixed api
+* fixed misc devops related
+---
+Friday 27 3PM - 4PM
+* researched vue
+* Testing deployments
+* fixing routing and ssh tunnels
+* testing database
+* security check (mosty fail imo)
 
-Total:
-2.5 + 4 + 2 + 2 + 4 + 2 + 5 + 8 + 8 = 37h30 (till tuesday 24)
->>>>>>> 847b3ca983c314d8df9224b5184d5d6c89455e24
+---
+Saturday 28 12AM-3pm
+* researched vue
+* Testing deployments
+* setup vue client
+* setup fabio
+* setup nomad
+* setup vault
+
+---
+Tuesday 10AM - 2pm
+* modulrized simulator
+* black-box testing api
+* consul
+Total: 
+2.5 + 4 + 2 + 2 + 4 + 2 + 5 + 8 + 8 + 1 + 3 +4= 45h30 (till tuesday 24) (some entries are missing, total is an underestimated number)

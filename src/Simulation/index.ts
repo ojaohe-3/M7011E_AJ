@@ -13,7 +13,7 @@ import { Simulator } from "./simulation";
 const app: express.Application = express();
 app.use(express.json());
 let logger = (req, res, next) =>{
-    console.log(`${req.protocol}://${req.get("host")}${req.originalUrl}: got ${req.method}`)
+    console.log(`at ${(new Date()).toString()}: ${req.protocol}://${req.get("host")}${req.originalUrl}: ${req.method} request`)
     next();
 }; 
 //todo authentication middleware

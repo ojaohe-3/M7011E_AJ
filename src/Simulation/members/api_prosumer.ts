@@ -2,15 +2,17 @@ import express = require("express");
 import { Consumer } from "../consumer";
 import { Procumer } from "../procumer";
 import { Simulator } from "../simulation";
+import { Weather } from "../weather";
 
 const app = express.Router();
 
 
 const sim = Simulator.singelton;
-
+const weather = Weather.singleton;
 app.get("/", (req, res)=>{//todo fetch from producer source
     const temp = Array.from(sim.consumers.values());
     let data = temp.map(e => {
+        e.demand = e.consumption(weather.temp);
         return [e, sim.prosumers.get(e.id)];  
     })
     res.json(data);
