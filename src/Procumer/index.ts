@@ -1,11 +1,19 @@
 import express = require("express");
 import { Procumer } from "./procumer";
 import uuid = require("uuid");
-import { Weather } from "./weather";
+import { Weather, Position } from "./weather";
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
+import * as dotenv from "dotenv";
+dotenv.config({path: "./.env"}); 
 
-const weather = new Weather(JSON.parse(process.env.POS));
+const sim_dest = process.env.SIM;
+const current_service = process.env.DEST;  
+const pos = {lat: +process.env.LAT, lon: +process.env.LON}
+console.log(pos);
+console.log(sim_dest);
+console.log(current_service);
+const weather = new Weather(pos); 
 let id = process.env.ID || uuid.v4();
 
 
@@ -17,7 +25,7 @@ const app: express.Application = express();
 
 app.use(express.json());
 
-let logger = (req, res, next) =>{
+let logger = (req, res, next) =>{ 
     console.log(`${req.protocol}://${req.get("host")}${req.originalUrl}: got request`)
     next();
 }; 
@@ -55,6 +63,7 @@ app.post('/api/member/', (req, res)=>{
         t.forEach(e => tc.push(new Turbine(e.maxPower)));
         procumers.set(data.id, new Procumer(bc,tc));
         //todo add to db and update simulation
+        //todo api post the new entry to simulation
         res.json({message:" success!", data: data});
 
     }else{
