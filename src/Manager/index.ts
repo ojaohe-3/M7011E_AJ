@@ -5,10 +5,10 @@ import uuid = require("uuid");
 import { Manager } from "./Manager";
 
 
-const app = express();
+const app = express(); 
 const managers = new Map<String, Manager>();
 const id = process.env.ID || uuid.v4();
-
+ 
 
 app.get('/api/members/',(req, res)=>{
     res.json(Array.from(managers.values())); 
