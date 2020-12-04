@@ -4,8 +4,12 @@ import uuid = require("uuid");
 import { Weather } from "./weather";
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
+require('dotenv').config();
 
-const weather = new Weather(JSON.parse(process.env.POS));
+console.log(process.env.POS);
+// const POS = JSON.parse(Buffer.from(process.env.POS, 'base64').toString());
+
+const weather = new Weather({lat: 65.5839, lon: 22.1532});
 let id = process.env.ID || uuid.v4();
 
 
@@ -39,7 +43,7 @@ app.get('/api/members', (req,res)=>{
     if(data)
         res.json(data);
     else
-        res.status(400).json({messsage:"No memebers!"});
+        res.status(400).json({messsage: "No memebers!"});
 });
 //api add procumer
 app.post('/api/member/', (req, res)=>{
