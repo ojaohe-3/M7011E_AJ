@@ -11,12 +11,13 @@ const weather = Weather.singleton;
 //api get get total production and total consumption todo with query
 app.get("/", async (req, res)=>{
     try {
+        await sim.tick();
         const supply = sim.getTotalSupply();
-        const demand = sim.getTotalDemand(weather.temp);
+        const demand = sim.getTotalDemand();
         res.json({totalProduction: supply, totalDemand: demand});
     } catch (error) {
         console.log(error);
-        res.status(400).json({message:"could not evaluate", err: error});
+        res.status(400).json({message:"could not evaluate simulation data, maybe services is missing?", err: error});
     }
 });
 

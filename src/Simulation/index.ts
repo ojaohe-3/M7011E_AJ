@@ -5,9 +5,7 @@ import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
 import { Simulator } from "./simulation";
-// const fetch = require("node-fetch");
 
-// const weather = new Weather({lat:0, lon:0});
 
 //todo create modules to clean this file
 const app: express.Application = express();
@@ -18,8 +16,12 @@ let logger = (req, res, next) =>{
 }; 
 //todo authentication middleware
 
+require( './../DB-Connector/db-connector');
+const model = require('./../DB-Connector/cell');
+const id = process.env.SIM_ID;
 
-
+const table = model.fetchOne({_id: id});
+//todo fetch cell from data base, Init Simulator, get Health status of all services, add all managers and procumers if they are available, otherwise wait and store all data in a cache.
 
 const pos = {lat: 65.58415, lon: 22.15465} //todo database entry get
 const simulation = new Simulator(pos);
@@ -34,6 +36,7 @@ const manager = require('./members/api_manager');
 const simdata = require('./members/api_collected_data');
 
 app.use(logger);
+
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);
 app.use('/api/members/managers', manager);
@@ -44,7 +47,6 @@ const PORT =  process.env.PORT || 5000;
 app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
-
 
 //todo fetch simulation data from managers
 //todo fetch siumlation data from procumers

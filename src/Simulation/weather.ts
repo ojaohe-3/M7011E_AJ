@@ -20,13 +20,13 @@ export class Weather{
     }
     
     async update(){
-        // try{
-        //     const req = await fetch(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
-        //     const data = await req.json();
-        //     this.temp = data.temp;
-        //     this.speed = data.speed
-        // }catch (error){
-        //     console.log(error);
-        // }
+        try{
+            const req = await fetch(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
+            const data = await req.json();
+            this.temp = data.temp;
+            this.speed = data.speed
+        }catch (error){
+            console.log(error);
+        }
     }
 }

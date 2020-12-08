@@ -12,8 +12,7 @@ const ProsumerSchema = mongoose.Schema({
     turbines: [{
         maxPower: Number
     }],
-    destination: String,
+    name: String,
     status: Boolean,
-    id: String,
 });
- module.exports = ProsumerSchema;
+ module.exports = mongoose.model('Prosumer', ProsumerSchema);

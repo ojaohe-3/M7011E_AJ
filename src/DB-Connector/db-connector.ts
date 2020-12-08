@@ -7,4 +7,4 @@ db.once('open', function() {
 });
 
 
-module.exports = mongoose.connect;
+module.exports = db;

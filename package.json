@@ -12,12 +12,9 @@
     "tsc": "tsc",
     "devsim": "npx tsc -w | nodemon ./build/src/simulation/index.js ",
     "devpro": "npx tsc -w | nodemon ./build/src/Procumer/index.js ",
-<<<<<<< HEAD
-=======
     "devw": "npx tsc -w | nodemon ./build/src/Weather/index.js ",
     "devMan": "npx tsc -w | nodemon ./build/src/Manager/index.js ",
     "devMar": "npx tsc -w | nodemon ./build/src/Market/index.js ",
->>>>>>> b7b9a7dbdb27b0d83622216bdb31c8ef87f6722e
     "start": "npx tsc &&"
   },
   "repository": {
@@ -34,10 +31,6 @@
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.9",
     "@types/mongodb": "^3.5.34",
-<<<<<<< HEAD
-    "@types/mongoose": "^5.10.1",
-=======
->>>>>>> b7b9a7dbdb27b0d83622216bdb31c8ef87f6722e
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.11.1",
