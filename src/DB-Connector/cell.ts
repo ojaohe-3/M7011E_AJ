@@ -1,12 +1,31 @@
+import { Schema,  model, Document, Model } from 'mongoose';
 
-
-const CellSchema = mongoose.Schema({
-    dest: String,
+declare interface ICell extends Document{
     manager_dest: String,
     prosumer_dest: String,
     name: String,
-    pos: {lat: Number, lon: Number},
-    manager_service: {type: mongoose.Schema.Type.ObjectId, ref: 'Manager'},
-    prosumer_service: {type: mongoose.Schema.Type.ObjectId, ref: 'Prosumer'}
-});
-module.exports = mongoose.model('Cell', CellSchema);
+    pos: {lat: Number, lon: Number}
+}
+export interface CellModel extends Model<ICell>{};
+
+export class CellSchema{
+    private _model: Model<ICell>;
+
+    constructor(){
+        const cellSchema = new Schema({
+            manager_dest: String,
+            prosumer_dest: String,
+            name: String,
+            lat: Number,
+            lon: Number
+        });
+        this._model = model<ICell>('Cell', cellSchema)
+    }
+
+    public get model(): Model<ICell> {
+        return this._model
+    }
+
+}
+
+

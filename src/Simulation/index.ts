@@ -1,6 +1,6 @@
 
 import express = require("express");
-import { Weather } from "../Procumer/weather";
+import { Weather, Position } from "../Procumer/weather";
 import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
@@ -20,20 +20,29 @@ require( './../DB-Connector/db-connector');
 const model = require('./../DB-Connector/cell');
 const id = process.env.SIM_ID;
 
-const table = model.fetchOne({_id: id});
+const table = model.findById(id);
+
 //todo fetch cell from data base, Init Simulator, get Health status of all services, add all managers and procumers if they are available, otherwise wait and store all data in a cache.
 
-const pos = {lat: 65.58415, lon: 22.15465} //todo database entry get
-const simulation = new Simulator(pos);
-const weather = new Weather(pos)
-setInterval(simulation.tick, 1000);//update simulation every second
+const pos: Position = {lat: 65.58415, lon: 22.15465} //todo database entry get
+if(table){
+    pos.lat = table.lat;
+    pos.lon = table.lon;
+    const simulation = new Simulator(pos, table.name, table.prosumer_dest, table.manager_dest);
+}else{
+    const simulation = new Simulator(pos, "", "", ""); //todo default parameters if db entry does not exist
+}
+const weather = new Weather(pos);
+
+
+setInterval(Simulator.singelton.tick, 1000);//update simulation every second
 //todo get simulation data from db
 //todo make a checkout and cach 
 
 const consumer = require('./members/api_consumer');
 const prosumer = require('./members/api_prosumer');
 const manager = require('./members/api_manager');
-const simdata = require('./members/api_collected_data');
+const simdata = require('./members/api/data');
 
 app.use(logger);
 

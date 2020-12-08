@@ -1,7 +1,24 @@
+import { Schema,  model, Document, Model, Number } from 'mongoose';
 
-
-const ConsumerSchema = mongoose.Schema({
+declare interface IConsumer extends Document{
     demand: Number,
-    id: String,
-});
- module.exports = mongoose.model('Consumer', ConsumerSchema);
+    timefn: Number[]
+}
+export interface ConsumerModel extends Model<IConsumer>{};
+
+export class ConsumerSchema {
+
+    private _model: Model<IConsumer>;
+
+    constructor(){
+        const customerSchema = new Schema({
+            demand: Number,
+            timefn: [{ type: Number, required : true}]
+        });
+        this._model = model<IConsumer>('Consumer', customerSchema)
+    }
+
+    public get model(): Model<IConsumer> {
+        return this._model
+    }
+};

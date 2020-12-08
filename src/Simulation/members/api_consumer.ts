@@ -5,7 +5,7 @@ import { Consumer } from "../consumer";
 
 const app = express.Router();
 
-
+const consumer = require("./../../DB-Connector/consumer");
 const sim = Simulator.singelton;
 const weather = Weather.singleton
 
@@ -39,8 +39,9 @@ app.post("/",(req,res) =>{
                     const dt = item.timefn[(new Date()).getHours()];
                     return Math.random()*dt[0]+Math.random()*dt[1]/2 - Math.random()*dt[1]/2 + (dt[0]-dt[1])^2/2;
                 };
-                sim.consumers.set(item.id, new Consumer(item.id, timefn));
-                //todo put in db
+                const consumer = new Consumer(item.id, timefn);
+                sim.consumers.set(item.id, consumer);
+                
             }
         }else
             res.status(400).json({message:"Invalid format", required: format});  

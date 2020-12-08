@@ -26,15 +26,14 @@ app.get("/", (req, res) => {
 
 
 app.post("/",(req,res) =>{
-    const format = ["id","max","current","name","status"] //enforced members
+    const format = ["id","max","current","status"] //enforced members
     const data= JSON.parse(req.body);
 
     data.body.forEach(item => {
         //look if all enforced key exists
         if(Object.keys(item).filter(k=>format.some(e => k === e)).length === format.length){
-            const manager = new Manager(item.id, item.current, item.max, item.name, item.status);
+            const manager = new Manager(item.id, item.current, item.max, item.name ? item.name: sim.manager_name, item.status);
             sim.managers.set(item.id, manager);
-            cache.manager.append(manager);            
         }else
             res.status(400).json({msg:"Invalid format", required: format});  
     });
