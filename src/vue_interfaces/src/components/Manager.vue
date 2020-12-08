@@ -6,13 +6,13 @@
                     <h3>Price of Electricity</h3>
                     <h4>{{ elecPrice }} kr/kw</h4>
                     <input type="text" v-model="elecPrice" placeholder="1.5">
-                    <button style="display: inline;">Submit</button>
+                    <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 <td v-bind="production">
                     <h3>My Production</h3>
                     <h4>{{ production }} kw/h</h4>
                     <input type="number" min="0" v-model="production" placeholder="3500">
-                    <button style="display: inline;">Submit</button>
+                    <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 <td v-bind="elecDemand" rowspan="2">
                     <h3>Electricity Demand</h3>
@@ -58,7 +58,7 @@
                     <h3>Price of Electricity</h3>
                     <h4>{{ elecPrice }} kr/kw</h4>
                     <input type="text" v-model="elecPrice" placeholder="1.5">
-                    <button style="display: inline;">Submit</button>
+                    <!--<button style="display: inline;">Submit</button>-->
                 </td>
             </tr>
             <tr>
@@ -66,7 +66,7 @@
                     <h3>My Production</h3>
                     <h4>{{ production }} kw/h</h4>
                     <input type="number" min="0" v-model="production" placeholder="3500">
-                    <button style="display: inline;">Submit</button>
+                    <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 <td v-bind="income">
                     <h3>Income from prosumer</h3>
@@ -130,7 +130,7 @@ export default {
 
 
 <style scoped>
-#manager {
+table {
     width: 100%;
     text-align: center;
     border-spacing: 70px;
@@ -149,14 +149,14 @@ td {
 }
 
 @media screen and (max-width: 1200px) {
-    #manager {
-        border-spacing: 40px;
+    table {
+        border-spacing: 35px;
     }
 }
 
 @media screen and (max-width: 860px) {
-    #manager {
-        border-spacing: 10px;
+    table {
+        border-spacing: 5px;
     }
 }
 
@@ -165,7 +165,7 @@ td {
     .smallScreen {display: block;}
     td {
         width: 350px;
-        padding: 10px;
+        padding: 5px;
     }
 }
 </style>

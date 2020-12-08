@@ -24,7 +24,7 @@
                     <h3>Ratio to my Battery</h3>
                     <h4>{{ ratio }} %</h4>
                     <input type="number" min="0" max="100" v-model="ratio" placeholder="70">
-                    <button style="display: inline;">Submit</button>
+                    <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 <td v-bind="marketConsumption">
                     <h3>My Consumption from the Market</h3>
@@ -54,7 +54,7 @@
                     <h3>My Ratio Battery/market</h3>
                     <h4>{{ ratio }} %</h4>
                     <input type="number" min="0" max="100" v-model="ratio" placeholder="70">
-                    <button style="display: inline;">Submit</button>
+                    <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 
             </tr>
@@ -94,7 +94,7 @@ export default {
 
 
 <style scoped>
-#prosumer {
+table {
     width: 100%;
     text-align: center;
     border-spacing: 70px;
@@ -113,13 +113,13 @@ td {
 }
 
 @media screen and (max-width: 1000px) {
-    #prosumer {
+    table {
         border-spacing: 40px;
     }
 }
 
 @media screen and (max-width: 860px) {
-    #prosumer {
+    table {
         border-spacing: 10px;
     }
 }

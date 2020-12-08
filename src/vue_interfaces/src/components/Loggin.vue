@@ -1,36 +1,38 @@
 <template>
-    <div id="loggin">
-        <h3>Username:</h3>
-        <input type="text" id="username" v-model="username">
-        <h3>Password:</h3>
-        <input type="password" id="password" v-model="password" />
-        <button id="submit">Loggin</button>
-        <div class="yellowLine"></div>
-        <div class="blueLine"></div>
-    </div>
+  <div id="loggin">
+    <h3>Username:</h3>
+    <input type="text" id="username" v-model="username">
+    <h3>Password:</h3>
+    <input type="password" id="password" v-model="password" />
+    <button id="submit">Loggin</button>
+    <div class="yellowLine"></div>
+    <div class="blueLine"></div>
+  </div>
 </template>
 
 
 
 <script>
 export default {
-    name: 'loggin',
-    data() {
-        return {
-        username: '',
-        password: '',
-        userInfo: {}
-        }
-    },
-    methods: {
-        valuesIntoJson: function(username, password) {
-            const saltedSha256 = require('salted-sha256');
-            this.userInfo = {
-                "username": username,
-                "password": saltedSha256(password)
-            }
-        }
+  name: 'loggin',
+  data() {
+    return {
+      username: '',
+      password: '',
+      userInfo: {},
+      newUserType: ''
     }
+  },
+  methods: {
+    valuesIntoJson: function(username, password) {
+      const saltedSha256 = require('salted-sha256');
+      this.userInfo = {
+        "username": username,
+        "password": saltedSha256(password)
+      }
+      // if this is correct, define userType and $emit('loggedIn', newUserType)
+    }
+  }
 }
 </script>
 
