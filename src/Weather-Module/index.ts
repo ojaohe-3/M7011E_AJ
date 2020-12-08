@@ -1,11 +1,15 @@
 import e = require("express");
 import express = require("express");
-import axios = require('axios');
+const axios = require('axios');
 require('dotenv').config();
+import cors = require("cors");
+
 
 
 const app: express.Application = express();
+
 app.use(express.json());
+app.use(cors());
 declare interface IWeatherReport {
     coord: {
         lon: number,
@@ -88,36 +92,47 @@ app.listen(PORT, function () {
 });
 
 
-async function getWeather(lat: number, lon: number) { // todo bulk download
-    fetch(`api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${
-        process.env.WAPI
-    }`).then(res => {
-            const data = await res.json();
-            temp = data.main.temp;
-            speed = data.wind.speed;
-            const entry = cach.filter(e => e.lat === lat && e.lon === lon);
-            if (entry.length > 0) 
-                entry.map(v => {
-                    v.last_updated = Date.now();
-                    v.speed = speed;
-                    v.temp = temp;
-                });
-             else 
-                cach.push({
-                    lat: lat,
-                    lon: lon,
-                    temp: temp,
-                    speed: speed,
-                    last_updated: Date.now()
-                });
-            
-            return {
-                lat: lat,
-                lon: lon,
-                temp: temp,
-                speed: speed,
-                last_updated: Date.now()
-            };
-        )};
+async function getWeather(lat: number, lon: number) {
+    try {
+    const res = await axios.get(`http:api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.WAPI}`);
+    // ({
+    //     url: "api.openweathermap.org/data/2.5/weather",
+    //     method:"GET",
+    //     params:{
+    //         lat: lat,
+    //         lon: lon,
+    //         appid: process.env.WAPI
+    //     }
+    // });
+    const data = res.data;
+    temp = data.main.temp;
+    speed = data.wind.speed;
+    const entry = cach.filter(e => e.lat === lat && e.lon === lon);
+    if (entry.length > 0) 
+        entry.map(v => {
+            v.last_updated = Date.now();
+            v.speed = speed;
+            v.temp = temp;
+        });
+    else 
+        cach.push({
+            lat: lat,
+            lon: lon,
+            temp: temp,
+            speed: speed,
+            last_updated: Date.now()
+        });
+    
+    return {
+        lat: lat,
+        lon: lon,
+        temp: temp,
+        speed: speed,
+        last_updated: Date.now()
+    };
+    } catch (error) {
+        console.log(error);
+    }
+    
 
 }

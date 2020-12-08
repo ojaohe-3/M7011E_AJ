@@ -1,12 +1,12 @@
 const fetch = require("node-fetch");
 export interface Position{
-    lat : Number;
-    lon : Number;
+    lat : number;
+    lon : number;
 }
 export class Weather{
     
-    temp: Number;
-    speed: Number;
+    temp: number;
+    speed: number;
     pos: Position;
     
     static singleton: Weather;

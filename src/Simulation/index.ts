@@ -29,8 +29,8 @@ let simulation : Simulator;
 const get_table = async()=> {
     const table = await DB.Models.Cell.findOne({_id: id}).exec();
     if(table){
-        pos.lat = table.lat;
-        pos.lon = table.lon;
+        pos.lat = +table.lat;
+        pos.lon = +table.lon;
         
     }else{
          simulation = new Simulator(pos, "", "", ""); //todo default parameters if db entry does not exist
@@ -51,7 +51,7 @@ app.use(logger);
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);
 app.use('/api/members/managers', manager);
-app.use('/api/members/data.collection', simdata);
+app.use('/api/members/data', simdata);
    
 
 const PORT =  process.env.PORT || 5000;
