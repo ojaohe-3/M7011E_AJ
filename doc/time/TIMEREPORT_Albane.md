@@ -122,6 +122,18 @@ Wednesday 02 December: 9AM - 11AM ; 1PM - 6PM </br>
 
 ---
 
+Thursday 03 December: 1PM - 4PM </br>
+* Learning vue.js
+
+---
+
+Tuesday 08 December: 10AM - </br>
+* Workshop
+* Learning vue.js
+* Trying to translate interfaces from html and css to vue.js
+
+---
+
 ## Total amount of time
 
-2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 7 = 75h
+2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 7 + 3 = 78h
