@@ -5,7 +5,7 @@ import { Consumer } from "../consumer";
 
 const app = express.Router();
 
-const consumer = require("./../../DB-Connector/consumer");
+const con = require("./../../DB-Connector/consumer");
 const sim = Simulator.singelton;
 const weather = Weather.singleton
 

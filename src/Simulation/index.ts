@@ -1,12 +1,14 @@
 
 import express = require("express");
-import { Weather, Position } from "../Procumer/weather";
+import { Weather, Position } from "./weather";
 import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
 import { Simulator } from "./simulation";
-
-
+import {DB} from './../DB-Connector/db-connector'
+import { CellSchema } from "../DB-Connector/cell";
+import { ConsumerSchema } from "../DB-Connector/consumer";
+require('dotenv').config();
 //todo create modules to clean this file
 const app: express.Application = express();
 app.use(express.json());
@@ -16,33 +18,33 @@ let logger = (req, res, next) =>{
 }; 
 //todo authentication middleware
 
-require( './../DB-Connector/db-connector');
-const model = require('./../DB-Connector/cell');
+const db = new DB({Cell: new CellSchema().model, Consumer: new ConsumerSchema().model});
 const id = process.env.SIM_ID;
 
-const table = model.findById(id);
 
 //todo fetch cell from data base, Init Simulator, get Health status of all services, add all managers and procumers if they are available, otherwise wait and store all data in a cache.
 
 const pos: Position = {lat: 65.58415, lon: 22.15465} //todo database entry get
-if(table){
-    pos.lat = table.lat;
-    pos.lon = table.lon;
-    const simulation = new Simulator(pos, table.name, table.prosumer_dest, table.manager_dest);
-}else{
-    const simulation = new Simulator(pos, "", "", ""); //todo default parameters if db entry does not exist
-}
-const weather = new Weather(pos);
+let simulation : Simulator;
+const get_table = async()=> {
+    const table = await DB.Models.Cell.findOne({_id: id}).exec();
+    if(table){
+        pos.lat = table.lat;
+        pos.lon = table.lon;
+        
+    }else{
+         simulation = new Simulator(pos, "", "", ""); //todo default parameters if db entry does not exist
+    }
+    simulation = new Simulator(pos, table.name, table.prosumer_dest, table.manager_dest);
+    setInterval(Simulator.singelton.tick, 1000);
+};
 
-
-setInterval(Simulator.singelton.tick, 1000);//update simulation every second
-//todo get simulation data from db
-//todo make a checkout and cach 
+get_table()
 
 const consumer = require('./members/api_consumer');
 const prosumer = require('./members/api_prosumer');
 const manager = require('./members/api_manager');
-const simdata = require('./members/api/data');
+const simdata = require('./members/api_collected_data');
 
 app.use(logger);
 

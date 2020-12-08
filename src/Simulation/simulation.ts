@@ -71,13 +71,13 @@ export class Simulator{
         
     }
 
-    getTotalDemand() : number{
-        let acc = 0;
+    getTotalDemand() : Number{
+        let acc : Number = 0;
         this.consumers.forEach(e => acc += e.consumption(this.weather.temp));
         return acc;
     }
 
-    getTotalSupply() : number{
+    getTotalSupply() : Number{
         let acc = 0;
         this.prosumers.forEach(e => acc += e.totalProduction);
         this.managers.forEach(e => acc += e.production);

@@ -4,7 +4,8 @@ declare interface ICell extends Document{
     manager_dest: String,
     prosumer_dest: String,
     name: String,
-    pos: {lat: Number, lon: Number}
+    lat: Number,
+    lon: Number
 }
 export interface CellModel extends Model<ICell>{};
 
