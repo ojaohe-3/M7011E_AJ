@@ -97,7 +97,6 @@ app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
 
-
 async function getWeather(lat: number, lon: number) {
     try {
     const res = await axios({
