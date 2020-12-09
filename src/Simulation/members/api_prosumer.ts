@@ -28,7 +28,7 @@ app.get("/:id", (req, res) => {//todo fetch from producer source
 });
 
 app.post("/",(req,res) =>{
-    const format = ["id","timefn","production","capacity","current","dest", "status"] //enforced members
+    const format = ["id","timefn","production","capacity","current","", "status"] //enforced members
     const data= req.body;
     data.body.forEach(item => {
         //look if all enforced key exists
@@ -43,7 +43,7 @@ app.post("/",(req,res) =>{
                 };
 
                 sim.consumers.set(item.id, new Consumer(item.id, timefn));
-                sim.prosumers.set(item.id, new Procumer(item.id, item.production, item.capacity,item.current, item.status, item.dest));
+                sim.prosumers.set(item.id, new Procumer(item.id, item.production, item.capacity,item.current, item.status, item.name ? item.name: sim.prosumer_name));
                 //todo put in db
             }
         }else

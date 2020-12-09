@@ -1,14 +1,14 @@
 
 import express = require("express");
-import { Weather } from "../Procumer/weather";
+import { Weather, Position } from "./weather";
 import { Consumer } from "./consumer";
 import { Manager } from "./manager";
 import { Procumer } from "./procumer";
 import { Simulator } from "./simulation";
-// const fetch = require("node-fetch");
-
-// const weather = new Weather({lat:0, lon:0});
-
+import {DB} from './../DB-Connector/db-connector'
+import { CellSchema } from "../DB-Connector/cell";
+import { ConsumerSchema } from "../DB-Connector/consumer";
+require('dotenv').config();
 //todo create modules to clean this file
 const app: express.Application = express();
 app.use(express.json());
@@ -18,15 +18,28 @@ let logger = (req, res, next) =>{
 }; 
 //todo authentication middleware
 
+const db = new DB({Cell: new CellSchema().model, Consumer: new ConsumerSchema().model});
+const id = process.env.SIM_ID;
 
 
+//todo fetch cell from data base, Init Simulator, get Health status of all services, add all managers and procumers if they are available, otherwise wait and store all data in a cache.
 
-const pos = {lat: 65.58415, lon: 22.15465} //todo database entry get
-const simulation = new Simulator(pos);
-const weather = new Weather(pos)
-setInterval(simulation.tick, 1000);//update simulation every second
-//todo get simulation data from db
-//todo make a checkout and cach 
+const pos: Position = {lat: 65.58415, lon: 22.15465} //todo database entry get
+let simulation : Simulator;
+const get_table = async()=> {
+    const table = await DB.Models.Cell.findOne({_id: id}).exec();
+    if(table){
+        pos.lat = +table.lat;
+        pos.lon = +table.lon;
+        
+    }else{
+         simulation = new Simulator(pos, "", "", ""); //todo default parameters if db entry does not exist
+    }
+    simulation = new Simulator(pos, table.name, table.prosumer_dest, table.manager_dest);
+    setInterval(Simulator.singelton.tick, 1000);
+};
+
+get_table()
 
 const consumer = require('./members/api_consumer');
 const prosumer = require('./members/api_prosumer');
@@ -34,17 +47,17 @@ const manager = require('./members/api_manager');
 const simdata = require('./members/api_collected_data');
 
 app.use(logger);
+
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);
 app.use('/api/members/managers', manager);
-app.use('/api/members/data.collection', simdata);
+app.use('/api/members/data', simdata);
    
 
 const PORT =  process.env.PORT || 5000;
 app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
-
 
 //todo fetch simulation data from managers
 //todo fetch siumlation data from procumers

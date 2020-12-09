@@ -3,13 +3,13 @@ export class Manager{
     production :number;
     max_production :number;
     running: boolean;
-    destination: String;
+    name: String;
     constructor(id :String, production :number,
-        max_production :number, destination: String, running: boolean){
+        max_production :number, name: String, running: boolean){
             this.id = id;
             this.production = production;
             this.max_production = max_production;
-            this.destination = destination;
+            this.name = name;
             this.running = running;
         }    
 

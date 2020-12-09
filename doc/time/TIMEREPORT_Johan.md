@@ -89,5 +89,33 @@ Tuesday 10AM - 2pm
 * modulrized simulator
 * black-box testing api
 * consul
+
+---
+Friday 04 10AM - 1 PM
+* db configuration
+* db modells setup
+* db testing
+
+---
+Saturday 06 9am-10am && Sunday 5pm - 7pm 
+* damage recovery from hack attack
+* drawing pratitions back and reconfiguring
+* added 16000 ip´s to ban. All tor clients stored in an api will be fetched every week and ip blacklisted by NAT
+* additional layers of security was added.
+
+---
+
+Monday 1pm - 3pm
+* DB modelling 
+* setting up enviromental variables
+
+---
+Thuesday 08 9am-9pm (with 2h break)
+* DB Connector object
+* OOP Models 
+* Connection Testing
+* Initial Deployment testing
+* docker initial Configurations 
+
 Total: 
 2.5 + 4 + 2 + 2 + 4 + 2 + 5 + 8 + 8 + 1 + 3 +4= 45h30 (till tuesday 24) (some entries are missing, total is an underestimated number)
