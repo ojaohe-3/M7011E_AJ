@@ -78,14 +78,14 @@
 export default {
   name: 'Prosumer',
   data() {
-      return {
-          production: 2400,
-          battery: 74,
-          elecPrice: 0.73,
-          consumption: 3140,
-          ratio: 70,
-          marketConsumption: 0
-      }
+    return {
+        production: 2400,
+        battery: 74,
+        elecPrice: 0.73,
+        consumption: 3140,
+        ratio: 70,
+        marketConsumption: 0
+    }
   }
 }
 </script>
