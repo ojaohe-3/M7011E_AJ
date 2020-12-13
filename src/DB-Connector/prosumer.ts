@@ -1,18 +1,23 @@
  import { Schema,  model, Document, Model, Number } from 'mongoose';
+import {Procumer} from './../Procumer/procumer'
 
-declare interface IProcumer extends Document{
-    totalProduction: Number,
-            totalCapacity: Number,
-            currentCapacity: Number,
-            batteries: {
-                capacity: Number,
-                current: Number,
-                maxOutput: Number,
-                maxCharge: Number
-            }[],
-            turbines: {
-                maxPower: Number
-            }[],
+export interface IBattery
+{
+    capacity: number,
+    current: number,
+    maxOutput: number,
+    maxCharge: number
+}
+export interface ITurbine //this will be expanded uppon in the future
+{
+    maxPower: number
+}
+export interface IProcumer extends Document{
+    totalProduction: number,
+            totalCapacity: number,
+            currentCapacity: number,
+            batteries: IBattery[],
+            turbines: ITurbine[],
             name: String,
             status: Boolean,
 }

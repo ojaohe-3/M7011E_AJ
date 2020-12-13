@@ -31,7 +31,6 @@ export class DB{
         Market: new MarketSchema().model,
         Manager: new ManagerSchema().model
       }
-    console.log(process.env.DB_CONNECT);
     connect(process.env.DB_CONNECT,{useNewUrlParser: true});//secure access tokens etc todo
     this._db = connection;
     this._db.on('open', this.connected);

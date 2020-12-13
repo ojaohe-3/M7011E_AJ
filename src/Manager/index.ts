@@ -21,12 +21,14 @@ app.get('/api/member/:id',(req, res)=>{
         res.status(404).json({message: "No such id!"}); 
 });
 
-app.post('/api/member/', (req, res)=>{
+app.post('/api/member/', async (req, res)=>{
     const format = ["id","maxProduction"]//enforced members
     const data= req.body;
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        //update database
-        managers.set(data.id, new Manager(data.id,data.maxProduction));
+
+        const manager = new Manager(data.id,data.maxProduction);
+        managers.set(data.id, manager);
+        await manager.document();
     }else
         res.status(400).json({message: "invalid format!", format:format});
 });

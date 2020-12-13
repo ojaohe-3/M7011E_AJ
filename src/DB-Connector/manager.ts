@@ -3,11 +3,11 @@
  import { Schema,  model, Document, Model, Number } from 'mongoose';
 
 declare interface IManager extends Document{
-    current: Number,
-    maxProduciton: Number,
-    production : Number,
+    current: number,
+    maxProduciton: number,
+    production : number,
     status: Boolean,
-    ratio: Number,
+    ratio: number,
     name: String,
 }
 export interface ManagerModel extends Model<IManager>{};

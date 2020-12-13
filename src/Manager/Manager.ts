@@ -1,4 +1,6 @@
-export class Manager{
+import {ManagerSchema} from './../DB-Connector/manager';
+export class Manager extends ManagerSchema{
+    
     id: String;
     current: number;
     maxProduciton: number;
@@ -7,6 +9,7 @@ export class Manager{
     ratio: number;
     
     constructor(id : String, maxProduciton: number){
+        super();
         this.id = id;
         this.current = 0;
         this.maxProduciton = maxProduciton;
@@ -56,5 +59,17 @@ export class Manager{
             }
         }        
         return this.Produce(acceleration)
+    }
+
+    async document() {
+        const body = {
+            current: this.current,
+            maxProduciton: this.maxProduciton,
+            production : this.production,
+            status: this.status,
+            ratio: this.ratio,
+            name: process.env.NAME,
+        }
+        await this.model.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
     }
 }

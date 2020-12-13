@@ -5,6 +5,8 @@ import { Weather, Position } from "./weather";
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
 import * as dotenv from "dotenv";
+import {DB} from './../DB-Connector/db-connector';
+import { ProsumerSchema } from "../DB-Connector/prosumer";
 dotenv.config({path: "./.env"}); 
 
 const sim_dest = process.env.SIM;
@@ -13,9 +15,10 @@ const pos = {lat: +process.env.LAT, lon: +process.env.LON}
 console.log(pos);
 console.log(sim_dest);
 console.log(current_service);
+
 const weather = new Weather(pos); 
 let id = process.env.ID || uuid.v4();
-
+const db = new DB({Prosumer : new ProsumerSchema().model})
 
 
 
@@ -50,7 +53,7 @@ app.get('/api/members', (req,res)=>{
         res.status(400).json({messsage: "No memebers!"});
 });
 //api add procumer
-app.post('/api/member/', (req, res)=>{
+app.post('/api/member/', async (req, res)=>{
     const format = ["id","turbines", "batteries"] //enforced members
     const data= req.body;
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
@@ -61,8 +64,9 @@ app.post('/api/member/', (req, res)=>{
         //unsafe but must be done we assume it is completed if the key exist
         b.forEach(e => bc.push(new Battery(e.capacity, e.maxOutput, e.maxCharge)));
         t.forEach(e => tc.push(new Turbine(e.maxPower)));
-        procumers.set(data.id, new Procumer(bc,tc));
-        //todo add to db and update simulation
+        const prosumer = new Procumer(bc,tc);
+        procumers.set(data.id, prosumer);
+        await prosumer.document();
         //todo api post the new entry to simulation
         res.json({message:" success!", data: data});
 
