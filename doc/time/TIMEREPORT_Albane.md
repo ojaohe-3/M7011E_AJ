@@ -107,11 +107,44 @@ Friday 27 November: 2.5PM - 4.5PM </br>
 
 ---
 
-Tuesday 01 December: 10AM - </br>
+Tuesday 01 December: 10AM - 3PM </br>
 * Improving manager's interface
+* Improving the general design of interfaces
+* Trying to learn Vue.js
+
+---
+
+Wednesday 02 December: 9AM - 11AM ; 1PM - 6PM </br>
+* Learning about cli vue.js
+* Debugging Git on visualStudioCode
+* Trying to set up cli vue.js
+* Translating interfaces from html and css to vue.js
+
+---
+
+Thursday 03 December: 1PM - 4PM </br>
+* Learning vue.js
+
+---
+
+Tuesday 08 December: 10AM - 12AM ; 3PM - 6PM </br>
+* Workshop
+* Learning vue.js
+* Trying to translate interfaces from html and css to vue.js
+
+---
+
+Wednesday 09 December: 11AM - 4PM </br>
+* Translating interfaces from html and css to vue.js
+
+---
+
+Thursday 10 December: 3AM - 5PM </br>
+* Translating interfaces from html and css to vue.js
+* Learning vue.js
 
 ---
 
 ## Total amount of time
 
-2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 = 63h
+2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 7 + 3 + 5 + 5 + 2 = 90h
