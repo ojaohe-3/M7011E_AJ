@@ -6,4 +6,4 @@ build
 /src/Weather-Module/api_key
 *.env
 */*.env
-**/*.env
+**/*.env,
