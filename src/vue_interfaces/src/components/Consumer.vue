@@ -1,3 +1,44 @@
+<template>
+    <table id="consumer">
+        <tr>
+            <td v-bind="consumption">
+                <div class="block">
+                    <h3>My Consumption</h3>
+                    <h4>{{ consumption }} kw/h</h4>
+                    <div id="yellowLine1"></div>
+                    <div id="blueLine1"></div>
+                </div>
+            </td>
+            <td v-bind="elecPrice">
+                <div class="block">
+                    <div id="blueLine2"></div>
+                    <h3>Price of Electricity</h3>
+                    <h4>{{ elecPrice }} kr/kw</h4>
+                    <div id="yellowLine2"></div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</template>
+
+
+
+<script>
+export default {
+  name: 'Consumer',
+  data() {
+      return {
+          consumption: 3500,
+          elecPrice: 0.73
+      }
+  }
+}
+</script>
+
+
+
+
+<style scoped>
 #consumer {
     width: 75%;
     text-align: center;
@@ -6,7 +47,7 @@
     margin-right: auto;
 }
 
-#consumer .block {
+.block {
     background-color: #ecf0f1;
     padding: 30px;
 }
@@ -76,3 +117,4 @@
         right: 32px;
     }
 }
+</style>
