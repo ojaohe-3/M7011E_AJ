@@ -1,9 +1,6 @@
 
 import express = require("express");
 import { Weather, Position } from "./weather";
-import { Consumer } from "./consumer";
-import { Manager } from "./manager";
-import { Procumer } from "./procumer";
 import { Simulator } from "./simulation";
 import {DB} from './../DB-Connector/db-connector'
 import { CellSchema } from "../DB-Connector/cell";
@@ -33,13 +30,12 @@ const get_table = async()=> {
         pos.lon = +table.lon;
         
     }else{
-         simulation = new Simulator(pos, "", "", ""); //todo default parameters if db entry does not exist
+         simulation = new Simulator(pos, "", ""); //todo default parameters if db entry does not exist
     }
-    simulation = new Simulator(pos, table.name, table.prosumer_dest, table.manager_dest);
+    simulation = new Simulator(pos, table.prosumer_dest, table.manager_dest);
     setInterval(Simulator.singelton.tick, 1000);
 };
 
-get_table()
 
 const consumer = require('./members/api_consumer');
 const prosumer = require('./members/api_prosumer');

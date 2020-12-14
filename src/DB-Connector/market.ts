@@ -12,11 +12,7 @@ export class MarketSchema {
 
     constructor(){
         const MarketSchema = new Schema({
-            current: Number,
-            maxProduciton: Number,
-            production : Number,
-            status: Boolean,
-            ratio: Number,
+            cells: [{type: String}],
             name: {type: String, required : true}
         });
         this._model = model<IMarket>('Market', MarketSchema)

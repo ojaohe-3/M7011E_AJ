@@ -16,11 +16,11 @@ export class Simulator{
     manager_name: String;
     prosumer_name: String;
 
-    constructor(pos: Position, name : String, manager_name: String, prosumer_name: String){
+    constructor(pos: Position, manager_name: String, prosumer_name: String){
         this.consumers = new Map<String, Consumer>();
         this.prosumers = new Map<String, Procumer>();
         this.managers = new Map<String, Manager>();
-        this.name = name;
+        this.name = process.env.Name;
         this.manager_name = manager_name;
         this.prosumer_name = prosumer_name;
         this.weather = new Weather(pos);

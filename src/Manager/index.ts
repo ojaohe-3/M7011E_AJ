@@ -3,8 +3,10 @@ import express = require("express");
 
 import uuid = require("uuid");
 import { Manager } from "./Manager";
+import {DB} from "./../DB-Connector/db-connector";
+import { ManagerSchema } from "../DB-Connector/manager";
 
-
+const db = new DB({Manager: new ManagerSchema().model});
 const app = express(); 
 const managers = new Map<String, Manager>();
 const id = process.env.ID || uuid.v4();

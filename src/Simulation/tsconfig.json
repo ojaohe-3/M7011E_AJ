@@ -71,7 +71,7 @@
 
 {
   "compilerOptions": {
-      "target": "es2017"17"17",
+      "target": "ES2020",
       "module": "commonjs",
       "declaration": false,
       "noImplicitAny": false,

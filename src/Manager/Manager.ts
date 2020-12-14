@@ -1,5 +1,6 @@
+import { DB } from '../DB-Connector/db-connector';
 import {ManagerSchema} from './../DB-Connector/manager';
-export class Manager extends ManagerSchema{
+export class Manager{
     
     id: String;
     current: number;
@@ -9,7 +10,6 @@ export class Manager extends ManagerSchema{
     ratio: number;
     
     constructor(id : String, maxProduciton: number){
-        super();
         this.id = id;
         this.current = 0;
         this.maxProduciton = maxProduciton;
@@ -70,6 +70,6 @@ export class Manager extends ManagerSchema{
             ratio: this.ratio,
             name: process.env.NAME,
         }
-        await this.model.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
+        await DB.Models.Manager.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
     }
 }

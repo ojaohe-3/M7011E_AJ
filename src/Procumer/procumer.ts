@@ -2,7 +2,8 @@ import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
 import {v4} from 'uuid'
 import { IBattery, IProcumer, ITurbine, ProsumerSchema } from "../DB-Connector/prosumer";
-export class Procumer extends ProsumerSchema{    
+import { DB } from "../DB-Connector/db-connector";
+export class Procumer{    
     totalProduction: number;
     totalCapacity: number;
     status: boolean;
@@ -14,7 +15,6 @@ export class Procumer extends ProsumerSchema{
     currentCapacity: () => number;
 
     constructor(batteries: Array<Battery>, turbines: Array<Turbine>, id? : String){
-        super();
         this.batteries = batteries;
         this.turbines = turbines;
         this.totalProduction = 0;
@@ -67,7 +67,7 @@ export class Procumer extends ProsumerSchema{
             status: this.status,
         };
 
-        await this.model.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
+        await DB.Models.Prosumer.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
            
         
     }

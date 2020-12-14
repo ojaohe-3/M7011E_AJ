@@ -5,6 +5,7 @@ import uuid = require("uuid");
 import { Procumer } from "../Simulation/procumer";
 import { Consumer } from "../Simulation/consumer";
 import { Cell, Stats } from "./cell";
+import { DB } from "../DB-Connector/db-connector";
 
 
 const app = express();
@@ -26,12 +27,13 @@ app.get('/api/member/:id',(req, res)=>{
         res.status(404).json({message: "No such id!"}); 
 });
 
-app.post('/api/member/', (req, res)=>{
+app.post('/api/member/', async (req, res)=>{
     const format = ["id","name", "dest"]//enforced members
     const data= req.body;
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        //update database
-        cells.set(data.id, new Cell(data.id, data.name, data.dest));
+        const cell =new Cell(data.id, data.dest);
+        cells.set(data.id,cell );
+        await cell.document();
     }else
         res.status(400).json({message: "invalid format!", format:format});
 });
