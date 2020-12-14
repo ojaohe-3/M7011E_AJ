@@ -1,4 +1,7 @@
+import { DB } from '../DB-Connector/db-connector';
+import {ManagerSchema} from './../DB-Connector/manager';
 export class Manager{
+    
     id: String;
     current: number;
     maxProduciton: number;
@@ -56,5 +59,17 @@ export class Manager{
             }
         }        
         return this.Produce(acceleration)
+    }
+
+    async document() {
+        const body = {
+            current: this.current,
+            maxProduciton: this.maxProduciton,
+            production : this.production,
+            status: this.status,
+            ratio: this.ratio,
+            name: process.env.NAME,
+        }
+        await DB.Models.Manager.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
     }
 }
