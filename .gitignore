@@ -4,3 +4,6 @@ node_modules
 build
 .prettierrc
 /src/Weather-Module/api_key
+*.env
+*/*.env
+**/*.env

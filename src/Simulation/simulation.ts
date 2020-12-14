@@ -11,14 +11,24 @@ export class Simulator{
     weather: Weather;
     pos : Position;
 
+    static singelton: Simulator;
+    name: String;
+    manager_name: String;
+    prosumer_name: String;
 
-    constructor(pos: Position){
+    constructor(pos: Position, manager_name: String, prosumer_name: String){
         this.consumers = new Map<String, Consumer>();
         this.prosumers = new Map<String, Procumer>();
         this.managers = new Map<String, Manager>();
+        this.name = process.env.Name;
+        this.manager_name = manager_name;
+        this.prosumer_name = prosumer_name;
         this.weather = new Weather(pos);
         this.pos = pos;
+        Simulator.singelton = this;
+        
     }
+
 
     async tick(){
         if(this.prosumers){
@@ -27,7 +37,7 @@ export class Simulator{
             try {
                 //fetch all procumers and consumers their current data
                 await Promise.all(pr.map(async p => {
-                    const req = await fetch(p.destination+'/api/member/'+p.id);
+                    const req = await fetch(p.name+'/api/member/'+p.id);
                     const data = await req.json();
 
                     const old = this.prosumers.get(p.id);
@@ -45,7 +55,7 @@ export class Simulator{
             const mr = Array.from(this.managers.values());
             try {
                 await Promise.all(mr.map(async m => {
-                    const req = await fetch(m.destination+'/api/member/'+m.id);
+                    const req = await fetch(m.name+'/api/member/'+m.id);
                     const data = await req.json();
         
                     const old = this.managers.get(m.id);
@@ -61,19 +71,8 @@ export class Simulator{
         
     }
 
-    totalLocalDemand(temp: number): number{
-        let acc = 0;
-        this.consumers.forEach(c => acc += c.consumption(temp));
-        return acc;
-    }
-    totalLocalSupply(): number{
-        let acc = 0;
-        this.managers.forEach(m => acc += m.production);
-        this.prosumers.forEach(p => acc += p.totalProduction);
-        return acc;
-    }
-    getTotalDemand(temp: number) : number{
-        let acc = 0;
+    getTotalDemand() : number{
+        let acc  = 0;
         this.consumers.forEach(e => acc += e.consumption(this.weather.temp));
         return acc;
     }
