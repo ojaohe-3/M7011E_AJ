@@ -48,7 +48,7 @@ export class ProsumerSchema {
             name: String,
             status: Boolean,
         });
-        this._model = model<IProcumer>('Market', ProcumerSchema)
+        this._model = model<IProcumer>('Prosumer', ProcumerSchema)
     }
 
     public get model(): Model<IProcumer> {

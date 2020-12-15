@@ -2,11 +2,7 @@
   "name": "m7011e_aj",
   "version": "1.0.0",
   "description": "School project in distributed dynamic websites",
-<<<<<<< HEAD
-  "main": "build/src/Interfaces/index.js",
-=======
-  "main": "./build/src/Weather-Module/index.js",
->>>>>>> origin/simulation/api/deploymenyt
+  "main": "./build/src/Procumer/index.js",
   "scripts": {
     "test_all": "jest",
     "test_cons": "jest consumer_test",
@@ -14,17 +10,11 @@
     "test_grid": "jest grid_test",
     "test_procumer": "jest procumer_test",
     "tsc": "tsc",
-<<<<<<< HEAD
-    "dev_all": "npm run dev_cons ",
-    "dev_cons": "npx tsc -w | nodemon ./build/src/simulation/index.js ",
-    "dev_interface": "npx tsc -w | nodemon ./build/src/Interfaces/index.js",
-=======
     "devsim": "npx tsc -w | nodemon ./build/src/simulation/index.js ",
     "devpro": "npx tsc -w | nodemon ./build/src/Procumer/index.js ",
     "devw": "npx tsc -w | nodemon ./build/src/Weather-Module/index.js ",
     "devMan": "npx tsc -w | nodemon ./build/src/Manager/index.js ",
     "devMar": "npx tsc -w | nodemon ./build/src/Market/index.js ",
->>>>>>> origin/simulation/api/deploymenyt
     "start": "npx tsc &&"
   },
   "repository": {
@@ -48,12 +38,9 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-<<<<<<< HEAD
     "salted-sha256": "^1.0.0",
     "swig": "^1.4.2",
-=======
     "mongoose": "^5.11.1",
->>>>>>> origin/simulation/api/deploymenyt
     "typescript": "^4.0.5",
     "uuid": "^8.3.1",
     "vue": "^2.6.12"

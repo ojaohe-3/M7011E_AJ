@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+const axios = require('axios');
 export interface Position{
     lat : number;
     lon : number;
@@ -21,8 +21,8 @@ export class Weather{
     
     async update(){
         try{
-            const req = await fetch(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
-            const data = await req.json();
+            const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
+            const data = req.data;
             this.temp = data.temp;
             this.speed = data.speed
         }catch (error){

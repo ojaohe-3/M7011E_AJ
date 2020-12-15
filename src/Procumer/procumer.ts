@@ -64,10 +64,15 @@ export class Procumer{
             batteries: bc,
             turbines: tc,
             name: process.env.NAME,
-            status: this.status,
+            status: this.status
         };
-
-        await DB.Models.Prosumer.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
+        try {
+            // await DB.Models.Prosumer.create(body);
+            await DB.Models.Prosumer.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+            
+        } catch (error) {
+            console.log(error)
+        }
            
         
     }

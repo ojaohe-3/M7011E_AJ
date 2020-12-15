@@ -2,8 +2,7 @@ import { Procumer } from './procumer';
 import { Consumer } from './consumer';
 import { Manager } from './manager';
 import { Weather, Position} from './weather';
-const fetch = require("node-fetch");
-
+const axios = require('axios');
 export class Simulator{
     consumers: Map<String, Consumer>;
     prosumers: Map<String, Procumer>;
@@ -37,15 +36,20 @@ export class Simulator{
             try {
                 //fetch all procumers and consumers their current data
                 await Promise.all(pr.map(async p => {
-                    const req = await fetch(p.name+'/api/member/'+p.id);
-                    const data = await req.json();
+                    const req = await axios.get(p.name+'/api/member/'+p.id);
+                    const data = req.data;
 
-                    const old = this.prosumers.get(p.id);
-
-                    old.totalProduction = data.production.totalProduction;
-                    old.totalCapacity = data.totalCapacity;
-                    old.currentCapacity = data.currentCapacity;
-                    old.status = data.status;
+                    const old = this.prosumers.get(data.id);
+                    if(old){
+                        old.totalProduction = data.production.totalProduction;
+                        old.totalCapacity = data.totalCapacity;
+                        old.currentCapacity = data.currentCapacity;
+                        old.status = data.status;
+                    }else if(data){
+                        this.prosumers.set(data.id, new Procumer(data.id, data.totalProduction, data.totalCapacity, data.current, data.status, p.name));
+                    }else{
+                        console.log('could not find: ' + data.id );
+                    }
                 }));
             } catch (error) {
                 console.log(error);

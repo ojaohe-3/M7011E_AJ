@@ -7,17 +7,13 @@ import { Turbine } from "./Turbine";
 import * as dotenv from "dotenv";
 import {DB} from './../DB-Connector/db-connector';
 import { ProsumerSchema } from "../DB-Connector/prosumer";
-dotenv.config({path: "./.env"}); 
+import {v4} from 'uuid';
+dotenv.config({path: "./.env"});  
 
 const sim_dest = process.env.SIM;
 const current_service = process.env.DEST;  
 const pos = {lat: +process.env.LAT, lon: +process.env.LON}
-console.log(pos);
-console.log(sim_dest);
-console.log(current_service);
-
-const weather = new Weather(pos); 
-let id = process.env.ID || uuid.v4();
+// const weather = new Weather(pos); 
 const db = new DB({Prosumer : new ProsumerSchema().model})
 
 
@@ -29,7 +25,7 @@ const app: express.Application = express();
 app.use(express.json());
 
 let logger = (req, res, next) =>{ 
-    console.log(`${req.protocol}://${req.get("host")}${req.originalUrl}: got request`)
+    console.log(`${req.protocol}://${req.get("host")}${req.originalUrl}: got  ${req.method}`)
     next();
 }; 
 app.use(logger);
@@ -39,7 +35,7 @@ app.use(express.json());
 app.get('/api/member/:id', (req,res)=>{
     const data = procumers.get(req.params.id);
     if(data){
-        data.tick(weather.speed);
+        data.tick(7);
         res.json(data);
     }
     else
@@ -54,7 +50,7 @@ app.get('/api/members', (req,res)=>{
 });
 //api add procumer
 app.post('/api/member/', async (req, res)=>{
-    const format = ["id","turbines", "batteries"] //enforced members
+    const format = ["turbines", "batteries"] //enforced members
     const data= req.body;
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
         const b = data.batteries;
@@ -65,9 +61,9 @@ app.post('/api/member/', async (req, res)=>{
         b.forEach(e => bc.push(new Battery(e.capacity, e.maxOutput, e.maxCharge)));
         t.forEach(e => tc.push(new Turbine(e.maxPower)));
         const prosumer = new Procumer(bc,tc);
-        procumers.set(data.id, prosumer);
+        procumers.set(v4(), prosumer);
         await prosumer.document();
-        //todo api post the new entry to simulation
+        //todo api post the new entry to simulation with consumption data, alternative is to simulate locally 
         res.json({message:" success!", data: data});
 
     }else{
@@ -88,7 +84,7 @@ app.post('/api/member/control', (req, res)=>{
             res.status(400).json({messsage:"No such memeber!"});
         }
     }
-    else
+    else 
         res.status(400).json({messsage:"Invalid format"});
         
   

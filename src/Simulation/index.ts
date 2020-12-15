@@ -6,6 +6,7 @@ import {DB} from './../DB-Connector/db-connector'
 import { CellSchema } from "../DB-Connector/cell";
 import { ConsumerSchema } from "../DB-Connector/consumer";
 require('dotenv').config();
+import cors = require("cors");
 //todo create modules to clean this file
 const app: express.Application = express();
 app.use(express.json());
@@ -17,7 +18,7 @@ let logger = (req, res, next) =>{
 
 const db = new DB({Cell: new CellSchema().model, Consumer: new ConsumerSchema().model});
 const id = process.env.SIM_ID;
-
+ 
 
 //todo fetch cell from data base, Init Simulator, get Health status of all services, add all managers and procumers if they are available, otherwise wait and store all data in a cache.
 
@@ -43,6 +44,7 @@ const manager = require('./members/api_manager');
 const simdata = require('./members/api_collected_data');
 
 app.use(logger);
+app.use(cors())
 
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);
