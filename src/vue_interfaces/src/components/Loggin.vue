@@ -4,7 +4,7 @@
     <input type="text" id="username" v-model="username">
     <h3>Password:</h3>
     <input type="password" id="password" v-model="password" />
-    <button id="submit">Loggin</button>
+    <button id="submit" v-on:click="valuesIntoJson()">Loggin</button>
     <div class="yellowLine"></div>
     <div class="blueLine"></div>
   </div>
@@ -24,12 +24,16 @@ export default {
     }
   },
   methods: {
-    valuesIntoJson: function(username, password) {
-      const saltedSha256 = require('salted-sha256');
+    valuesIntoJson() {
+      //const saltedSha256 = require('salted-sha256');
       this.userInfo = {
-        "username": username,
-        "password": saltedSha256(password)
+        "username": this.username,
+        //"password": saltedSha256(password)
+        "password": this.password
       }
+      this.newUserType = 'consumer'
+      //this.newUserType = 'consumer'
+      //this.$emit('loggedIn', this.newUserType)
       // if this is correct, define userType and $emit('loggedIn', newUserType)
     }
   }

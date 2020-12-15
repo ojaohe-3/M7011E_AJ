@@ -1,9 +1,8 @@
 <template>
   <div id="app">
     <Header v-bind:userType = "userType" v-on:loggout="userType = 'loggin'" />
-    <Loggin v-if="userType === 'loggin'" /> <!-- v-on:loggedIn="userType = newUserType" -->
+    <Loggin v-if="userType === 'loggin'" v-on:loggedIn="userType = newUserType"/>
     <Consumer v-if="userType === 'consumer'" />
-    <!-- <Simulator v-if="(userType === 'manager' && nextPage === 'simulator')" /> -->
     <Prosumer v-if="userType === 'prosumer'" />
     <Manager v-if="userType === 'manager'" />
   </div>
@@ -16,7 +15,6 @@
 import Header from './components/Header.vue'
 import Loggin from './components/Loggin.vue'
 import Consumer from './components/Consumer.vue'
-//import Simulator from './components/Simulator.vue'
 import Prosumer from './components/Prosumer.vue'
 import Manager from './components/Manager.vue'
 
@@ -26,7 +24,6 @@ export default {
     Header,
     Loggin,
     Consumer,
-    //Simulator,
     Prosumer,
     Manager
   },
