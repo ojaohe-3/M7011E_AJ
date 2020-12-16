@@ -1,9 +1,6 @@
-const axios = require('axios');
+
 export class Procumer{
-    async getProduction() : Promise<number>{
-        const data = await axios.get(this.name + "/api/member/"+ this.id).data;
-        return data.totalProduction;
-    }
+
     totalProduction: number;
     totalCapacity: number;
     currentCapacity: number;

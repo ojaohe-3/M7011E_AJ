@@ -87,10 +87,10 @@ export class Simulator{
         return acc;
     }
 
-    async getTotalSupply() : Promise<number>{
+    getTotalSupply() : number{
         let acc = 0; 
-        this.prosumers.forEach(async e => acc += await e.getProduction());
-        this.managers.forEach(async e => acc += await e.getProduction());
+        this.prosumers.forEach(async e => acc +=  e.totalProduction);
+        this.managers.forEach(async e => acc +=  e.current);
         return acc;
     }
 }
