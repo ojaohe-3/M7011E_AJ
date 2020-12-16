@@ -37,6 +37,7 @@ app.get('/api/member/:id', (req,res)=>{
     const data = procumers.get(req.params.id);
     if(data){
         data.tick(Weather.singleton.speed);
+        console.log(data);
         res.json(data);
     }
     else
@@ -105,6 +106,7 @@ app.post('/api/member/control', (req, res)=>{
 app.get('/api/member/control/:id', (req, res)=>{
     const id = req.params.id;
     const procumer = procumers.get(id);
+
     res.json({"input_ratio": procumer.input_ratio, "output_ratio": procumer.output_ratio});
 });
 
@@ -120,7 +122,11 @@ async function fetchAll() {
         const tc = [];
         entry.batteries.forEach(b=> bc.push(new Battery(b.capacity,b.maxOutput, b.maxCharge, b.current)));
         entry.turbines.forEach(t=>tc.push(new Turbine(t.maxPower)));
-        procumers.set(entry.id, new Procumer(bc,tc, entry.id));
+        const prosumer = new Procumer(bc,tc, entry.id);
+        procumers.set(entry.id, prosumer);
+        prosumer.status =  entry.status ? true: false;
+
+
     });
     // console.log(data);
 }
