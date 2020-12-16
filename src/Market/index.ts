@@ -8,9 +8,17 @@ import { Types } from "mongoose";
 const app = express();
 const cells = new Map<String, Cell>();
 const id = process.env.ID || Types.ObjectId().toHexString();
+let old_price = 0.15;
 let price = (supply, demand)=>{
-    return 0.0001*(demand-supply)/2+0.15;
+    const newPrice = old_price + 0.0001*(demand-supply)/2;
+    old_price = newPrice;
+    return ;
 };
+const tick = async () => {
+    const stat = await totalStats();
+    price(stat.totalProduction, stat.totalDemand);
+};
+setInterval(tick, 1000);
 fetchAll();
 
 app.get('/api/members/',(req, res)=>{
