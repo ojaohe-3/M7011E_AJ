@@ -1,8 +1,6 @@
 import express = require("express");
-import { Weather } from "../weather";
 import { Simulator } from "../simulation";
 import { Consumer } from "../consumer";
-import { DB } from "../../DB-Connector/db-connector";
 import { Types } from "mongoose";
 
 const app = express.Router();
@@ -31,7 +29,7 @@ app.post("/", (req, res) => {
 
 	const data = req.body;
 	//look if all enforced key exists
-	data.body.forEach((item) => {
+	data.body.forEach(async (item) => {
 		if (
 			Object.keys(item).filter((k) => format.some((e) => k === e))
 				.length === format.length
@@ -47,7 +45,7 @@ app.post("/", (req, res) => {
 				const id = item.id ? item.id : Types.ObjectId().toHexString();
 				const consumer = new Consumer(id, item.timefn);
 				sim.consumers.set(id, consumer);
-				consumer.document();
+				await consumer.document();
 			}
 		} else
 			res.status(400).json({
