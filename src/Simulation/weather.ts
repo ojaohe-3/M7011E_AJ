@@ -22,7 +22,8 @@ export class Weather{
     static async update(){
         try{
             console.log(Weather.singleton.pos);
-            const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
+            const pos = Weather.singleton.pos;
+            const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${pos.lat}&lon=${pos.lon}`);
             const data = req.data;
             Weather.singleton.temp = data.temp;
             Weather.singleton.speed = data.speed
