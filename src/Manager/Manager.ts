@@ -1,6 +1,5 @@
 import { Types } from 'mongoose';
 import { DB } from '../DB-Connector/db-connector';
-import {ManagerSchema} from './../DB-Connector/manager';
 export class Manager{
     
     id: String;

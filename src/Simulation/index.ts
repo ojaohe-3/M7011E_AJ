@@ -2,9 +2,9 @@
 import express = require("express");
 import { Weather, Position } from "./weather";
 import { Simulator } from "./simulation";
-import {DB} from './../DB-Connector/db-connector'
-import { CellSchema } from "../DB-Connector/cell";
-import { ConsumerSchema } from "../DB-Connector/consumer";
+import {DB} from './DB-Connector/db-connector'
+import { CellSchema } from "./DB-Connector/cell";
+import { ConsumerSchema } from "./DB-Connector/consumer";
 require('dotenv').config();
 import cors = require("cors");
 import { Types } from "mongoose";

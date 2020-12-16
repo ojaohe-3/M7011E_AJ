@@ -3,7 +3,7 @@ import express = require("express");
 
 import uuid = require("uuid");
 import { Manager } from "./Manager";
-import {DB} from "./../DB-Connector/db-connector";
+import {DB} from "../DB-Connector/db-connector";
 import { ManagerSchema } from "../DB-Connector/manager";
 import { Types } from "mongoose";
 require('dotenv').config();

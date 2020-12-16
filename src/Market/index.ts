@@ -2,10 +2,8 @@
 import express = require("express");
 
 import uuid = require("uuid");
-import { Procumer } from "../Simulation/procumer";
-import { Consumer } from "../Simulation/consumer";
 import { Cell, Stats } from "./cell";
-import { DB } from "../DB-Connector/db-connector";
+import { DB } from "./DB-Connector/db-connector"; //todo
 
 
 const app = express();
