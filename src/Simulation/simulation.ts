@@ -36,7 +36,8 @@ export class Simulator{
 
         if(prosumers){
             const pr = Array.from(prosumers.values());
-            console.log('fetching data from prosumers')
+            console.log('fetching data from prosumers');
+            console.log(pr);
             try {
                 //fetch all procumers and consumers their current data
                 await Promise.all(pr.map(async p => {
