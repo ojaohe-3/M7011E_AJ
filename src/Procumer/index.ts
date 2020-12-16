@@ -124,7 +124,7 @@ async function fetchAll() {
         entry.turbines.forEach(t=>tc.push(new Turbine(t.maxPower)));
         const prosumer = new Procumer(bc,tc, entry.id);
         procumers.set(entry.id, prosumer);
-        prosumer.status =  entry.status ? true: false;
+        prosumer.status =  true;
 
 
     });

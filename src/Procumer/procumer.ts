@@ -54,6 +54,8 @@ export class Procumer{
         else{
             const reactivate = () => this.status = true;
             setTimeout(reactivate, 600000);//crude
+            console.log(`unactive will reactivate in ca 10 min`);
+
         }
     }
 
