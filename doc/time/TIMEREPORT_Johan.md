@@ -116,6 +116,26 @@ Thuesday 08 9am-9pm (with 2h break)
 * Connection Testing
 * Initial Deployment testing
 * docker initial Configurations 
+---
+*some days are missing here*
+Friday 11 9am - 5pm
+* bug testing
+* full unit test
+---
+Sunday 4pm-8pm
+* Database setup
+* unit tests
+---
+Tuesday 4pm - 4am
+* Docker files
+* making production code more ready
+* Deploying on nomad
+
+---
+Wensday
+* Presentation
+* Some vision graphics
+* Creating a link between backend and front end.
 
 Total: 
 2.5 + 4 + 2 + 2 + 4 + 2 + 5 + 8 + 8 + 1 + 3 +4= 45h30 (till tuesday 24) (some entries are missing, total is an underestimated number)
