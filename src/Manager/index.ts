@@ -55,3 +55,20 @@ app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
 
+async function fechAll(){
+    try {
+        const entry = await DB.Models.Manager.find({name: process.env.NAME}).exec();
+        entry.forEach(m => 
+            { 
+                const man = new Manager(m.id, m.maxProduciton);
+                man.current = m.current;
+                man.ratio = m.ratio;
+                if( m.status)
+                    man.setActive();
+                man.Produce(1.1);
+                managers.set(m.id, man);
+            }
+    } catch (error) {
+        
+    }
+}

@@ -1,0 +1,34 @@
+version: "3"
+services:
+  simulator:
+    build: 
+      context: ./Simulation
+    ports: 
+      - "5000:5000"
+    env_file: sim.env
+
+
+  weather:
+    build: ./Weather-Module
+    ports: 
+      - "2555:5000"
+    env_file: w.env
+
+
+  market:
+    build: ./Market
+    ports: 
+      - "5001:5000"
+    env_file: mar.env
+
+  prosumer:
+    build: ./Procumer
+    ports: 
+      - "5002:5000"
+    env_file: pro.env
+
+  manager:
+    build: ./Manager
+    ports: 
+      - "5003:5000"
+    env_file: man.env
