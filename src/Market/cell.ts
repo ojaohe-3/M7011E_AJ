@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import {DB} from '../DB-Connector/db-connector'
+import {DB} from './DB-Connector/db-connector'
 const axios = require('axios');
 
 export interface Stats{
