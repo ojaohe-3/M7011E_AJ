@@ -1,4 +1,9 @@
+const axios = require('axios');
 export class Manager{
+    async getProduction() : Promise<number>{
+        const data = await axios.get(this.name + "/api/member/"+ this.id).data;
+        return data.totalProduction;
+    }
     id : String;
     current :number;
     max_production :number;

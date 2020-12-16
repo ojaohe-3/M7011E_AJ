@@ -81,14 +81,14 @@ export class Simulator{
 
     getTotalDemand() : number{
         let acc  = 0;
-        this.consumers.forEach(e => acc += e.consumption(270));
+        this.consumers.forEach(e => acc += e.consumption(Weather.singleton.temp));
         return acc;
     }
 
-    getTotalSupply() : number{
-        let acc = 0;
-        this.prosumers.forEach(e => acc += e.totalProduction);
-        this.managers.forEach(e => acc += e.current);
+    async getTotalSupply() : Promise<number>{
+        let acc = 0; 
+        this.prosumers.forEach(async e => acc += await e.getProduction());
+        this.managers.forEach(async e => acc += await e.getProduction());
         return acc;
     }
 }
