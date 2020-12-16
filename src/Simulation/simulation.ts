@@ -36,7 +36,7 @@ export class Simulator{
 
         if(prosumers){
             const pr = Array.from(prosumers.values());
-            
+            console.log('fetching data from prosumers')
             try {
                 //fetch all procumers and consumers their current data
                 await Promise.all(pr.map(async p => {
@@ -61,6 +61,8 @@ export class Simulator{
         }
         if(managers){
             const mr = Array.from(managers.values());
+            console.log('fetching data from managers')
+
             try {
                 await Promise.all(mr.map(async m => {
                     const req = await fetch(m.name+'/api/member/'+m.id);

@@ -11,7 +11,7 @@ app.get("/", async (req, res)=>{
     console.log(sim)
     try {
         await sim.tick();
-        const supply = sim.getTotalSupply();
+        const supply = await sim.getTotalSupply();
         const demand = sim.getTotalDemand();
         res.json({totalProduction: supply, totalDemand: demand});
     } catch (error) {
