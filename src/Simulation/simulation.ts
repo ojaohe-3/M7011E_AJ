@@ -7,7 +7,7 @@ export class Simulator{
     consumers: Map<String, Consumer>;
     prosumers: Map<String, Procumer>;
     managers: Map<String, Manager>;
-    weather: Weather;
+    weather: Weather;//its a singleton so make it appear as such
     pos : Position;
 
     static singelton: Simulator;
@@ -22,6 +22,7 @@ export class Simulator{
         this.manager_name = manager_name;
         this.prosumer_name = prosumer_name;
         this.weather = new Weather(pos);
+        Weather.singleton = this.weather;
         this.name = process.env.NAME;
         this.pos = pos;
         Simulator.singelton = this;

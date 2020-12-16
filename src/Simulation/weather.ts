@@ -11,8 +11,8 @@ export class Weather{
     
     static singleton: Weather;
     constructor(pos: Position){
-        this.temp = 0;
-        this.speed = 0;
+        this.temp = 270;
+        this.speed = 7;
         this.pos = pos;
         this.update();
         setImmediate(this.update,3600000);//update every hour
@@ -21,6 +21,7 @@ export class Weather{
     
     async update(){
         try{
+            console.log(this.pos);
             const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
             const data = req.data;
             this.temp = data.temp;
