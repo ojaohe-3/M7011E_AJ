@@ -1,8 +1,8 @@
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
 import {v4} from 'uuid'
-import { IBattery, IProcumer, ITurbine, ProsumerSchema } from "../DB-Connector/prosumer";
-import { DB } from "../DB-Connector/db-connector";
+import { IBattery, ITurbine } from "./DB-Connector/prosumer";
+import { DB } from "./DB-Connector/db-connector";
 import { Types } from "mongoose";
 export class Procumer{    
     totalProduction: number;

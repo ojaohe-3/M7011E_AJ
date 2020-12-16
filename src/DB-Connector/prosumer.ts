@@ -1,5 +1,4 @@
  import { Schema,  model, Document, Model, Number, Types} from 'mongoose';
-import {Procumer} from './../Procumer/procumer'
 
 export interface IBattery
 {
