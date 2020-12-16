@@ -1,5 +1,5 @@
 const axios = require('axios');
-export interface Position{
+export interface GeoLocation{
     lat : number;
     lon : number;
 }
@@ -7,10 +7,10 @@ export class Weather{
     
     temp: number;
     speed: number;
-    pos: Position;
+    pos: GeoLocation;
     
     static singleton: Weather;
-    constructor(pos: Position){
+    constructor(pos: GeoLocation){
         this.temp = 270;
         this.speed = 7;
         this.pos = pos;

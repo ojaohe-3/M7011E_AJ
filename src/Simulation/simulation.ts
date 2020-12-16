@@ -1,21 +1,21 @@
 import { Procumer } from './procumer';
 import { Consumer } from './consumer';
 import { Manager } from './manager';
-import { Weather, Position} from './weather';
+import { Weather, GeoLocation} from './weather';
 const axios = require('axios');
 export class Simulator{
     consumers: Map<String, Consumer>;
     prosumers: Map<String, Procumer>;
     managers: Map<String, Manager>;
     weather: Weather;//its a singleton so make it appear as such
-    pos : Position;
+    pos : GeoLocation;
 
     static singelton: Simulator;
     name: String;
     manager_name: String;
     prosumer_name: String;
 
-    constructor(pos: Position, manager_name: String, prosumer_name: String){
+    constructor(pos: GeoLocation, manager_name: String, prosumer_name: String){
         this.consumers = new Map<String, Consumer>();
         this.prosumers = new Map<String, Procumer>();
         this.managers = new Map<String, Manager>();
