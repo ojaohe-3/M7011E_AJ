@@ -5,6 +5,5 @@ WORKDIR /app
 COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install --production 
 COPY . .
-COPY ./../DB-Connector .
 RUN npm run tsc
 CMD ["npm", "start"]
