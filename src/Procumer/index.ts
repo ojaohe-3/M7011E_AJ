@@ -13,7 +13,7 @@ dotenv.config({path: "./.env"});
 
 const sim_dest = process.env.SIM;
 const pos = {lat: +process.env.LAT, lon: +process.env.LON}
-// const weather = new Weather(pos); 
+const weather = new Weather(pos); 
 const db = new DB({Prosumer : new ProsumerSchema().model})
 
 
