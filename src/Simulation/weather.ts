@@ -14,18 +14,18 @@ export class Weather{
         this.temp = 270;
         this.speed = 7;
         this.pos = pos;
-        this.update();
-        setImmediate(this.update,3600000);//update every hour
+        Weather.update();
+        setImmediate(Weather.update,3600000);//update every hour
         Weather.singleton = this;
     }
     
-    async update(){
+    static async update(){
         try{
-            console.log(this.pos);
+            console.log(Weather.singleton.pos);
             const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
             const data = req.data;
-            this.temp = data.temp;
-            this.speed = data.speed
+            Weather.singleton.temp = data.temp;
+            Weather.singleton.speed = data.speed
         }catch (error){
             console.log(error);
         }
