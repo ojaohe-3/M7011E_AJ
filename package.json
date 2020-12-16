@@ -2,7 +2,7 @@
   "name": "m7011e_aj",
   "version": "1.0.0",
   "description": "School project in distributed dynamic websites",
-  "main": "./build/src/Manager/index.js",
+
   "scripts": {
     "test_all": "jest",
     "test_cons": "jest consumer_test",

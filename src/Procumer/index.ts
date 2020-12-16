@@ -5,10 +5,9 @@ import { Weather, Position } from "./weather";
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
 import * as dotenv from "dotenv";
-import {DB} from './../DB-Connector/db-connector';
+import {DB} from '../DB-Connector/db-connector';
 import { ProsumerSchema } from "../DB-Connector/prosumer";
 import { Types } from "mongoose";
-import { isTemplateExpression } from "typescript";
 const axios = require('axios');
 dotenv.config({path: "./.env"});  
 
@@ -38,7 +37,7 @@ app.use(express.json());
 app.get('/api/member/:id', (req,res)=>{
     const data = procumers.get(req.params.id);
     if(data){
-        data.tick(7);
+        data.tick(Weather.singleton.speed);
         res.json(data);
     }
     else
