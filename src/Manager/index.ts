@@ -28,7 +28,8 @@ app.get('/api/members/',(req, res)=>{
     res.json(Array.from(managers.values())); 
 });
 app.get('/api/members/prosumers', async (req,res)=>{
-    await DB.Models.Prosumer.find({name: "this.sim"}); //todo, what controll api does manager controll? 
+    const data = await DB.Models.Prosumer.find({name: "this.sim"}); //todo manager prosumer controller
+    res.json(data);
 });
 app.get('/api/member/:id',(req, res)=>{
     const id = req.params.id;
