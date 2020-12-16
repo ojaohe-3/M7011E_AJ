@@ -4,7 +4,10 @@ import { Cell, Stats } from "./cell";
 import { DB } from "./DB-Connector/db-connector"; //todo
 import { Types } from "mongoose";
 
-
+let logger = (req, res, next) =>{
+    console.log(`at ${(new Date()).toString()}: ${req.protocol}://${req.get("host")}${req.originalUrl}: ${req.method} request`)
+    next();
+}; 
 const app = express();
 const cells = new Map<String, Cell>();
 const id = process.env.ID || Types.ObjectId().toHexString();
@@ -14,13 +17,17 @@ let price = (supply, demand)=>{
     old_price = newPrice;
     return ;
 };
-const tick = async () => {
+const tick = async () => { //this is serious need of caching
     const stat = await totalStats();
     price(stat.totalProduction, stat.totalDemand);
 };
 setInterval(tick, 60000); //update every minute
 fetchAll();
 
+
+
+app.use(express.json());
+app.use(logger);
 app.get('/api/members/',(req, res)=>{
     res.json(Array.from(cells.values())); 
 });
