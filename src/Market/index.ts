@@ -18,7 +18,7 @@ const tick = async () => {
     const stat = await totalStats();
     price(stat.totalProduction, stat.totalDemand);
 };
-setInterval(tick, 1000);
+setInterval(tick, 60000); //update every minute
 fetchAll();
 
 app.get('/api/members/',(req, res)=>{
