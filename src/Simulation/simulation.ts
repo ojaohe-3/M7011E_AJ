@@ -23,16 +23,16 @@ export class Simulator{
         this.manager_name = manager_name;
         this.prosumer_name = prosumer_name;
         this.weather = new Weather(pos);
+        this.name = process.env.NAME;
         this.pos = pos;
         Simulator.singelton = this;
-        
     }
 
 
     async tick(){
         if(this.prosumers){
             const pr = Array.from(this.prosumers.values());
-
+            
             try {
                 //fetch all procumers and consumers their current data
                 await Promise.all(pr.map(async p => {
@@ -65,7 +65,7 @@ export class Simulator{
                     const old = this.managers.get(m.id);
         
                     old.max_production = data.max_production;
-                    old.production = data.production;
+                    old.current = data.production;
                     old.running = data.running;
                 }));
             } catch (error) {
@@ -77,14 +77,14 @@ export class Simulator{
 
     getTotalDemand() : number{
         let acc  = 0;
-        this.consumers.forEach(e => acc += e.consumption(this.weather.temp));
+        this.consumers.forEach(e => acc += e.consumption(270));
         return acc;
     }
 
     getTotalSupply() : number{
         let acc = 0;
         this.prosumers.forEach(e => acc += e.totalProduction);
-        this.managers.forEach(e => acc += e.production);
+        this.managers.forEach(e => acc += e.current);
         return acc;
     }
 }

@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import {DB} from './../DB-Connector/db-connector'
 export interface Stats{
     totalProduction: number;
@@ -33,10 +34,25 @@ export class Cell{
     }
 
     async document(){
-        const body = {
-            name: process.env.NAME,
-            cells: this.destinations
-        };
-        await DB.Models.Market.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
+        
+        try {
+        const entry = await DB.Models.Market.findById(this.id).exec(); //todo fix this sly solution
+        if(!entry){
+            const body = {
+                name: process.env.NAME,
+                cells: this.destinations,
+                _id: Types.ObjectId(+this.id)
+            };
+            await DB.Models.Market.create(body);
+        }else{
+            const body = {
+                name: process.env.NAME,
+                cells: this.destinations    
+            }
+            await DB.Models.Market.findByIdAndUpdate(this.id, body, {upsert : true});
+        }
+        } catch (error) {
+            console.log(error);
+        }
     }
 }

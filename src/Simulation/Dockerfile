@@ -1,1 +1,10 @@
-FROM node:12.18.1
+FROM node:latest
+ENV NODE_ENV=production
+#todo, load from .env
+WORKDIR /app
+COPY ["package.json", "package-lock.json*", "./"]
+RUN npm install --production 
+COPY . .
+COPY ./../DB-Connector .
+RUN npm run tsc
+CMD ["npm", "start"]

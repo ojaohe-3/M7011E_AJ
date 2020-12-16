@@ -7,7 +7,10 @@ import { Turbine } from "./Turbine";
 import * as dotenv from "dotenv";
 import {DB} from './../DB-Connector/db-connector';
 import { ProsumerSchema } from "../DB-Connector/prosumer";
-import {v4} from 'uuid';
+import {v1, v4} from 'uuid';
+import { Types } from "mongoose";
+import { isTemplateExpression } from "typescript";
+const axios = require('axios');
 dotenv.config({path: "./.env"});  
 
 const sim_dest = process.env.SIM;
@@ -20,6 +23,7 @@ const db = new DB({Prosumer : new ProsumerSchema().model})
 
 const procumers: Map<String, Procumer> = new Map<String, Procumer>();
 //fetch from database, id and procumers
+fetchAll();
 const app: express.Application = express();
 
 app.use(express.json());
@@ -56,15 +60,26 @@ app.post('/api/member/', async (req, res)=>{
         const b = data.batteries;
         const t = data.turbines;
         let bc:Array<Battery> = [];
-        let tc:Array<Turbine> = [];
+        let tc:Array<Turbine> = []; 
         //unsafe but must be done we assume it is completed if the key exist
         b.forEach(e => bc.push(new Battery(e.capacity, e.maxOutput, e.maxCharge)));
         t.forEach(e => tc.push(new Turbine(e.maxPower)));
-        const prosumer = new Procumer(bc,tc);
-        procumers.set(v4(), prosumer);
-        await prosumer.document();
+        const id =  data.id ? data.id :Types.ObjectId().toHexString();
+
+        const prosumer = new Procumer(bc,tc, id);
+        procumers.set(id, prosumer);
+        await prosumer.document(); 
+        //todo make sure data format is in an interface
+        //todo make a sensible timefn, or include as key when posting
+        await axios.post(process.env.SIM + '/members/prosumers/', {
+            id: id, 
+             timefn: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], //temporary, fix later
+             capacity: prosumer.totalCapacity,
+             current: prosumer.currentCapacity(), 
+             status: prosumer.status
+        }).then(()=> console.log('sent upstream')).catch((err)=>console.log(err));
         //todo api post the new entry to simulation with consumption data, alternative is to simulate locally 
-        res.json({message:" success!", data: data});
+        res.json({message:" success!", data: data}); 
 
     }else{
         res.status(400).json({message:"Invalid format", format:format})
@@ -99,3 +114,15 @@ let PORT =  process.env.PORT || 5000;
 app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
+
+async function fetchAll() {
+    const data = await DB.Models.Prosumer.find({name: process.env.NAME}).exec();
+    data.forEach(entry => {
+        const bc = [];
+        const tc = [];
+        entry.batteries.forEach(b=> bc.push(new Battery(b.capacity,b.maxOutput, b.maxCharge, b.current)));
+        entry.turbines.forEach(t=>tc.push(new Turbine(t.maxPower)));
+        procumers.set(entry.id, new Procumer(bc,tc, entry.id));
+    });
+    // console.log(data);
+}

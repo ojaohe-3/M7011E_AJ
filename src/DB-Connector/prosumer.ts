@@ -1,4 +1,4 @@
- import { Schema,  model, Document, Model, Number } from 'mongoose';
+ import { Schema,  model, Document, Model, Number, Types} from 'mongoose';
 import {Procumer} from './../Procumer/procumer'
 
 export interface IBattery
@@ -14,12 +14,12 @@ export interface ITurbine //this will be expanded uppon in the future
 }
 export interface IProcumer extends Document{
     totalProduction: number,
-            totalCapacity: number,
-            currentCapacity: number,
-            batteries: IBattery[],
-            turbines: ITurbine[],
-            name: String,
-            status: Boolean,
+    totalCapacity: number,
+    currentCapacity: number,
+    batteries: IBattery[],
+    turbines: ITurbine[],
+    name: String,
+    status: Boolean,
 }
 
 
@@ -30,7 +30,7 @@ export class ProsumerSchema {
     private _model: Model<IProcumer>;
 
     constructor(){
-        const battery = new Schema({
+        const battery = new Schema({//make sure _id is not pressent in this item and turbine
             capacity: Number,
             current: Number,
             maxOutput: Number,
@@ -46,7 +46,8 @@ export class ProsumerSchema {
             batteries: [battery],
             turbines: [turbin],
             name: String,
-            status: Boolean,
+            status: Boolean
+
         });
         this._model = model<IProcumer>('Prosumer', ProcumerSchema)
     }

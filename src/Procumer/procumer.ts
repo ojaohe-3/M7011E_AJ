@@ -3,6 +3,7 @@ import { Turbine } from "./Turbine";
 import {v4} from 'uuid'
 import { IBattery, IProcumer, ITurbine, ProsumerSchema } from "../DB-Connector/prosumer";
 import { DB } from "../DB-Connector/db-connector";
+import { Types } from "mongoose";
 export class Procumer{    
     totalProduction: number;
     totalCapacity: number;
@@ -54,21 +55,37 @@ export class Procumer{
     async document() {
         const bc: IBattery[] = [];
         const tc :ITurbine[]= [];
-        
+        console.log(this.id.length)
         this.batteries.forEach(battery => bc.push({capacity: battery.capacity, current: battery.current, maxOutput: battery.maxOutput,maxCharge:  battery.maxCharge}));
         this.turbines.forEach(turbine => tc.push({maxPower: turbine.maxPower}));
-        const body= {
-            totalProduction: this.totalProduction,
-            totalCapacity: this.totalCapacity,
-            currentCapacity: this.currentCapacity(),
-            batteries: bc,
-            turbines: tc,
-            name: process.env.NAME,
-            status: this.status
-        };
+       
         try {
-            // await DB.Models.Prosumer.create(body);
-            await DB.Models.Prosumer.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+            const entry = await DB.Models.Prosumer.findById(Types.ObjectId(+this.id)).exec();
+            if(!entry){
+                const body= {
+                    totalProduction: this.totalProduction,
+                    totalCapacity: this.totalCapacity,
+                    currentCapacity: this.currentCapacity(),
+                    batteries: bc,
+                    turbines: tc,
+                    name: process.env.NAME,
+                    status: this.status,
+                    _id : this.id
+                };
+                await DB.Models.Prosumer.create(body);
+            }
+            else{
+                const body= {
+                    totalProduction: this.totalProduction,
+                    totalCapacity: this.totalCapacity,
+                    currentCapacity: this.currentCapacity(),
+                    batteries: bc,
+                    turbines: tc,
+                    name: process.env.NAME,
+                    status: this.status
+                };
+                await DB.Models.Prosumer.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+            }
             
         } catch (error) {
             console.log(error)

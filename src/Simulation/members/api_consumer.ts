@@ -3,35 +3,20 @@ import { Weather } from "../weather";
 import { Simulator } from "../simulation";
 import { Consumer } from "../consumer";
 import { DB } from "../../DB-Connector/db-connector";
+import { Types } from "mongoose";
 
 const app = express.Router();
 
-const sim = Simulator.singelton;
-const weather = Weather.singleton;
-
-const get_consumers = async () => {
-	const collection = await DB.Models.Consumer.find({
-		name: process.env.NAME,
-	}).exec();
-	if (collection) {
-		collection.forEach((e) =>
-			sim.consumers.set(
-				e.id,
-				new Consumer(e.id, () => {
-					return +e.timefn[new Date().getHours()];
-				})
-			)
-		); //add timefunction to db
-	}
-};
-
 app.get("/", (req, res) => {
-	sim.consumers.forEach((e) => (e.demand = e.consumption(weather.temp)));
+	const sim = Simulator.singelton;
+	sim.consumers.forEach((e) => (e.demand = e.consumption(sim.weather.temp)));
 	const data = Array.from(sim.consumers.values());
 	res.json(data);
 });
 
 app.get("/:id", (req, res) => {
+	const sim = Simulator.singelton;
+
 	const data = sim.consumers.get(req.params.id);
 	if (data) res.json(data);
 	else
@@ -41,7 +26,8 @@ app.get("/:id", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-	const format = ["id", "timefn"]; //enforced members
+	const format = [ "timefn"]; //enforced members
+	const sim = Simulator.singelton;
 
 	const data = req.body;
 	//look if all enforced key exists
@@ -53,21 +39,15 @@ app.post("/", (req, res) => {
 			if (item.timefn.length !== 24) {
 				res.status(400).json({
 					message: "Invalid format for timefn",
-					required: "24 length array of (mean, diviation)",
+					required: "24 length array of numbers",
 				});
+				
 			} else {
-				const timefn = () => {
-					const dt = item.timefn[new Date().getHours()];
-					return (
-						(Math.random() * dt[0] +
-							(Math.random() * dt[1]) / 2 -
-							(Math.random() * dt[1]) / 2 +
-							(dt[0] - dt[1])) ^
-						(2 / 2)
-					);
-				};
-				const consumer = new Consumer(item.id, timefn);
-				sim.consumers.set(item.id, consumer);
+				
+				const id = item.id ? item.id : Types.ObjectId().toHexString();
+				const consumer = new Consumer(id, item.timefn);
+				sim.consumers.set(id, consumer);
+				consumer.document();
 			}
 		} else
 			res.status(400).json({

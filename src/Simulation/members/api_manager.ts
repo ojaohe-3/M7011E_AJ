@@ -5,10 +5,10 @@ import { Simulator } from "../simulation";
 const app = express.Router();
 
 
-const sim = Simulator.singelton;
 
 
 app.get("/:id", (req, res) => {//todo fetch from producer source
+    const sim = Simulator.singelton;
 
     const data =sim.managers.get(req.params.id);
     if(data)
@@ -18,6 +18,8 @@ app.get("/:id", (req, res) => {//todo fetch from producer source
     
 });
 app.get("/", (req, res) => {
+    const sim = Simulator.singelton;
+
     const data = Array.from(sim.managers.values());
     
     res.json(data)
@@ -26,8 +28,10 @@ app.get("/", (req, res) => {
 
 
 app.post("/",(req,res) =>{
+    const sim = Simulator.singelton;
+
     const format = ["id","max","current","status"] //enforced members
-    const data= JSON.parse(req.body);
+    const data= req.body;
 
     data.body.forEach(item => {
         //look if all enforced key exists

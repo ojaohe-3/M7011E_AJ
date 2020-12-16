@@ -5,13 +5,22 @@ import uuid = require("uuid");
 import { Manager } from "./Manager";
 import {DB} from "./../DB-Connector/db-connector";
 import { ManagerSchema } from "../DB-Connector/manager";
-
+import { Types } from "mongoose";
+require('dotenv').config();
+const cors = require('cors');
+const axios = require('axios');
 const db = new DB({Manager: new ManagerSchema().model});
 const app = express(); 
 const managers = new Map<String, Manager>();
-const id = process.env.ID || uuid.v4();
- 
 
+
+let logger = (req, res, next) =>{
+    console.log(`at ${(new Date()).toString()}: ${req.protocol}://${req.get("host")}${req.originalUrl}: ${req.method} request`)
+    next();
+}; 
+app.use(cors())
+app.use(logger)
+app.use(express.json());
 app.get('/api/members/',(req, res)=>{
     res.json(Array.from(managers.values())); 
 });
@@ -24,13 +33,20 @@ app.get('/api/member/:id',(req, res)=>{
 });
 
 app.post('/api/member/', async (req, res)=>{
-    const format = ["id","maxProduction"]//enforced members
+    const format = ["maxProduction"]//enforced members todo central funciton handle this perferable decorator
     const data= req.body;
+    console.log(data);
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-
-        const manager = new Manager(data.id,data.maxProduction);
-        managers.set(data.id, manager);
+        const id = data.id ? data.id : Types.ObjectId().toHexString();
+        const manager = new Manager(id,data.maxProduction);
+        managers.set(id, manager);
         await manager.document();
+        await axios.post(process.env.SIM +'/members/managers/', {
+            id: id,
+            max: manager.maxProduciton,
+            current: manager.current,
+            status: manager.status
+        }).then(m => console.log(m)).catch(err => console.log(err));//todo make interface for data
     }else
         res.status(400).json({message: "invalid format!", format:format});
 });

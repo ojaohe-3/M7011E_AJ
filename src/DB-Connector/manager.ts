@@ -5,7 +5,6 @@
 declare interface IManager extends Document{
     current: number,
     maxProduciton: number,
-    production : number,
     status: Boolean,
     ratio: number,
     name: String,
