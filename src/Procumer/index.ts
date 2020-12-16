@@ -50,9 +50,10 @@ app.get('/api/members', (req,res)=>{
         res.status(400).json({messsage: "No memebers!"});
 });
 //api add procumer
-app.post('/api/member/', async (req, res)=>{
+app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
     const format = ["turbines", "batteries"] //enforced members
     const data= req.body;
+    console.log(data);
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
         const b = data.batteries;
         const t = data.turbines;
