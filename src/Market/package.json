@@ -1,5 +1,6 @@
 
-  "name": "m7011e_aj",
+ { 
+   "name": "m7011e_aj",
   "version": "1.0.0",
   "description": "School project in distributed dynamic websites",
   "main": "build/index.js",
