@@ -33,9 +33,9 @@ export class Simulator{
 
         const prosumers = Simulator.singelton.prosumers;
         const managers = Simulator.singelton.managers;
-        
+
         if(prosumers){
-            const pr = Array.from(this.prosumers.values());
+            const pr = Array.from(prosumers.values());
             
             try {
                 //fetch all procumers and consumers their current data
@@ -43,7 +43,7 @@ export class Simulator{
                     const req = await axios.get(p.name+'/api/member/'+p.id);
                     const data = req.data;
 
-                    const old = this.prosumers.get(data.id);
+                    const old = prosumers.get(data.id);
                     if(old){
                         old.totalProduction = data.production.totalProduction;
                         old.totalCapacity = data.totalCapacity;
@@ -60,13 +60,13 @@ export class Simulator{
             }
         }
         if(managers){
-            const mr = Array.from(this.managers.values());
+            const mr = Array.from(managers.values());
             try {
                 await Promise.all(mr.map(async m => {
                     const req = await fetch(m.name+'/api/member/'+m.id);
                     const data = await req.json();
         
-                    const old = this.managers.get(m.id);
+                    const old = managers.get(m.id);
         
                     old.max_production = data.max_production;
                     old.current = data.production;
