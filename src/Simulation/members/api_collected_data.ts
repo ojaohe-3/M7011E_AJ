@@ -4,10 +4,11 @@ import { Simulator } from "../simulation";
 const app = express.Router();
 
 
-const sim = Simulator.singelton;
 
 //api get get total production and total consumption todo with query
 app.get("/", async (req, res)=>{
+const sim = Simulator.singelton;
+
     try {
         await sim.tick();
         const supply = sim.getTotalSupply();
