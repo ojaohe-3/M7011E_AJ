@@ -1,7 +1,7 @@
 
 import express = require("express");
 import { Cell, Stats } from "./cell";
-import { DB } from "../DB-Connector/db-connector"; //todo
+import { DB } from "./DB-Connector/db-connector"; //todo
 import { Types } from "mongoose";
 
 
