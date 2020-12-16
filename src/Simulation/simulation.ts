@@ -40,9 +40,9 @@ export class Simulator{
             try {
                 //fetch all procumers and consumers their current data
                 await Promise.all(pr.map(async p => {
-                    const req = await axios.get(p.name+'/api/member/'+p.id);
+                    const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+p.id);
                     const data = req.data;
-
+                    console.log(data);
                     const old = prosumers.get(data.id);
                     if(old){
                         old.totalProduction = data.production.totalProduction;
@@ -65,9 +65,9 @@ export class Simulator{
 
             try {
                 await Promise.all(mr.map(async m => {
-                    const req = await fetch(m.name+'/api/member/'+m.id);
-                    const data = await req.json();
-        
+                    const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+m.id);
+                    const data = req.data;
+                    console.log(data);
                     const old = managers.get(m.id);
         
                     old.max_production = data.max_production;
