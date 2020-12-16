@@ -7,7 +7,6 @@ import { Turbine } from "./Turbine";
 import * as dotenv from "dotenv";
 import {DB} from './../DB-Connector/db-connector';
 import { ProsumerSchema } from "../DB-Connector/prosumer";
-import {v1, v4} from 'uuid';
 import { Types } from "mongoose";
 import { isTemplateExpression } from "typescript";
 const axios = require('axios');
