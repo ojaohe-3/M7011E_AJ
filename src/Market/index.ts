@@ -49,7 +49,7 @@ app.listen(PORT, function () {
 
 async function totalStats() : Promise<Stats>{
     const data = Array.from(cells.values());
-    let acc: Stats;
+    let acc: Stats = {totalDemand: 0, totalProduction: 0};
     await Promise.all(data.map(async c => {
         const body = await c.getStats();
         acc.totalDemand += body.totalDemand;
