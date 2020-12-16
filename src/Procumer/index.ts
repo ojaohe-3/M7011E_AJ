@@ -84,7 +84,7 @@ app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
         res.status(400).json({message:"Invalid format", format:format})
     }
 });
-app.post('/api/member/control', (req, res)=>{
+app.post('/api/member/control', (req, res)=>{//todo fix
     const data = req.body;
 
     if(data.id){

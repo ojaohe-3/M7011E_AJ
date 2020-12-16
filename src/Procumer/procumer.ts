@@ -28,11 +28,11 @@ export class Procumer{
         };
         this.input_ratio = 0.5;
         this.output_ratio = 0.5;
-
+        this.status = true;
         if(id)
             this.id = id;
         else
-            this.id = v4();
+            this.id = Types.ObjectId().toHexString();
     }
      /**
      * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
@@ -40,6 +40,7 @@ export class Procumer{
      * @param ratio 
      */
     tick(speed: number){
+        console.log(`speed :${speed}`);
         this.totalProduction = 0;
         if(this.status){
             this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(speed));
@@ -49,6 +50,10 @@ export class Procumer{
                 this.totalProduction += b.Output(1);
             });
             this.totalProduction*this.output_ratio;
+        }
+        else{
+            const reactivate = () => this.status = true;
+            setTimeout(reactivate, 600000);//crude
         }
     }
 
