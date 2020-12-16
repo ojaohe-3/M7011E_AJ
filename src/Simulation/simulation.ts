@@ -30,7 +30,11 @@ export class Simulator{
 
 
     async tick(){
-        if(this.prosumers){
+
+        const prosumers = Simulator.singelton.prosumers;
+        const managers = Simulator.singelton.managers;
+        
+        if(prosumers){
             const pr = Array.from(this.prosumers.values());
             
             try {
@@ -55,7 +59,7 @@ export class Simulator{
                 console.log(error);
             }
         }
-        if(this.managers){
+        if(managers){
             const mr = Array.from(this.managers.values());
             try {
                 await Promise.all(mr.map(async m => {

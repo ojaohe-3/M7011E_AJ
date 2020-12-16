@@ -56,11 +56,9 @@ async function fetchAll() {
         const sim_data = await DB.Models.Cell.findById(Types.ObjectId(id)).exec();
         const sim = new Simulator({lat: +sim_data.lat, lon: +sim_data.lon}, sim_data.manager_dest, sim_data.prosumer_dest);
         console.log("simulator loaded!");
-        console.log(sim_data);
         Simulator.singelton = sim;
         const data = await DB.Models.Consumer.find({name: process.env.NAME}).exec();
         data.forEach(c => sim.consumers.set(c.id, new Consumer(c.id,c.timefn, c.demand, c.profile)));
-        console.log(sim);
         setInterval(Simulator.singelton.tick, 1000);
     } catch (error) {
         console.log(error)
