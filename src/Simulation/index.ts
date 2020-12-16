@@ -36,7 +36,7 @@ app.use(cors())
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);
 app.use('/api/members/managers', manager);
-app.use('/api/members/data', simdata);
+app.use('/api/data', simdata);
    
 
 const PORT =  process.env.PORT || 5000;

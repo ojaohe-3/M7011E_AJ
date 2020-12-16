@@ -1,5 +1,4 @@
 import express = require("express");
-import { Weather } from "../weather";
 import { Simulator } from "../simulation";
 
 const app = express.Router();

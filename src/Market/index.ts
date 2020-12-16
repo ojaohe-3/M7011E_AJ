@@ -1,14 +1,13 @@
 
 import express = require("express");
-
-import uuid = require("uuid");
 import { Cell, Stats } from "./cell";
-import { DB } from "./DB-Connector/db-connector"; //todo
+import { DB } from "../DB-Connector/db-connector"; //todo
+import { Types } from "mongoose";
 
 
 const app = express();
 const cells = new Map<String, Cell>();
-const id = process.env.ID || uuid.v4();
+const id = process.env.ID || Types.ObjectId().toHexString();
 let price = (supply, demand)=>{
     return 0.0001*(demand-supply)/2+0.15;
 };
@@ -26,19 +25,20 @@ app.get('/api/member/:id',(req, res)=>{
 });
 
 app.post('/api/member/', async (req, res)=>{
-    const format = ["id","name", "dest"]//enforced members
+    const format = ["dest"]//enforced members
     const data= req.body;
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        const cell =new Cell(data.id, data.dest);
-        cells.set(data.id,cell );
-        await cell.document();
+        const id  = data.id ? data.id : Types.ObjectId().toHexString();
+        const cell =new Cell(data.dest);
+        cells.set(id, cell);
+        await document();
     }else
         res.status(400).json({message: "invalid format!", format:format});
 });
 
 app.get('/api/price',async (req, res)=>{
     const stats = await totalStats();//handle errors
-    res.json(stats);
+    res.json(price(stats.totalProduction, stats.totalDemand));
 });
 
 let PORT =  process.env.PORT || 5000;
@@ -56,4 +56,37 @@ async function totalStats() : Promise<Stats>{
         acc.totalProduction += body.totalProduction;
     }));
     return acc;
+}
+async function fetchAll() {
+    try {
+        const data = await DB.Models.Market.findById(id);
+        if(data){
+            data.cells.forEach(d => cells.set(data.id, new Cell(d)));
+        }
+    } catch (error) {
+        await document();
+    }
+}
+async function document(){
+        
+    try {
+    const cell_dest = Array.from(cells.values()).map(c => c.destination);
+    const entry = await DB.Models.Market.findById(this.id).exec(); //todo fix this sly solution
+    if(!entry){
+        const body = {
+            name: process.env.NAME,
+            cells: cell_dest,
+            _id: Types.ObjectId(+this.id)
+        };
+        await DB.Models.Market.create(body);
+    }else{
+        const body = {
+            name: process.env.NAME,
+            cells: cell_dest    
+        }
+        await DB.Models.Market.findByIdAndUpdate(this.id, body, {upsert : true});
+    }
+    } catch (error) {
+        console.log(error);
+    }
 }
