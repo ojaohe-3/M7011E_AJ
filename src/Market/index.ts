@@ -11,7 +11,7 @@ const id = process.env.ID || Types.ObjectId().toHexString();
 let price = (supply, demand)=>{
     return 0.0001*(demand-supply)/2+0.15;
 };
-
+fetchAll();
 
 app.get('/api/members/',(req, res)=>{
     res.json(Array.from(cells.values())); 
