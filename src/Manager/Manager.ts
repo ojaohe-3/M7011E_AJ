@@ -20,7 +20,7 @@ export class Manager{
 
     setActive(){
         this.status = true;
-        this.Produce(1.05);
+        this.Produce(1.1);
     }
     stop(){
         this.status = false;

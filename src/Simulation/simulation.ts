@@ -19,7 +19,6 @@ export class Simulator{
         this.consumers = new Map<String, Consumer>();
         this.prosumers = new Map<String, Procumer>();
         this.managers = new Map<String, Manager>();
-        this.name = process.env.Name;
         this.manager_name = manager_name;
         this.prosumer_name = prosumer_name;
         this.weather = new Weather(pos);

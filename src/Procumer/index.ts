@@ -12,7 +12,6 @@ const axios = require('axios');
 dotenv.config({path: "./.env"});  
 
 const sim_dest = process.env.SIM;
-const current_service = process.env.DEST;  
 const pos = {lat: +process.env.LAT, lon: +process.env.LON}
 // const weather = new Weather(pos); 
 const db = new DB({Prosumer : new ProsumerSchema().model})

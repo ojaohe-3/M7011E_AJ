@@ -18,6 +18,8 @@ let logger = (req, res, next) =>{
     console.log(`at ${(new Date()).toString()}: ${req.protocol}://${req.get("host")}${req.originalUrl}: ${req.method} request`)
     next();
 }; 
+fetchAll();
+//todo, put, controll api
 app.use(cors())
 app.use(logger)
 app.use(express.json());
@@ -55,7 +57,7 @@ app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
 
-async function fechAll(){
+async function fetchAll(){
     try {
         const entry = await DB.Models.Manager.find({name: process.env.NAME}).exec();
         entry.forEach(m => 
@@ -65,9 +67,10 @@ async function fechAll(){
                 man.ratio = m.ratio;
                 if( m.status)
                     man.setActive();
-                man.Produce(1.1);
+                
                 managers.set(m.id, man);
-            }
+                man.Produce(1.1);
+            });
     } catch (error) {
         
     }
