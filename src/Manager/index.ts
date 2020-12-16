@@ -6,10 +6,11 @@ import { Manager } from "./Manager";
 import {DB} from "./DB-Connector/db-connector";
 import { ManagerSchema } from "./DB-Connector/manager";
 import { Types } from "mongoose";
+import { ProsumerSchema } from "./DB-Connector/prosumer";
 require('dotenv').config();
 const cors = require('cors');
 const axios = require('axios');
-const db = new DB({Manager: new ManagerSchema().model});
+const db = new DB({Manager: new ManagerSchema().model, Prosumer: new ProsumerSchema().model});
 const app = express(); 
 const managers = new Map<String, Manager>();
 
@@ -25,6 +26,9 @@ app.use(logger)
 app.use(express.json());
 app.get('/api/members/',(req, res)=>{
     res.json(Array.from(managers.values())); 
+});
+app.get('/api/members/prosumers', async (req,res)=>{
+    await DB.Models.Prosumer.find({name: "this.sim"}); //todo, what controll api does manager controll? 
 });
 app.get('/api/member/:id',(req, res)=>{
     const id = req.params.id;
