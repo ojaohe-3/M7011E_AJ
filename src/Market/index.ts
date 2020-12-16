@@ -15,7 +15,7 @@ let old_price = 0.15;
 let price = (supply, demand)=>{
     const newPrice = old_price + 0.0001*(demand-supply)/2;
     old_price = newPrice;
-    return ;
+    return newPrice;
 };
 const tick = async () => { //this is serious need of caching
     const stat = await totalStats();
@@ -53,7 +53,7 @@ app.post('/api/member/', async (req, res)=>{
 
 app.get('/api/price',async (req, res)=>{
     const stats = await totalStats();//handle errors
-    res.json(price(stats.totalProduction, stats.totalDemand));
+    res.json({"price" : price(stats.totalProduction, stats.totalDemand)});
 });
 
 let PORT =  process.env.PORT || 5000;
