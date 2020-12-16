@@ -53,7 +53,7 @@ app.post('/api/member/', async (req, res)=>{
 
 app.get('/api/price',async (req, res)=>{
     const stats = await totalStats();//handle errors
-    res.json({"price" : price(stats.totalProduction, stats.totalDemand)});
+    res.json({"price" : price(stats.totalProduction, stats.totalDemand), "stats": stats});
 });
 
 let PORT =  process.env.PORT || 5000;
