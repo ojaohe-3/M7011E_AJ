@@ -29,7 +29,7 @@ export class Simulator{
     }
 
 
-    async tick(){ //todo add caching here
+    async tick(){ //todo add caching here 
 
         // const prosumers = Simulator.singelton.prosumers;
         // const managers = Simulator.singelton.managers;
@@ -80,14 +80,15 @@ export class Simulator{
 
     getTotalDemand() : number{
         let acc  = 0;
-        this.consumers.forEach(e => acc += e.consumption(Weather.singleton.temp));
+        Simulator.singelton.consumers.forEach(e => acc += e.consumption(Weather.singleton.temp));
         return acc;
     }
 
     getTotalSupply() : number{
         let acc = 0; 
-        this.prosumers.forEach(e => acc +=  e.totalProduction);
-        this.managers.forEach(e => acc +=  e.current);
+
+        Simulator.singelton.prosumers.forEach(e => acc +=  e.totalProduction);
+        Simulator.singelton.managers.forEach(e => acc +=  e.current);
         return acc;
     }
 }

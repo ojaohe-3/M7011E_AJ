@@ -52,7 +52,7 @@ export class Manager{
             a += 1;
 
         this.current *= a; //updates value
-        this.tick();
+        await this.tick();
         await new Promise(resolve => setTimeout(resolve, 250));  //wait 250ms
         
         //if we are producing i.e accelerating

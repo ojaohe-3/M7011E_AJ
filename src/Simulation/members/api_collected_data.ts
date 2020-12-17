@@ -6,10 +6,10 @@ const app = express.Router();
 
 
 //api get get total production and total consumption todo with query
-app.get("/", async (req, res)=>{
+app.get("/", (req, res)=>{
     const sim = Simulator.singelton;
     try {
-        await sim.tick();
+        // await sim.tick();
         const supply = sim.getTotalSupply();
         const demand = sim.getTotalDemand();
         res.json({totalProduction: supply, totalDemand: demand});
