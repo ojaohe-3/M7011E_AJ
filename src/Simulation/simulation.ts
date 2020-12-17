@@ -63,7 +63,7 @@ export class Simulator{
 
             try {
                 mr.forEach(async m => {
-                    const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+m.id);
+                    const req = await axios.get(Simulator.singelton.manager_name+'/api/member/'+m.id);
                     const data = req.data;
                     const old = managers.get(m.id);
         
