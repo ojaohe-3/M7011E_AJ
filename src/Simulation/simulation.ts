@@ -40,7 +40,7 @@ export class Simulator{
             console.log(pr);
             try {
                 //fetch all procumers and consumers their current data
-                await Promise.all(pr.map(async p => {
+                await pr.forEach (async p => {
                     const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+p.id);
                     const data = req.data;
                     console.log(data);
@@ -51,11 +51,11 @@ export class Simulator{
                         old.currentCapacity = data.currentCapacity;
                         old.status = data.status;
                     }else if(data){
-                        this.prosumers.set(data.id, new Procumer(data.id, data.totalProduction, data.totalCapacity, data.current, data.status, p.name));
+                        Simulator.singelton.prosumers.set(data.id, new Procumer(data.id, data.totalProduction, data.totalCapacity, data.current, data.status, p.name));
                     }else{
                         console.log('could not find: ' + data.id );
                     }
-                }));
+                });
             } catch (error) {
                 console.log(error);
             }
