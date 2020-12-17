@@ -89,6 +89,7 @@ async function fetchAll(){
                     current: man.current,
                     status: man.status
                 });
+                setTimeout(man.Produce(1.1), 60000);
                 
             });
             await axios.post(process.env.SIM + '/api/members/managers', {
