@@ -10,7 +10,11 @@ import { ProsumerSchema } from "./DB-Connector/prosumer";
 require('dotenv').config();
 const cors = require('cors');
 const axios = require('axios');
+
+
 const db = new DB({Manager: new ManagerSchema().model, Prosumer: new ProsumerSchema().model});
+fetchAll();
+
 const app = express(); 
 const managers = new Map<String, Manager>();
 
@@ -19,7 +23,6 @@ let logger = (req, res, next) =>{
     console.log(`at ${(new Date()).toString()}: ${req.protocol}://${req.get("host")}${req.originalUrl}: ${req.method} request`)
     next();
 }; 
-fetchAll();
 //todo, put, controll api
 app.use(cors())
 app.use(logger)
