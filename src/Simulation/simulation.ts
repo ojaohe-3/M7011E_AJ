@@ -40,7 +40,7 @@ export class Simulator{
             console.log(pr);
             try {
                 //fetch all procumers and consumers their current data
-                await pr.forEach (async p => {
+                pr.forEach (async p => {
                     const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+p.id);
                     const data = req.data;
                     console.log(data);
@@ -65,7 +65,7 @@ export class Simulator{
             console.log('fetching data from managers')
 
             try {
-                await Promise.all(mr.map(async m => {
+               mr.forEach(async m => {
                     const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+m.id);
                     const data = req.data;
                     console.log(data);
@@ -74,7 +74,7 @@ export class Simulator{
                     old.max_production = data.max_production;
                     old.current = data.production;
                     old.running = data.running;
-                }));
+                });
             } catch (error) {
                 console.log(error);
             }
