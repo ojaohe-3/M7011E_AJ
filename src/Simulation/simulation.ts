@@ -44,7 +44,7 @@ export class Simulator{
                     const data = req.data;
                     const old = prosumers.get(data.id);
                     if(old){
-                        old.totalProduction = data.production.totalProduction;
+                        old.totalProduction = data.totalProduction;
                         old.totalCapacity = data.totalCapacity;
                         old.currentCapacity = data.currentCapacity;
                         old.status = data.status;
@@ -67,9 +67,9 @@ export class Simulator{
                     const data = req.data;
                     const old = managers.get(m.id);
         
-                    old.max_production = data.max_production;
-                    old.current = data.production;
-                    old.running = data.running;
+                    old.max_production = data.maxProduciton;
+                    old.current = data.current;
+                    old.running = data.status;
                 });
             } catch (error) {
                 console.log(error);
