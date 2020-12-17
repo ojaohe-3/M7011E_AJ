@@ -70,7 +70,7 @@ app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
         await prosumer.document(); 
         //todo make sure data format is in an interface
         //todo make a sensible timefn, or include as key when posting
-        await axios.post(process.env.SIM + '/members/prosumers/', {
+        await axios.post(process.env.SIM + '/api/members/prosumers/', {
             body:[
                 {
                     id: id, 
@@ -139,7 +139,7 @@ async function fetchAll() {
         });
         
     });
-    await axios.post(process.env.SIM + '/members/prosumers/', 
+    await axios.post(process.env.SIM + '/api/members/prosumers/', 
     {
       body: publisher  
     }   
