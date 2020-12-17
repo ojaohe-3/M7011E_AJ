@@ -10,7 +10,6 @@ app.get("/", (req, res)=>{
     const sim = Simulator.singelton;
     try {
         // await sim.tick();
-        console.log(sim);
         const supply = sim.getTotalSupply();
         const demand = sim.getTotalDemand();
         res.json({totalProduction: supply, totalDemand: demand});
