@@ -58,7 +58,7 @@ app.put("/:id",(req,res) =>{
     const id = req.params.id;
     
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        if(Simulator.singelton.managers.has(id)){
+        if(Simulator.singelton.prosumers.has(id)){
             const entry = Simulator.singelton.prosumers.get(id);
             entry.totalCapacity = data.current;
             entry.totalProduction = data.totalProduction;
