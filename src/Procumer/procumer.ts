@@ -52,9 +52,7 @@ export class Procumer{
             this.totalProduction*this.output_ratio;
             axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
                 {
-                    timefn: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], //temporary, fix later
-                    capacity:this.totalCapacity,
-                    current: this.currentCapacity(),
+                    totalCapacity: this.currentCapacity(),
                     totalProduction: this.totalProduction, 
                     status: this.status
                 }
