@@ -36,7 +36,7 @@ export class Procumer{
         else
             this.id = Types.ObjectId().toHexString();
         this.update = ()=> this.tick(Weather.singleton.speed);
-        setInterval(this.update, 5000);
+        setInterval(this.update, 60000);
     }
      /**
      * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
@@ -80,11 +80,13 @@ export class Procumer{
        
         try {
             const entry = await DB.Models.Prosumer.findById(Types.ObjectId(+this.id)).exec();
+            const capacity = this.currentCapacity();
+
             if(!entry){
                 const body= {
                     totalProduction: this.totalProduction,
                     totalCapacity: this.totalCapacity,
-                    currentCapacity: this.currentCapacity(),
+                    currentCapacity: capacity,
                     batteries: bc,
                     turbines: tc,
                     name: process.env.NAME,
@@ -97,7 +99,7 @@ export class Procumer{
                 const body= {
                     totalProduction: this.totalProduction,
                     totalCapacity: this.totalCapacity,
-                    currentCapacity: this.currentCapacity(),
+                    currentCapacity: capacity,
                     batteries: bc,
                     turbines: tc,
                     name: process.env.NAME,

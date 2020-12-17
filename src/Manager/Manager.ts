@@ -13,7 +13,7 @@ export class Manager{
         this.id = id;
         this.current = 0;
         this.maxProduciton = maxProduciton;
-        this.status = false;
+        this.status = true;
         this.ratio = 1;
 
     }

@@ -7,9 +7,9 @@ import {DB} from "./DB-Connector/db-connector";
 import { ManagerSchema } from "./DB-Connector/manager";
 import { Types } from "mongoose";
 import { ProsumerSchema } from "./DB-Connector/prosumer";
+import Axios from "axios";
 require('dotenv').config();
 const cors = require('cors');
-const axios = require('axios');
 
 
 const db = new DB({Manager: new ManagerSchema().model, Prosumer: new ProsumerSchema().model});
@@ -52,7 +52,7 @@ app.post('/api/member/', async (req, res)=>{
         const manager = new Manager(id,data.maxProduction);
         managers.set(id, manager);
         await manager.document();
-        await axios.post(process.env.SIM +'/members/managers/', {
+        await Axios.post(process.env.SIM +'/members/managers/', {
             body: [
                 {
                     id: id,
@@ -80,7 +80,7 @@ async function fetchAll(){
                 man.current = m.current;
                 man.ratio = m.ratio;
                 if( m.status)
-                    man.setActive();
+                    man.status = true;
                 
                 managers.set(m.id, man);
                 publisher.push({
@@ -89,12 +89,12 @@ async function fetchAll(){
                     current: man.current,
                     status: man.status
                 });
-                setTimeout(man.Produce(1.1), 60000);
                 
             });
-            await axios.post(process.env.SIM + '/api/members/managers', {
+            await Axios.post(process.env.SIM + '/api/members/managers', {
                 body: publisher
             });
+            managers.forEach(async (m) => await m.Produce(1.1));
     } catch (error) {
         
     }
