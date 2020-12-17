@@ -53,7 +53,7 @@ app.post('/api/member/', async (req, res)=>{
             body: [
                 {
                     id: id,
-                    max: manager.maxProduciton,
+                    maxProduciton: manager.maxProduciton,
                     current: manager.current,
                     status: manager.status
                 }

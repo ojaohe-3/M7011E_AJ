@@ -13,7 +13,6 @@ export class Manager{
         this.id = id;
         this.current = 0;
         this.maxProduciton = maxProduciton;
-        const acceleration = 1.5;
         this.status = false;
         this.ratio = 1;
 
@@ -52,8 +51,8 @@ export class Manager{
             a += 1;
 
         this.current *= a; //updates value
-        await this.tick();
         await new Promise(resolve => setTimeout(resolve, 250));  //wait 250ms
+        await this.tick();
         
         //if we are producing i.e accelerating
         if(this.status){
