@@ -37,7 +37,6 @@ app.get('/api/member/:id', (req,res)=>{
     const data = procumers.get(req.params.id);
     if(data){
         data.tick(Weather.singleton.speed);
-        console.log(data);
         res.json(data);
     }
     else
@@ -54,7 +53,6 @@ app.get('/api/members', (req,res)=>{
 app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
     const format = ["turbines", "batteries"] //enforced members
     const data= req.body;
-    console.log(data);
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
         const b = data.batteries;
         const t = data.turbines;

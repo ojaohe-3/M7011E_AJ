@@ -71,7 +71,6 @@ export class Procumer{
     async document() {
         const bc: IBattery[] = [];
         const tc :ITurbine[]= [];
-        console.log(this.id.length)
         this.batteries.forEach(battery => bc.push({capacity: battery.capacity, current: battery.current, maxOutput: battery.maxOutput,maxCharge:  battery.maxCharge}));
         this.turbines.forEach(turbine => tc.push({maxPower: turbine.maxPower}));
        

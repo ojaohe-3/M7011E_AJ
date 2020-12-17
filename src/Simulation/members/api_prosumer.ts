@@ -63,13 +63,14 @@ app.put("/:id",(req,res) =>{
             entry.totalCapacity = data.current;
             entry.totalProduction = data.totalProduction;
             entry.status = data.status;
+            res.json({message: "memeber updated!", data: data});
+
         }else{
             res.status(404).json({"message": "no such id!"})
         }
     }else{
         res.status(400).json({message:"Invalid format", required: format});  
     }
-    res.json({message: "memeber updated!", data: data});
 
 });
 module.exports = app;

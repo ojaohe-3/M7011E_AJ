@@ -56,13 +56,14 @@ app.put("/:id",(req, res)=>{
             const entry = Simulator.singelton.managers.get(id);
             entry.current = data.current;
             entry.running = data.status;
+            res.json({message: "memeber updated!", data: data});
         }else{
             res.status(404).json({"message": "no such id!"})
         }
     }else{
         res.status(400).json({message:"Invalid format", required: format});  
     }
-    res.json({message: "memeber updated!", data: data});
+    
 
 });
 
