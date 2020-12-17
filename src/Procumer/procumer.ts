@@ -1,9 +1,9 @@
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
-import {v4} from 'uuid'
 import { IBattery, ITurbine } from "./DB-Connector/prosumer";
 import { DB } from "./DB-Connector/db-connector";
 import { Types } from "mongoose";
+const axios = require('axios');
 export class Procumer{    
     totalProduction: number;
     totalCapacity: number;
@@ -50,6 +50,15 @@ export class Procumer{
                 this.totalProduction += b.Output(1);
             });
             this.totalProduction*this.output_ratio;
+            axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
+                {
+                    timefn: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], //temporary, fix later
+                    capacity:this.totalCapacity,
+                    current: this.currentCapacity(),
+                    totalProduction: this.totalProduction, 
+                    status: this.status
+                }
+            );
         }
         else{
             const reactivate = () => this.status = true;

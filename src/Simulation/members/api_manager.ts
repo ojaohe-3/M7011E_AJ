@@ -39,11 +39,31 @@ app.post("/",(req,res) =>{
             const manager = new Manager(item.id, item.current, item.max, item.name ? item.name: sim.manager_name, item.status);
             sim.managers.set(item.id, manager);
         }else
-            res.status(400).json({msg:"Invalid format", required: format});  
+            res.status(400).json({message:"Invalid format", required: format});  
     });
-    res.json({msg: "memeber added!", data: data});
+    res.json({message: "memeber added!", data: data});
 
     
+});
+
+app.put("/:id",(req, res)=>{
+    const data = req.body;
+    const format = ["current","status"]
+    const id = req.params.id;
+    
+    if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
+        if(Simulator.singelton.managers.has(id)){
+            const entry = Simulator.singelton.managers.get(id);
+            entry.current = data.current;
+            entry.running = data.status;
+        }else{
+            res.status(404).json({"message": "no such id!"})
+        }
+    }else{
+        res.status(400).json({message:"Invalid format", required: format});  
+    }
+    res.json({message: "memeber updated!", data: data});
+
 });
 
 module.exports = app;

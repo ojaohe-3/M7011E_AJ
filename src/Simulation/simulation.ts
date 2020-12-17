@@ -29,7 +29,7 @@ export class Simulator{
     }
 
 
-    async tick(){
+    async tick(){ //todo add caching here
 
         const prosumers = Simulator.singelton.prosumers;
         const managers = Simulator.singelton.managers;

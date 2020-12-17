@@ -1,3 +1,4 @@
+import Axios from 'axios';
 import { Types } from 'mongoose';
 import { DB } from './DB-Connector/db-connector';
 export class Manager{
@@ -27,7 +28,14 @@ export class Manager{
         if(this.current !== 0)
             this.Produce(0.95);
     }
-
+    async tick(){
+        await Axios.put(process.env.SIM + '/api/members/managers/'+this.id,
+            {
+                current: this.current,
+                status: this.status
+            }
+        );
+    }
     /**
      * start production
      * returns a promise, does only really return max or min
@@ -44,6 +52,7 @@ export class Manager{
             a += 1;
 
         this.current *= a; //updates value
+        this.tick();
         await new Promise(resolve => setTimeout(resolve, 250));  //wait 250ms
         
         //if we are producing i.e accelerating
