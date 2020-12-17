@@ -29,7 +29,7 @@ export class Procumer{
             return sum;
         };
         this.input_ratio = 0.5;
-        this.output_ratio = 0.5;
+        this.output_ratio = 1;
         this.status = true;
         if(id)
             this.id = id;
@@ -54,6 +54,7 @@ export class Procumer{
                 this.totalProduction += b.Output(1);
             });
             this.totalProduction*this.output_ratio;
+            console.log(this);
             await axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
                 {
                     currentCapacity: this.currentCapacity(),

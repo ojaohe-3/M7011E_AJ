@@ -83,7 +83,6 @@ async function fetchAll(){
                     man.setActive();
                 
                 managers.set(m.id, man);
-                man.Produce(1.1);
                 publisher.push({
                     id: man.id,
                     maxProduciton: man.maxProduciton,
