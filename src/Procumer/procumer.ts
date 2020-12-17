@@ -35,7 +35,10 @@ export class Procumer{
             this.id = id;
         else
             this.id = Types.ObjectId().toHexString();
-        this.update = ()=> this.tick(Weather.singleton.speed);
+        this.update = async ()=> {
+            await this.tick(Weather.singleton.speed);
+            await this.document();
+        };
         setInterval(this.update, 60000);
     }
      /**

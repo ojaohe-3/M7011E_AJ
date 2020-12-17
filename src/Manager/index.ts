@@ -65,6 +65,11 @@ app.post('/api/member/', async (req, res)=>{
     }else
         res.status(400).json({message: "invalid format!", format:format});
 });
+
+app.get('/api/control', (req, res)=>{
+    
+});
+
 let PORT =  process.env.PORT || 5000;
 app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);

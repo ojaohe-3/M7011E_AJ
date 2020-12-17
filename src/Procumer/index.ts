@@ -87,15 +87,16 @@ app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
         res.status(400).json({message:"Invalid format", format:format})
     }
 });
-app.post('/api/member/control', (req, res)=>{//todo fix
+app.post('/api/member/control/:id', (req, res)=>{//todo fix
     const data = req.body;
-
-    if(data.id){
-        const procumer = procumers.get(data.id);
+    const id = req.params.id;
+    if(id){
+        const procumer = procumers.get(id);
         if(procumer){   
             procumer.input_ratio = data.input_ratio;
             procumer.output_ratio = data.output_ratio;
             procumer.status = data.status;
+            procumer.update();
             res.json({"input_ratio": procumer.input_ratio, "output_ratio": procumer.output_ratio});
         }else{
             res.status(400).json({messsage:"No such memeber!"});
