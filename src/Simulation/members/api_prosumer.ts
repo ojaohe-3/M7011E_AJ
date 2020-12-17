@@ -31,7 +31,8 @@ app.get("/:id", (req, res) => {
 
 app.post("/",(req,res) =>{
     const sim = Simulator.singelton;
-    const format = ["id","timefn","capacity","current", "status"] //enforced members
+
+    const format = ["id","timefn","totalProduction","currentCapacity", "status","totalCapacity"] //enforced members
     const data= req.body;
     data.body.forEach(item => {
         //look if all enforced key exists
@@ -42,7 +43,12 @@ app.post("/",(req,res) =>{
             else{   
                 const consumer = new Consumer(item.id, item.timefn);
                 sim.consumers.set(item.id, consumer);
-                sim.prosumers.set(item.id, new Procumer(item.id, item.production, item.capacity,item.current, item.status, item.name ? item.name: sim.prosumer_name));
+                sim.prosumers.set(item.id, {id: item.id, 
+                    status: item.status,  
+                    totalProduction: item.totalProduction, 
+                    currentCapacity: item.currentCapacity,
+                    totalCapacity: item.totalCapacity
+                });
                 consumer.document();
             }
         }else
@@ -54,13 +60,13 @@ app.post("/",(req,res) =>{
 
 app.put("/:id",(req,res) =>{
     const data = req.body;
-    const format = ["totalCapacity","totalProduction","status"]
+    const format = ["currentCapacity","totalProduction","status"]
     const id = req.params.id;
     
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
         if(Simulator.singelton.prosumers.has(id)){
             const entry = Simulator.singelton.prosumers.get(id);
-            entry.totalCapacity = data.current;
+            entry.currentCapacity = data.currentCapacity;
             entry.totalProduction = data.totalProduction;
             entry.status = data.status;
             console.log(entry);

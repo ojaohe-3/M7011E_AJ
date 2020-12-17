@@ -29,15 +29,14 @@ app.get("/", (req, res) => {
 
 app.post("/",(req,res) =>{
     const sim = Simulator.singelton;
-
-    const format = ["id","max","current","status"] //enforced members
+    const format = ["id","maxProduction","current","status"] //enforced members
     const data= req.body;
 
     data.body.forEach(item => {
         //look if all enforced key exists
         if(Object.keys(item).filter(k=>format.some(e => k === e)).length === format.length){
-            const manager = new Manager(item.id, item.current, item.max, item.name ? item.name: sim.manager_name, item.status);
-            sim.managers.set(item.id, manager);
+            
+            sim.managers.set(item.id, data);
         }else
             res.status(400).json({message:"Invalid format", required: format});  
     });
@@ -55,7 +54,7 @@ app.put("/:id",(req, res)=>{
         if(Simulator.singelton.managers.has(id)){
             const entry = Simulator.singelton.managers.get(id);
             entry.current = data.current;
-            entry.running = data.status;
+            entry.status = data.status;
             res.json({message: "memeber updated!", data: data});
         }else{
             res.status(404).json({"message": "no such id!"})

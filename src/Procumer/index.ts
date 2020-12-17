@@ -73,8 +73,9 @@ app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
                 {
                     id: id, 
                     timefn: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], //temporary, fix later
-                    capacity: prosumer.totalCapacity,
-                    current: prosumer.currentCapacity(), 
+                    totalCapacity: prosumer.totalCapacity,
+                    totalProduction: prosumer.totalProduction,
+                    currentCapacity: prosumer.currentCapacity(), 
                     status: prosumer.status
                 }
             ]

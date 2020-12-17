@@ -3,6 +3,7 @@ import { Turbine } from "./Turbine";
 import { IBattery, ITurbine } from "./DB-Connector/prosumer";
 import { DB } from "./DB-Connector/db-connector";
 import { Types } from "mongoose";
+import { Weather } from "./weather";
 const axios = require('axios');
 export class Procumer{    
     totalProduction: number;
@@ -14,6 +15,7 @@ export class Procumer{
     input_ratio: number
     output_ratio: number;
     currentCapacity: () => number;
+    update: () => Promise<void>;
 
     constructor(batteries: Array<Battery>, turbines: Array<Turbine>, id? : String){
         this.batteries = batteries;
@@ -33,7 +35,8 @@ export class Procumer{
             this.id = id;
         else
             this.id = Types.ObjectId().toHexString();
-        setInterval(this.tick, 5000);
+        this.update = ()=> this.tick(Weather.singleton.speed);
+        setInterval(this.update, 5000);
     }
      /**
      * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
@@ -53,7 +56,7 @@ export class Procumer{
             this.totalProduction*this.output_ratio;
             await axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
                 {
-                    totalCapacity: this.currentCapacity(),
+                    currentCapacity: this.currentCapacity(),
                     totalProduction: this.totalProduction, 
                     status: this.status
                 }
