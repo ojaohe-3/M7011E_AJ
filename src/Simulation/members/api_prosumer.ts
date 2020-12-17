@@ -63,6 +63,7 @@ app.put("/:id",(req,res) =>{
             entry.totalCapacity = data.current;
             entry.totalProduction = data.totalProduction;
             entry.status = data.status;
+            console.log(entry);
             res.json({message: "memeber updated!", data: data});
 
         }else{
