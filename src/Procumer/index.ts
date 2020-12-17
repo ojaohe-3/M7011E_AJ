@@ -71,13 +71,17 @@ app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
         //todo make sure data format is in an interface
         //todo make a sensible timefn, or include as key when posting
         await axios.post(process.env.SIM + '/members/prosumers/', {
-            id: id, 
-             timefn: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], //temporary, fix later
-             capacity: prosumer.totalCapacity,
-             current: prosumer.currentCapacity(), 
-             status: prosumer.status
+            body:[
+                {
+                    id: id, 
+                    timefn: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], //temporary, fix later
+                    capacity: prosumer.totalCapacity,
+                    current: prosumer.currentCapacity(), 
+                    status: prosumer.status
+                }
+            ]
         }).then(()=> console.log('sent upstream')).catch((err)=>console.log(err));
-        //todo api post the new entry to simulation with consumption data, alternative is to simulate locally 
+        //todo api post the new entry to simulation with consumption data, alternative is to simulate localy 
         res.json({message:" success!", data: data}); 
 
     }else{
@@ -117,6 +121,7 @@ app.listen(PORT, function () {
 
 async function fetchAll() {
     const data = await DB.Models.Prosumer.find({name: process.env.NAME}).exec();
+    const publisher = [];
     data.forEach(entry => {
         const bc = [];
         const tc = [];
@@ -125,8 +130,20 @@ async function fetchAll() {
         const prosumer = new Procumer(bc,tc, entry.id);
         procumers.set(entry.id, prosumer);
         prosumer.status =  true;
-
-
+        publisher.push( {
+            id: entry.id, 
+            timefn: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], //temporary, fix later
+            capacity: prosumer.totalCapacity,
+            current: prosumer.currentCapacity(), 
+            status: prosumer.status
+        });
+        
     });
+    await axios.post(process.env.SIM + '/members/prosumers/', 
+    {
+      body: publisher  
+    }   
+   );
+
     // console.log(data);
 }

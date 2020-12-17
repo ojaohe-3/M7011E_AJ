@@ -49,10 +49,14 @@ app.post('/api/member/', async (req, res)=>{
         managers.set(id, manager);
         await manager.document();
         await axios.post(process.env.SIM +'/members/managers/', {
-            id: id,
-            max: manager.maxProduciton,
-            current: manager.current,
-            status: manager.status
+            body: [
+                {
+                    id: id,
+                    max: manager.maxProduciton,
+                    current: manager.current,
+                    status: manager.status
+                }
+            ]
         }).then(m => console.log(m)).catch(err => console.log(err));//todo make interface for data
     }else
         res.status(400).json({message: "invalid format!", format:format});
@@ -65,6 +69,7 @@ app.listen(PORT, function () {
 async function fetchAll(){
     try {
         const entry = await DB.Models.Manager.find({name: process.env.NAME}).exec();
+        const publisher = [];
         entry.forEach(m => 
             { 
                 const man = new Manager(m.id, m.maxProduciton);
@@ -75,6 +80,16 @@ async function fetchAll(){
                 
                 managers.set(m.id, man);
                 man.Produce(1.1);
+                publisher.push({
+                    id: man.id,
+                    max: man.maxProduciton,
+                    current: man.current,
+                    status: man.status
+                });
+                
+            });
+            await axios.post(process.env.SIM + '/api/members/managers', {
+                body: publisher
             });
     } catch (error) {
         

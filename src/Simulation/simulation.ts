@@ -63,9 +63,9 @@ export class Simulator{
         if(managers){
             const mr = Array.from(managers.values());
             console.log('fetching data from managers')
-
+            console.log(mr);
             try {
-               mr.forEach(async m => {
+                mr.forEach(async m => {
                     const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+m.id);
                     const data = req.data;
                     console.log(data);
