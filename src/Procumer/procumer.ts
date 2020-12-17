@@ -33,13 +33,14 @@ export class Procumer{
             this.id = id;
         else
             this.id = Types.ObjectId().toHexString();
+        setInterval(this.tick, 5000);
     }
      /**
      * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
      * @param speed 
      * @param ratio 
      */
-    tick(speed: number){
+    async tick(speed: number){
         console.log(`speed :${speed}`);
         this.totalProduction = 0;
         if(this.status){
@@ -50,7 +51,7 @@ export class Procumer{
                 this.totalProduction += b.Output(1);
             });
             this.totalProduction*this.output_ratio;
-            axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
+            await axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
                 {
                     totalCapacity: this.currentCapacity(),
                     totalProduction: this.totalProduction, 
