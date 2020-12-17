@@ -8,7 +8,7 @@ import * as dotenv from "dotenv";
 import {DB} from './DB-Connector/db-connector';
 import { ProsumerSchema } from "./DB-Connector/prosumer";
 import { Types } from "mongoose";
-const axios = require('axios');
+import Axios from "axios";
 dotenv.config({path: "./.env"});  
 
 const sim_dest = process.env.SIM;
@@ -68,7 +68,7 @@ app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
         await prosumer.document(); 
         //todo make sure data format is in an interface
         //todo make a sensible timefn, or include as key when posting
-        await axios.post(process.env.SIM + '/api/members/prosumers/', {
+        await Axios.post(process.env.SIM + '/api/members/prosumers/', {
             body:[
                 {
                     id: id, 
@@ -79,7 +79,7 @@ app.post('/api/members/', async (req, res)=>{ //todo restAPI stuff
                     status: prosumer.status
                 }
             ]
-        }).then(()=> console.log('sent upstream')).catch((err)=>console.log(err));
+        });
         //todo api post the new entry to simulation with consumption data, alternative is to simulate localy 
         res.json({message:" success!", data: data}); 
 
@@ -132,13 +132,14 @@ async function fetchAll() {
         publisher.push( {
             id: entry.id, 
             timefn: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], //temporary, fix later
-            capacity: prosumer.totalCapacity,
-            current: prosumer.currentCapacity(), 
+            totalCapacity: prosumer.totalCapacity,
+            totalProduction: prosumer.totalProduction,
+            currentCapacity: prosumer.currentCapacity(), 
             status: prosumer.status
         });
         
     });
-    await axios.post(process.env.SIM + '/api/members/prosumers/', 
+    await Axios.post(process.env.SIM + '/api/members/prosumers/', 
     {
       body: publisher  
     }   
