@@ -1,7 +1,5 @@
 
 import express = require("express");
-
-import uuid = require("uuid");
 import { Manager } from "./Manager";
 import {DB} from "./DB-Connector/db-connector";
 import { ManagerSchema } from "./DB-Connector/manager";
@@ -66,7 +64,16 @@ app.post('/api/member/', async (req, res)=>{
         res.status(400).json({message: "invalid format!", format:format});
 });
 
-app.get('/api/control', (req, res)=>{
+app.post('/api/control/:id', (req, res)=>{
+    const id = req.params.id;
+    const data = req.body;
+    const manager = managers.get(id);
+    if(data.ratio)
+        manager.ratio = data.ratio;
+    if(data.acceleration)
+        manager.Produce(data.acceleration);
+    if(data.status)
+        manager.setActive();
     
 });
 
