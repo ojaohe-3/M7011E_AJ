@@ -35,12 +35,12 @@ app.post("/",(req,res) =>{
     data.body.forEach(item => {
         //look if all enforced key exists
         if(Object.keys(item).filter(k=>format.some(e => k === e)).length === format.length){
-            
             sim.managers.set(item.id, data);
+            res.json({message: "memeber added!", data: data});
         }else
             res.status(400).json({message:"Invalid format", required: format});  
     });
-    res.json({message: "memeber added!", data: data});
+    
 
     
 });
