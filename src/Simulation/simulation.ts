@@ -31,50 +31,50 @@ export class Simulator{
 
     async tick(){ //todo add caching here
 
-        const prosumers = Simulator.singelton.prosumers;
-        const managers = Simulator.singelton.managers;
+        // const prosumers = Simulator.singelton.prosumers;
+        // const managers = Simulator.singelton.managers;
 
-        if(prosumers){
-            const pr = Array.from(prosumers.values());
+        // if(prosumers){
+        //     const pr = Array.from(prosumers.values());
 
-            try {
-                //fetch all procumers and consumers their current data
-                pr.forEach (async p => {
-                    const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+p.id);
-                    const data = req.data;
-                    const old = prosumers.get(data.id);
-                    if(old){
-                        old.totalProduction = data.totalProduction;
-                        old.totalCapacity = data.totalCapacity;
-                        old.currentCapacity = data.currentCapacity;
-                        old.status = data.status;
-                    }else if(data){
-                        Simulator.singelton.prosumers.set(data.id, new Procumer(data.id, data.totalProduction, data.totalCapacity, data.current, data.status, p.name));
-                    }else{
-                        console.log('could not find: ' + data.id );
-                    }
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        if(managers){
-            const mr = Array.from(managers.values());
+        //     try {
+        //         //fetch all procumers and consumers their current data
+        //         pr.forEach (async p => {
+        //             const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+p.id);
+        //             const data = req.data;
+        //             const old = prosumers.get(data.id);
+        //             if(old){
+        //                 old.totalProduction = data.totalProduction;
+        //                 old.totalCapacity = data.totalCapacity;
+        //                 old.currentCapacity = data.currentCapacity;
+        //                 old.status = data.status;
+        //             }else if(data){
+        //                 Simulator.singelton.prosumers.set(data.id, new Procumer(data.id, data.totalProduction, data.totalCapacity, data.current, data.status, p.name));
+        //             }else{
+        //                 console.log('could not find: ' + data.id );
+        //             }
+        //         });
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // }
+        // if(managers){
+        //     const mr = Array.from(managers.values());
 
-            try {
-                mr.forEach(async m => {
-                    const req = await axios.get(Simulator.singelton.manager_name+'/api/member/'+m.id);
-                    const data = req.data;
-                    const old = managers.get(m.id);
+        //     try {
+        //         mr.forEach(async m => {
+        //             const req = await axios.get(Simulator.singelton.manager_name+'/api/member/'+m.id);
+        //             const data = req.data;
+        //             const old = managers.get(m.id);
         
-                    old.max_production = data.maxProduciton;
-                    old.current = data.current;
-                    old.running = data.status;
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        }
+        //             old.max_production = data.maxProduciton;
+        //             old.current = data.current;
+        //             old.running = data.status;
+        //         });
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // }
         
     }
 
@@ -86,8 +86,8 @@ export class Simulator{
 
     getTotalSupply() : number{
         let acc = 0; 
-        this.prosumers.forEach(async e => acc +=  e.totalProduction);
-        this.managers.forEach(async e => acc +=  e.current);
+        this.prosumers.forEach(e => acc +=  e.totalProduction);
+        this.managers.forEach(e => acc +=  e.current);
         return acc;
     }
 }
