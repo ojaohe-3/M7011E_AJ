@@ -33,6 +33,7 @@ app.get('/api/members/prosumers', async (req,res)=>{
 });
 app.get('/api/member/:id',(req, res)=>{
     const id = req.params.id;
+    console.log(id);
     if(id && managers.has(id))
         res.json(managers.get(id));
     else
