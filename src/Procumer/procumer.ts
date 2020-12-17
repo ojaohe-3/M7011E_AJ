@@ -55,9 +55,10 @@ export class Procumer{
             });
             this.totalProduction*this.output_ratio;
             console.log(this);
+            const capacity = this.currentCapacity();
             await axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
                 {
-                    currentCapacity: this.currentCapacity(),
+                    currentCapacity: capacity,
                     totalProduction: this.totalProduction, 
                     status: this.status
                 }
