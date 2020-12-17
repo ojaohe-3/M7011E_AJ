@@ -83,7 +83,7 @@ async function fetchAll(){
                 man.Produce(1.1);
                 publisher.push({
                     id: man.id,
-                    max: man.maxProduciton,
+                    maxProduciton: man.maxProduciton,
                     current: man.current,
                     status: man.status
                 });
