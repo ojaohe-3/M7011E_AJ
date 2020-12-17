@@ -86,7 +86,7 @@ export class Simulator{
 
     getTotalSupply() : number{
         let acc = 0; 
-
+        console.log(Simulator.singelton);
         Simulator.singelton.prosumers.forEach(e => acc +=  e.totalProduction);
         Simulator.singelton.managers.forEach(e => acc +=  e.current);
         return acc;
