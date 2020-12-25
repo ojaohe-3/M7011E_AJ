@@ -53,7 +53,7 @@ app.post('/api/member/', async (req, res)=>{
         const manager = new Manager(id,data.maxProduction);
         managers.set(id, manager);
         await manager.document();
-        await Axios.post(process.env.SIM +'/members/managers/', {
+        await Axios.post(process.env.SIM +'/api/members/managers', {
             body: [
                 {
                     id: id,
