@@ -49,7 +49,7 @@ app.post('/api/member/', async (req, res)=>{
     const data= req.body;
     console.log(data);
     if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        const id = data.id ? data.id : Types.ObjectId().toHexString();
+        const id = Types.ObjectId().toHexString();
         const manager = new Manager(id,data.maxProduction);
         managers.set(id, manager);
         await manager.document();
