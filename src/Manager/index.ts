@@ -28,15 +28,18 @@ app.use(express.json());
 app.get('/api/members/',(req, res)=>{
     res.json(Array.from(managers.values())); 
 });
-app.get('/api/members/prosumers', async (req,res)=>{
+app.get('/api/members/:id/prosumers', async (req,res)=>{
     const data = await DB.Models.Prosumer.find({name: "this.sim"}); //todo manager prosumer controller
     res.json(data);
 });
-app.get('/api/member/:id',(req, res)=>{
+app.get('/api/member/:id',async (req, res)=>{
     const id = req.params.id;
     console.log(id);
-    if(id && managers.has(id))
-        res.json(managers.get(id));
+    if(id && managers.has(id)){
+        const manager = managers.get(id);
+        await manager.tick();
+        res.json(manager);
+    }
     else
         res.status(404).json({message: "No such id!"}); 
 });
@@ -49,6 +52,7 @@ app.post('/api/member/', async (req, res)=>{
         const id = data.id ? data.id : Types.ObjectId().toHexString();
         const manager = new Manager(id,data.maxProduction);
         managers.set(id, manager);
+        await manager.tick();
         await manager.document();
         await Axios.post(process.env.SIM +'/members/managers/', {
             body: [
@@ -68,10 +72,12 @@ app.post('/api/control/:id', (req, res)=>{
     const id = req.params.id;
     const data = req.body;
     const manager = managers.get(id);
-    if(data.ratio)
-        manager.ratio = data.ratio;
-    manager.status = data.status ? true : false;
-    
+    if(manager){
+        if(data.ratio)
+            manager.ratio = data.ratio;
+        manager.status = data.status ? true : false;
+        manager.tick();
+    }
 });
 
 let PORT =  process.env.PORT || 5000;
