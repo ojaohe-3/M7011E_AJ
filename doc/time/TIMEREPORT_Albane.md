@@ -145,6 +145,16 @@ Thursday 10 December: 3AM - 5PM </br>
 
 ---
 
+Tuesday 15 December: 1PM - 5PM </br>
+* Connecting pages together
+
+---
+
+Wednesday 16 December: 2PM - 5PM </br>
+* Preparation of the presentation
+
+---
+
 ## Total amount of time
 
-2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 7 + 3 + 5 + 5 + 2 = 90h
+2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 7 + 3 + 5 + 5 + 2 + 3 = 93h
