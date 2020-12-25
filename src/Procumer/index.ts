@@ -1,7 +1,7 @@
 import express = require("express");
 import { Procumer } from "./procumer";
 import uuid = require("uuid");
-import { Weather, Position } from "./weather";
+import { Weather, Location } from "./weather";
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
 import * as dotenv from "dotenv";
@@ -33,10 +33,10 @@ app.use(logger);
 app.use(express.json());
 
 
-app.get('/api/member/:id', (req,res)=>{
+app.get('/api/member/:id', async (req,res)=>{
     const data = procumers.get(req.params.id);
     if(data){
-        data.tick(Weather.singleton.speed);
+        await data.update();
         res.json(data);
     }
     else

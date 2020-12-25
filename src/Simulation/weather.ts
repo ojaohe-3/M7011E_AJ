@@ -1,5 +1,5 @@
 const axios = require('axios');
-export interface GeoLocation{
+export interface Location{
     lat : number;
     lon : number;
 }
@@ -7,28 +7,33 @@ export class Weather{
     
     temp: number;
     speed: number;
-    pos: GeoLocation;
+    pos: Location;
     
-    static singleton: Weather;
-    constructor(pos: GeoLocation){
-        this.temp = 270;
-        this.speed = 7;
+    private static singleton: Weather;
+    update: () => Promise<void>;
+
+    constructor(pos: Location){
+        this.temp = 0;
+        this.speed = 0;
         this.pos = pos;
-        Weather.update();
-        setImmediate(Weather.update,3600000);//update every hour
-        Weather.singleton = this;
+        this.update = async() => {
+            try{
+                const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
+                const data = req.data;
+                this.temp = data.temp;
+                this.speed = data.speed
+            }catch (error){
+                console.log(error);
+            }
+        }
+        setImmediate(this.update, 3600000);//update every hour
+
+    }
+    static getInstance() : Weather {
+        if(!Weather.singleton)
+            Weather.singleton = new Weather({lat: +process.env.LAT, lon: +process.env.LAT});
+        return Weather.singleton;
     }
     
-    static async update(){
-        try{
-            console.log(Weather.singleton.pos);
-            const pos = Weather.singleton.pos;
-            const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${pos.lat}&lon=${pos.lon}`);
-            const data = req.data;
-            Weather.singleton.temp = data.temp;
-            Weather.singleton.speed = data.speed
-        }catch (error){
-            console.log(error);
-        }
-    }
+  
 }

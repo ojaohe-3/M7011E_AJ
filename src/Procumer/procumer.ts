@@ -4,7 +4,7 @@ import { IBattery, ITurbine } from "./DB-Connector/prosumer";
 import { DB } from "./DB-Connector/db-connector";
 import { Types } from "mongoose";
 import { Weather } from "./weather";
-const axios = require('axios');
+import Axios from 'axios';
 export class Procumer{    
     totalProduction: number;
     totalCapacity: number;
@@ -36,45 +36,36 @@ export class Procumer{
         else
             this.id = Types.ObjectId().toHexString();
         this.update = async ()=> {
-            await this.tick(Weather.singleton.speed);
+            this.totalProduction = 0;
+            if(this.status){
+                this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(Weather.getInstance().speed));
+                this.batteries.forEach((b) => {
+                    let tot = this.totalProduction;
+                    this.totalProduction -= b.Input(tot*(this.input_ratio/this.batteries.length)); //distribute input equally among all batteries
+                    this.totalProduction += b.Output(1);
+                });
+                this.totalProduction*this.output_ratio;
+    
+                const capacity = this.currentCapacity();
+                await Axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
+                    {
+                        currentCapacity: capacity,
+                        totalProduction: this.totalProduction, 
+                        status: this.status
+                    }
+                );
+            }
+            else{
+                const reactivate = () => this.status = true;
+                setTimeout(reactivate, 600000);//crude
+                console.log(`unactive will reactivate in ca 10 min`);
+    
+            }
             await this.document();
         };
         setInterval(this.update, 60000);
     }
-     /**
-     * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
-     * @param speed 
-     * @param ratio 
-     */
-    async tick(speed: number){
-        console.log(`speed :${speed}`);
-        this.totalProduction = 0;
-        if(this.status){
-            this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(speed));
-            this.batteries.forEach((b) => {
-                let tot = this.totalProduction;
-                this.totalProduction -= b.Input(tot*(this.input_ratio/this.batteries.length)); //distribute input equally among all batteries
-                this.totalProduction += b.Output(1);
-            });
-            this.totalProduction*this.output_ratio;
-            console.log(this);
-            const capacity = this.currentCapacity();
-            await axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
-                {
-                    currentCapacity: capacity,
-                    totalProduction: this.totalProduction, 
-                    status: this.status
-                }
-            );
-        }
-        else{
-            const reactivate = () => this.status = true;
-            setTimeout(reactivate, 600000);//crude
-            console.log(`unactive will reactivate in ca 10 min`);
-
-        }
-    }
-
+    
     async document() {
         const bc: IBattery[] = [];
         const tc :ITurbine[]= [];
