@@ -48,6 +48,7 @@ export class Manager{
         }
         try {
             const entry = await DB.Models.Manager.findById(+this.id).exec();
+            console.log(entry);
             if(!entry)
                 await DB.Models.Manager.create(body);
             else
