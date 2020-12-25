@@ -11,11 +11,9 @@ let logger = (req, res, next) =>{
 const app = express();
 const cells = new Map<String, Cell>();
 const id = process.env.ID || Types.ObjectId().toHexString();
-let old_price = 0.15;
+
 let price = (supply, demand)=>{
-    const newPrice = old_price + 0.0001*(demand-supply)/2;
-    old_price = newPrice;
-    return newPrice;
+    return  0.15 + 0.001*(demand-supply)/2;
 };
 const tick = async () => { //this is serious need of caching
     const stat = await totalStats();
