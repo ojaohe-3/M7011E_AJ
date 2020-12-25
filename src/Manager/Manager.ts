@@ -43,16 +43,10 @@ export class Manager{
             maxProduciton: this.maxProduciton,
             status: this.status,
             ratio: this.ratio,
-            name: process.env.NAME,
-            _id: Types.ObjectId(+this.id)
+            name: process.env.NAME
         }
         try {
-            const entry = await DB.Models.Manager.findById(+this.id).exec();
-            console.log(entry);
-            if(!entry)
-                await DB.Models.Manager.create(body);
-            else
-                await DB.Models.Manager.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+            await DB.Models.Manager.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
         } catch (error) {
             console.log(error);
         }
