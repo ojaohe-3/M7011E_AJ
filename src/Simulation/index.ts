@@ -30,7 +30,7 @@ const manager = require('./members/api_manager');
 const simdata = require('./members/api_collected_data');
 
 app.use(logger);
-app.use(cors())
+app.use(cors()) //not sure what it does, it lets me work with axios, also my firend yelled at me for not using it, he knows better
 
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);

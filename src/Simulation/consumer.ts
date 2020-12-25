@@ -34,27 +34,16 @@ export class Consumer{
         
 
         try {
-            const entry = await DB.Models.Consumer.findById(Types.ObjectId(+this.id)).exec();
-            if(!entry){
-                const body = {
-                    demand: this.demand,
-                    timefn: this.timefn,
-                    profile: this.profile,
-                    name: process.env.NAME,
-                    _id: Types.ObjectId(+this.id)
-                }
-                await DB.Models.Consumer.create(body);
+        
+            const body = {
+                demand: this.demand,
+                timefn: this.timefn,
+                profile: this.profile,
+                name: process.env.NAME
             }
-            else{
-                const body = {
-                    demand: this.demand,
-                    timefn: this.timefn,
-                    profile: this.profile,
-                    name: process.env.NAME
-                }
-                await DB.Models.Consumer.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
-            }
-            
+            await DB.Models.Consumer.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+        
+        
         } catch (error) {
             console.log(error)
         }
