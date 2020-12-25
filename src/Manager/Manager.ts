@@ -18,62 +18,23 @@ export class Manager{
 
     }
 
-    setActive(){
-        this.status = true;
-        this.Produce(1.1);
-    }
-    stop(){
-        this.status = false;
-        if(this.current !== 0)
-            this.Produce(0.95);
-    }
+
     async tick(){
+
+        if(this.status){
+            this.current *= 1.005;
+            this.current = this.current > this.maxProduciton ? this.maxProduciton : this.current;
+        }else{
+            this.current *= 0.995;
+            this.current = this.current < 1.0 ? 0 : this.current;
+        }
         await Axios.put(process.env.SIM + '/api/members/managers/'+this.id,
             {
                 current: this.current,
                 status: this.status
             }
         );
-    }
-    /**
-     * start production
-     * returns a promise, does only really return max or min
-     * @param speed t0
-     */
-    async Produce(acceleration : number){
-        if(this.current == 0 && this.status)
-            this.current = 0.1;
-
-        let a = acceleration;
-        if( a > 1 && !this.status){
-            a =  a +  (1 - a*1.1);
-        }else if( a < 1 && this.status)
-            a += 1;
-
-        this.current *= a; //updates value
-        await new Promise(resolve => setTimeout(resolve, 1000));  //wait 1s
-        await this.tick();
-        
-        //if we are producing i.e accelerating
-        if(this.status){
-            if(this.current >= this.maxProduciton*this.ratio){
-                this.current = this.maxProduciton*this.ratio;
-                return this.maxProduciton*this.ratio;
-            
-            }
-                
-        }
-        //if we are de accelerating
-        if(!this.status)
-        {
-            if(this.current < 1)
-            {   
-                this.current = 0;
-                return 0;
-            }
-            
-        }        
-        return this.Produce(a)
+        setTimeout(this.tick, 1000);
     }
 
     async document() {
