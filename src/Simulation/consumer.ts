@@ -31,8 +31,6 @@ export class Consumer{
     }
 
     async document(){
-        
-
         try {
         
             const body = {

@@ -64,6 +64,8 @@ app.post('/api/member/', async (req, res)=>{
                 }
             ]
         });
+
+        manager.tick();
         res.json({data: data, message: "success!"});
     }else
         res.status(400).json({message: "invalid format!", format:format});

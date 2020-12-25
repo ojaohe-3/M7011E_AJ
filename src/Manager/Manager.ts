@@ -20,10 +20,10 @@ export class Manager{
         this.tick = async () => {
             if(this.status){
                 this.current = this.current <= 0 ? 1 : this.current;
-                this.current *= 1.005;
+                this.current *= 1.05;
                 this.current = this.current > this.maxProduciton ? this.maxProduciton : this.current;
             }else{
-                this.current *= 0.995;
+                this.current *= 0.95;
                 this.current = this.current < 1.0 ? 0 : this.current;
             }
             await Axios.put(process.env.SIM + '/api/members/managers/'+this.id,
