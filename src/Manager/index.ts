@@ -109,8 +109,8 @@ async function fetchAll(){
             await Axios.post(process.env.SIM + '/api/members/managers', {
                 body: publisher
             });
-            managers.forEach((m) => m.tick());
+            managers.forEach(async (m) => m.tick());
     } catch (error) {
-        
+        console.log(error);
     }
 }

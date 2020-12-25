@@ -8,6 +8,8 @@ export class Manager{
     maxProduciton: number;
     status: boolean;
     ratio: number;
+    tick: () => Promise<void>;
+
     
     constructor(id : String, maxProduciton: number){
         this.id = id;
@@ -15,26 +17,24 @@ export class Manager{
         this.maxProduciton = maxProduciton;
         this.status = true;
         this.ratio = 1;
-
-    }
-
-
-    async tick(){
-
-        if(this.status){
-            this.current *= 1.005;
-            this.current = this.current > this.maxProduciton ? this.maxProduciton : this.current;
-        }else{
-            this.current *= 0.995;
-            this.current = this.current < 1.0 ? 0 : this.current;
-        }
-        await Axios.put(process.env.SIM + '/api/members/managers/'+this.id,
-            {
-                current: this.current,
-                status: this.status
+        this.tick = async () => {
+            if(this.status){
+                this.current = this.current <= 0 ? 1 : this.current;
+                this.current *= 1.005;
+                this.current = this.current > this.maxProduciton ? this.maxProduciton : this.current;
+            }else{
+                this.current *= 0.995;
+                this.current = this.current < 1.0 ? 0 : this.current;
             }
-        );
-        setTimeout(this.tick, 1000);
+            await Axios.put(process.env.SIM + '/api/members/managers/'+this.id,
+                {
+                    current: this.current,
+                    status: this.status
+                }
+            );
+            await this.document();
+            setTimeout(this.tick, 1000);
+        }
     }
 
     async document() {
