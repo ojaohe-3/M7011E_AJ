@@ -70,10 +70,7 @@ app.post('/api/control/:id', (req, res)=>{
     const manager = managers.get(id);
     if(data.ratio)
         manager.ratio = data.ratio;
-    if(data.acceleration)
-        manager.Produce(data.acceleration);
-    if(data.status)
-        manager.setActive();
+    manager.status = data.status ? true : false;
     
 });
 
