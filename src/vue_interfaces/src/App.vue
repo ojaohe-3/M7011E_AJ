@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header v-bind:userType = "userType" v-on:loggout="userType = 'loggin'" />
-    <Loggin v-if="userType === 'loggin'" v-on:loggedIn="userType = newUserType"/>
+    <Loggin v-bind:userType = "userType" v-if="userType === 'loggin'" v-on:loggedIn="updateUserType"/>
     <Consumer v-if="userType === 'consumer'" />
     <Prosumer v-if="userType === 'prosumer'" />
     <Manager v-if="userType === 'manager'" />
@@ -30,6 +30,11 @@ export default {
   data () {
     return {
       userType: 'loggin' // put 'loggin' by default
+    }
+  },
+  methods: {
+    updateUserType(type) {
+      this.userType = type;
     }
   }
 }

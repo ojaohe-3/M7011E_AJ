@@ -15,12 +15,14 @@
 <script>
 export default {
   name: 'loggin',
-  data() {
+  data: function() {
     return {
       username: '',
       password: '',
-      userInfo: {},
-      newUserType: ''
+      userInfo: {
+        "username": '',
+        "password": ''
+      }
     }
   },
   methods: {
@@ -32,6 +34,7 @@ export default {
       var newUserType = ''
       if (this.username === 'consumer1') {
         newUserType = 'consumer';
+<<<<<<< HEAD
       }
       else if (this.username === 'prosumer1') {
         newUserType = 'prosumer';
@@ -39,6 +42,15 @@ export default {
       else if (this.username === 'manager1') {
         newUserType = 'manager';
       }
+=======
+      }
+      else if (this.username === 'prosumer1') {
+        newUserType = 'prosumer';
+      }
+      else if (this.username === 'manager1') {
+        newUserType = 'manager';
+      }
+>>>>>>> e7744606b7b5c848cadc50536abae3643afd574f
       this.$emit('loggedIn', newUserType);
     }
   }
