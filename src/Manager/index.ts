@@ -52,7 +52,6 @@ app.post('/api/member/', async (req, res)=>{
         const id = data.id ? data.id : Types.ObjectId().toHexString();
         const manager = new Manager(id,data.maxProduction);
         managers.set(id, manager);
-        await manager.tick();
         await manager.document();
         await Axios.post(process.env.SIM +'/members/managers/', {
             body: [
