@@ -4,11 +4,15 @@ export class Battery{
     maxOutput: number; // maximum output in kwh
     maxCharge: number; // maximum accepted input to chage in kwh
 
-    constructor(capacity: number, maxOutput: number, maxCharge: number){
+    constructor(capacity: number, maxOutput: number, maxCharge: number, current?: number){
         this.capacity = capacity;
         this.maxOutput = maxOutput;
         this.maxCharge = maxCharge;
-        this.current = 0;
+        
+        if(current)
+            this.current = current;
+        else
+            this.current = 0;
     }
     /**
      * convert input power, and return the actual that was used up

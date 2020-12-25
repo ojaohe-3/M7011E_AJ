@@ -1,86 +1,93 @@
 import { Procumer } from './procumer';
 import { Consumer } from './consumer';
 import { Manager } from './manager';
-import { Weather, Position} from './weather';
-const fetch = require("node-fetch");
-
+import { Weather, GeoLocation} from './weather';
+const axios = require('axios');
 export class Simulator{
     consumers: Map<String, Consumer>;
     prosumers: Map<String, Procumer>;
     managers: Map<String, Manager>;
-    weather: Weather;
-    pos : Position;
+    weather: Weather;//its a singleton so make it appear as such
+    pos : GeoLocation;
 
     static singelton: Simulator;
     name: String;
     manager_name: String;
     prosumer_name: String;
 
-    constructor(pos: Position, manager_name: String, prosumer_name: String){
+    constructor(pos: GeoLocation, manager_name: String, prosumer_name: String){
         this.consumers = new Map<String, Consumer>();
         this.prosumers = new Map<String, Procumer>();
         this.managers = new Map<String, Manager>();
-        this.name = process.env.Name;
         this.manager_name = manager_name;
         this.prosumer_name = prosumer_name;
         this.weather = new Weather(pos);
+        Weather.singleton = this.weather;
+        this.name = process.env.NAME;
         this.pos = pos;
         Simulator.singelton = this;
-        
     }
 
 
-    async tick(){
-        if(this.prosumers){
-            const pr = Array.from(this.prosumers.values());
+    async tick(){ //todo add caching here 
 
-            try {
-                //fetch all procumers and consumers their current data
-                await Promise.all(pr.map(async p => {
-                    const req = await fetch(p.name+'/api/member/'+p.id);
-                    const data = await req.json();
+        // const prosumers = Simulator.singelton.prosumers;
+        // const managers = Simulator.singelton.managers;
 
-                    const old = this.prosumers.get(p.id);
+        // if(prosumers){
+        //     const pr = Array.from(prosumers.values());
 
-                    old.totalProduction = data.production.totalProduction;
-                    old.totalCapacity = data.totalCapacity;
-                    old.currentCapacity = data.currentCapacity;
-                    old.status = data.status;
-                }));
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        if(this.managers){
-            const mr = Array.from(this.managers.values());
-            try {
-                await Promise.all(mr.map(async m => {
-                    const req = await fetch(m.name+'/api/member/'+m.id);
-                    const data = await req.json();
+        //     try {
+        //         //fetch all procumers and consumers their current data
+        //         pr.forEach (async p => {
+        //             const req = await axios.get(Simulator.singelton.prosumer_name+'/api/member/'+p.id);
+        //             const data = req.data;
+        //             const old = prosumers.get(data.id);
+        //             if(old){
+        //                 old.totalProduction = data.totalProduction;
+        //                 old.totalCapacity = data.totalCapacity;
+        //                 old.currentCapacity = data.currentCapacity;
+        //                 old.status = data.status;
+        //             }else if(data){
+        //                 Simulator.singelton.prosumers.set(data.id, new Procumer(data.id, data.totalProduction, data.totalCapacity, data.current, data.status, p.name));
+        //             }else{
+        //                 console.log('could not find: ' + data.id );
+        //             }
+        //         });
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // }
+        // if(managers){
+        //     const mr = Array.from(managers.values());
+
+        //     try {
+        //         mr.forEach(async m => {
+        //             const req = await axios.get(Simulator.singelton.manager_name+'/api/member/'+m.id);
+        //             const data = req.data;
+        //             const old = managers.get(m.id);
         
-                    const old = this.managers.get(m.id);
-        
-                    old.max_production = data.max_production;
-                    old.production = data.production;
-                    old.running = data.running;
-                }));
-            } catch (error) {
-                console.log(error);
-            }
-        }
+        //             old.max_production = data.maxProduciton;
+        //             old.current = data.current;
+        //             old.running = data.status;
+        //         });
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // }
         
     }
 
     getTotalDemand() : number{
         let acc  = 0;
-        this.consumers.forEach(e => acc += e.consumption(this.weather.temp));
+        Simulator.singelton.consumers.forEach(e => acc += e.consumption(Weather.singleton.temp));
         return acc;
     }
 
     getTotalSupply() : number{
-        let acc = 0;
-        this.prosumers.forEach(e => acc += e.totalProduction);
-        this.managers.forEach(e => acc += e.production);
+        let acc = 0; 
+        Simulator.singelton.prosumers.forEach(e => acc +=  e.totalProduction);
+        Simulator.singelton.managers.forEach(e => acc +=  e.current);
         return acc;
     }
 }

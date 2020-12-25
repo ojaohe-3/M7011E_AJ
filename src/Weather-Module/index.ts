@@ -90,8 +90,8 @@ app.get("/", cors(), async (req, res) => {
             res.json(await getWeather(lat, lon));
         }
 
-    }
-    res.send("no location specified")
+    }else
+        res.send("no location specified")
 });
 app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);

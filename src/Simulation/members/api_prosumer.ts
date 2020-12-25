@@ -1,4 +1,5 @@
 import express = require("express");
+import { Types } from "mongoose";
 import { Consumer } from "../consumer";
 import { Procumer } from "../procumer";
 import { Simulator } from "../simulation";
@@ -7,18 +8,19 @@ import { Weather } from "../weather";
 const app = express.Router();
 
 
-const sim = Simulator.singelton;
-const weather = Weather.singleton;
-app.get("/", (req, res)=>{//todo fetch from producer source
+app.get("/", (req, res)=>{
+    const sim = Simulator.singelton;
+
     const temp = Array.from(sim.consumers.values());
     let data = temp.map(e => {
-        e.demand = e.consumption(weather.temp);
+        e.demand = e.consumption(sim.weather.temp);
         return [e, sim.prosumers.get(e.id)];  
     })
     res.json(data);
 });
 //api get procumer
-app.get("/:id", (req, res) => {//todo fetch from producer source
+app.get("/:id", (req, res) => {
+    const sim = Simulator.singelton;
     const data =sim.prosumers.get(req.params.id);
     if(data)
         res.json(data);
@@ -28,7 +30,9 @@ app.get("/:id", (req, res) => {//todo fetch from producer source
 });
 
 app.post("/",(req,res) =>{
-    const format = ["id","timefn","production","capacity","current","", "status"] //enforced members
+    const sim = Simulator.singelton;
+
+    const format = ["id","timefn","totalProduction","currentCapacity", "status","totalCapacity"] //enforced members
     const data= req.body;
     data.body.forEach(item => {
         //look if all enforced key exists
@@ -37,14 +41,15 @@ app.post("/",(req,res) =>{
                 res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, deviation)"});  
             }
             else{   
-                const timefn = () : number => {
-                    const dt = item.timefn[(new Date()).getHours()];
-                    return Math.random()*dt[0]+Math.random()*dt[1]/2 - Math.random()*dt[1]/2 + (dt[0]-dt[1])^2/2; 
-                };
-
-                sim.consumers.set(item.id, new Consumer(item.id, timefn));
-                sim.prosumers.set(item.id, new Procumer(item.id, item.production, item.capacity,item.current, item.status, item.name ? item.name: sim.prosumer_name));
-                //todo put in db
+                const consumer = new Consumer(item.id, item.timefn);
+                sim.consumers.set(item.id, consumer);
+                sim.prosumers.set(item.id, {id: item.id, 
+                    status: item.status,  
+                    totalProduction: item.totalProduction, 
+                    currentCapacity: item.currentCapacity,
+                    totalCapacity: item.totalCapacity
+                });
+                consumer.document();
             }
         }else
             res.status(400).json({msg:"Invalid format", required: format});  
@@ -53,5 +58,25 @@ app.post("/",(req,res) =>{
 
 });
 
+app.put("/:id",(req,res) =>{
+    const data = req.body;
+    const format = ["currentCapacity","totalProduction","status"]
+    const id = req.params.id;
+    
+    if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
+        if(Simulator.singelton.prosumers.has(id)){
+            const entry = Simulator.singelton.prosumers.get(id);
+            entry.currentCapacity = data.currentCapacity;
+            entry.totalProduction = data.totalProduction;
+            entry.status = data.status;
+            res.json({message: "memeber updated!", data: data});
 
+        }else{
+            res.status(404).json({"message": "no such id!"})
+        }
+    }else{
+        res.status(400).json({message:"Invalid format", required: format});  
+    }
+
+});
 module.exports = app;

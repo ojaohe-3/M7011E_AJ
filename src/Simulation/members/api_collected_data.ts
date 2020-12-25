@@ -1,16 +1,15 @@
 import express = require("express");
-import { Weather } from "../weather";
 import { Simulator } from "../simulation";
 
 const app = express.Router();
 
 
-const sim = Simulator.singelton;
 
 //api get get total production and total consumption todo with query
-app.get("/", async (req, res)=>{
+app.get("/", (req, res)=>{
+    const sim = Simulator.singelton;
     try {
-        await sim.tick();
+        // await sim.tick();
         const supply = sim.getTotalSupply();
         const demand = sim.getTotalDemand();
         res.json({totalProduction: supply, totalDemand: demand});

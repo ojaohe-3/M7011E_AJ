@@ -1,5 +1,5 @@
-const fetch = require("node-fetch");
-export interface Position{
+const axios = require('axios');
+export interface GeoLocation{
     lat : number;
     lon : number;
 }
@@ -7,24 +7,26 @@ export class Weather{
     
     temp: number;
     speed: number;
-    pos: Position;
+    pos: GeoLocation;
     
     static singleton: Weather;
-    constructor(pos: Position){
-        this.temp = 0;
-        this.speed = 0;
+    constructor(pos: GeoLocation){
+        this.temp = 270;
+        this.speed = 7;
         this.pos = pos;
-        this.update();
-        setImmediate(this.update,3600000);//update every hour
+        Weather.update();
+        setImmediate(Weather.update,3600000);//update every hour
         Weather.singleton = this;
     }
     
-    async update(){
+    static async update(){
         try{
-            const req = await fetch(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
-            const data = await req.json();
-            this.temp = data.temp;
-            this.speed = data.speed
+            console.log(Weather.singleton.pos);
+            const pos = Weather.singleton.pos;
+            const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${pos.lat}&lon=${pos.lon}`);
+            const data = req.data;
+            Weather.singleton.temp = data.temp;
+            Weather.singleton.speed = data.speed
         }catch (error){
             console.log(error);
         }

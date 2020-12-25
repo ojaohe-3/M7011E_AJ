@@ -1,8 +1,10 @@
 import { Battery } from "./Battery";
 import { Turbine } from "./Turbine";
-import {v4} from 'uuid'
-import { IBattery, IProcumer, ITurbine, ProsumerSchema } from "../DB-Connector/prosumer";
-import { DB } from "../DB-Connector/db-connector";
+import { IBattery, ITurbine } from "./DB-Connector/prosumer";
+import { DB } from "./DB-Connector/db-connector";
+import { Types } from "mongoose";
+import { Weather } from "./weather";
+const axios = require('axios');
 export class Procumer{    
     totalProduction: number;
     totalCapacity: number;
@@ -13,6 +15,7 @@ export class Procumer{
     input_ratio: number
     output_ratio: number;
     currentCapacity: () => number;
+    update: () => Promise<void>;
 
     constructor(batteries: Array<Battery>, turbines: Array<Turbine>, id? : String){
         this.batteries = batteries;
@@ -26,19 +29,25 @@ export class Procumer{
             return sum;
         };
         this.input_ratio = 0.5;
-        this.output_ratio = 0.5;
-
+        this.output_ratio = 1;
+        this.status = true;
         if(id)
             this.id = id;
         else
-            this.id = v4();
+            this.id = Types.ObjectId().toHexString();
+        this.update = async ()=> {
+            await this.tick(Weather.singleton.speed);
+            await this.document();
+        };
+        setInterval(this.update, 60000);
     }
      /**
      * Update simulation profile by accessing tick from weathermodule, speed and ratio necessetates input
      * @param speed 
      * @param ratio 
      */
-    tick(speed: number){
+    async tick(speed: number){
+        console.log(`speed :${speed}`);
         this.totalProduction = 0;
         if(this.status){
             this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(speed));
@@ -48,26 +57,63 @@ export class Procumer{
                 this.totalProduction += b.Output(1);
             });
             this.totalProduction*this.output_ratio;
+            console.log(this);
+            const capacity = this.currentCapacity();
+            await axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
+                {
+                    currentCapacity: capacity,
+                    totalProduction: this.totalProduction, 
+                    status: this.status
+                }
+            );
+        }
+        else{
+            const reactivate = () => this.status = true;
+            setTimeout(reactivate, 600000);//crude
+            console.log(`unactive will reactivate in ca 10 min`);
+
         }
     }
 
     async document() {
         const bc: IBattery[] = [];
         const tc :ITurbine[]= [];
-        
         this.batteries.forEach(battery => bc.push({capacity: battery.capacity, current: battery.current, maxOutput: battery.maxOutput,maxCharge:  battery.maxCharge}));
         this.turbines.forEach(turbine => tc.push({maxPower: turbine.maxPower}));
-        const body= {
-            totalProduction: this.totalProduction,
-            totalCapacity: this.totalCapacity,
-            currentCapacity: this.currentCapacity(),
-            batteries: bc,
-            turbines: tc,
-            name: process.env.NAME,
-            status: this.status,
-        };
+       
+        try {
+            const entry = await DB.Models.Prosumer.findById(Types.ObjectId(+this.id)).exec();
+            const capacity = this.currentCapacity();
 
-        await DB.Models.Prosumer.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
+            if(!entry){
+                const body= {
+                    totalProduction: this.totalProduction,
+                    totalCapacity: this.totalCapacity,
+                    currentCapacity: capacity,
+                    batteries: bc,
+                    turbines: tc,
+                    name: process.env.NAME,
+                    status: this.status,
+                    _id : this.id
+                };
+                await DB.Models.Prosumer.create(body);
+            }
+            else{
+                const body= {
+                    totalProduction: this.totalProduction,
+                    totalCapacity: this.totalCapacity,
+                    currentCapacity: capacity,
+                    batteries: bc,
+                    turbines: tc,
+                    name: process.env.NAME,
+                    status: this.status
+                };
+                await DB.Models.Prosumer.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+            }
+            
+        } catch (error) {
+            console.log(error)
+        }
            
         
     }

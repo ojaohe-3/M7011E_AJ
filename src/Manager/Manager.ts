@@ -1,11 +1,11 @@
-import { DB } from '../DB-Connector/db-connector';
-import {ManagerSchema} from './../DB-Connector/manager';
+import Axios from 'axios';
+import { Types } from 'mongoose';
+import { DB } from './DB-Connector/db-connector';
 export class Manager{
     
     id: String;
     current: number;
     maxProduciton: number;
-    production : number;
     status: boolean;
     ratio: number;
     
@@ -13,63 +13,48 @@ export class Manager{
         this.id = id;
         this.current = 0;
         this.maxProduciton = maxProduciton;
-        const acceleration = 1.5;
-        this.production = 0;
-        this.status = false;
+        this.status = true;
         this.ratio = 1;
 
     }
 
-    setActive(){
-        this.status = true;
-        this.Produce(1.05);
-    }
-    stop(){
-        this.status = false;
-        if(this.production !== 0)
-            this.Produce(0.95);
-    }
 
-    /**
-     * start production
-     * returns a promise, does only really return max or min
-     * @param speed t0
-     */
-    async Produce(acceleration : number){
-        this.production += this.production*acceleration; //updates value
-        await new Promise(resolve => setTimeout(resolve, 250));  //wait 250ms
-        
-        //if we are producing i.e accelerating
+    async tick(){
+
         if(this.status){
-            if(this.production >= this.maxProduciton*this.ratio)
-                if(this.production - this.maxProduciton < 5)
-                    return this.maxProduciton*this.ratio;
-                else
-                    acceleration = 2- acceleration;// this should occur every time we change the ratio while produciton is running
+            this.current *= 1.005;
+            this.current = this.current > this.maxProduciton ? this.maxProduciton : this.current;
+        }else{
+            this.current *= 0.995;
+            this.current = this.current < 1.0 ? 0 : this.current;
         }
-        //if we are de accelerating
-        if(!this.status)
-        {
-            if(this.production < 1)
+        await Axios.put(process.env.SIM + '/api/members/managers/'+this.id,
             {
-                return 0;
+                current: this.current,
+                status: this.status
             }
-            if(acceleration > 1){
-                acceleration = 2- acceleration;
-            }
-        }        
-        return this.Produce(acceleration)
+        );
+        setTimeout(this.tick, 1000);
     }
 
     async document() {
         const body = {
             current: this.current,
             maxProduciton: this.maxProduciton,
-            production : this.production,
             status: this.status,
             ratio: this.ratio,
             name: process.env.NAME,
+            _id: Types.ObjectId(+this.id)
         }
-        await DB.Models.Manager.findByIdAndUpdate(this.id, body, {upsert : true}).exec();
+        try {
+            const entry = await DB.Models.Manager.findById(Types.ObjectId(+this.id)).exec();
+            if(!entry)
+                await DB.Models.Manager.create(body);
+            else
+                await DB.Models.Manager.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+        } catch (error) {
+            console.log(error);
+        }
+        
     }
 }

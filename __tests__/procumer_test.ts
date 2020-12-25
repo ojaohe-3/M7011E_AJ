@@ -6,7 +6,7 @@ test('procumer_test',()=>{
     let procumer = new Procumer([new Battery(1000, 51, 51)], [new Turbine(2000)]);
     procumer.input_ratio = 1;
     procumer.output_ratio = 0;
-    procumer.tick(3);
+    procumer.tick(2);
     expect(procumer.totalProduction).toEqual(0);
     for (let index = 0; index < 100; index++) {
         procumer.tick(36);
@@ -30,6 +30,7 @@ test('procumer_test',()=>{
 
         
     }
+    console.log(procumer.tick(4.1));
 });
 
 test('api_procumer_test', async ()=>{
