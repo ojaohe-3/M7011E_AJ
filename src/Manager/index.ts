@@ -63,7 +63,8 @@ app.post('/api/member/', async (req, res)=>{
                     status: manager.status
                 }
             ]
-        }).then(m => console.log(m)).catch(err => console.log(err));//todo make interface for data
+        });
+        res.json({data: data, message: "success!"});
     }else
         res.status(400).json({message: "invalid format!", format:format});
 });
