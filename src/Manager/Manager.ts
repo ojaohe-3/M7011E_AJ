@@ -47,7 +47,7 @@ export class Manager{
             _id: Types.ObjectId(+this.id)
         }
         try {
-            const entry = await DB.Models.Manager.findById(Types.ObjectId(+this.id)).exec();
+            const entry = await DB.Models.Manager.findById(+this.id).exec();
             if(!entry)
                 await DB.Models.Manager.create(body);
             else
