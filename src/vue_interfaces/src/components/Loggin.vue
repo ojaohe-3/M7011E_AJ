@@ -25,16 +25,21 @@ export default {
   },
   methods: {
     valuesIntoJson() {
-      //const saltedSha256 = require('salted-sha256');
-      this.userInfo = {
-        "username": this.username,
-        //"password": saltedSha256(password)
-        "password": this.password
+      //this.userInfo = {
+      //  "username": this.username,
+      //  "password": this.password
+      //}
+      var newUserType = ''
+      if (this.username === 'consumer1') {
+        newUserType = 'consumer';
       }
-      this.newUserType = 'consumer'
-      //this.newUserType = 'consumer'
-      //this.$emit('loggedIn', this.newUserType)
-      // if this is correct, define userType and $emit('loggedIn', newUserType)
+      else if (this.username === 'prosumer1') {
+        newUserType = 'prosumer';
+      }
+      else if (this.username === 'manager1') {
+        newUserType = 'manager';
+      }
+      this.$emit('loggedIn', newUserType);
     }
   }
 }
