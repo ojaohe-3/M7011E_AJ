@@ -11,7 +11,7 @@
                 <td v-bind="production">
                     <h3>My Production</h3>
                     <h4>{{ production }} kw/h</h4>
-                    <input type="number" min="0" v-model="production" placeholder="3500">
+                    <input type="number" min="0" v-model="production"  v-on:input="productionStep" placeholder="3500">
                     <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 <td v-bind="elecDemand" rowspan="2">
@@ -65,7 +65,7 @@
                 <td v-bind="production">
                     <h3>My Production</h3>
                     <h4>{{ production }} kw/h</h4>
-                    <input type="number" min="0" v-model="production" placeholder="3500">
+                    <input type="number" min="0" v-model="production" v-on:input="productionStep" placeholder="3500">
                     <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 <td v-bind="income">
@@ -111,18 +111,47 @@
 
 
 <script>
+import FetchComponent from './FetchComponent';
+
 export default {
     name: 'Manager',
+    props: ["id"],
     data() {
         return {
             elecPrice: 0.73,
             production: 37100,
             elecDemand: 56300,
+            ratio: 100,
             income: 25300,
             totalAvailable: 62400,
+            maxProduction: 50000,
             consumption: 3140
         }
-    }
+    },
+    mounted() {
+        const update = () => {
+
+            const market = FetchComponent._get("market/price", 'token');
+            const manager = FetchComponent._get("manager/"+this.id, 'token');
+
+            this.elecPrice = market.price;
+            this.production = manager.production;
+            this.elecDemand = market.totalDemand;
+            this.maxProduction = manager.maxProduction();
+            this.income = this.production * this.elecPrice;
+            this.totalAvailable = manager.maxProduction;
+
+        }
+        setInterval(update, 1000);
+
+    },
+    methods: {
+        productionStep(){
+            const ratio = this.production/this.maxProduction;
+            FetchComponent._post("manger/control", {"ratio": ration}, 'token');
+        }
+    },
+    
 }
 </script>
 

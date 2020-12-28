@@ -30,7 +30,7 @@ const manager = require('./members/api_manager');
 const simdata = require('./members/api_collected_data');
 
 app.use(logger);
-app.use(cors()) //not sure what it does, it lets me work with axios, also my firend yelled at me for not using it, he knows better
+app.use(cors());// vanurability, cross origin sharing, allows some xss
 
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);
@@ -43,11 +43,6 @@ app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
 
-//todo fetch simulation data from managers
-//todo fetch siumlation data from procumers
-
-//todo publish change to database async
-//todo async get weather module data and simulate tick.
 
 //keep profiles updates
 

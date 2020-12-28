@@ -24,15 +24,33 @@
 
 
 <script>
+import FetchComponent from './FetchComponent';
 export default {
   name: 'Consumer',
+ props: ["id"],
   data() {
       return {
           consumption: 3500,
-          elecPrice: 0.73
+          elecPrice: 0.73,
+          cost: 0.73*3500,
+          id : "temporary"
       }
+  },
+  mounted () {
+        const update = () => {
+
+            const market = FetchComponent._get("market/price", 'token');
+            const simulator = FetchComponent._get("simulator/data", 'token');
+            const consumer = FetchComponent._get("simulator/:id", 'token');
+
+            this.cost = consumer.demand * market.price;
+            this.elecPrice = market.price;
+            this.elecDemand = simulator.totalDemand;
+        }
+        setInterval(update, 1000);
+    }
   }
-}
+
 </script>
 
 

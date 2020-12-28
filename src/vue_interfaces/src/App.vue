@@ -2,7 +2,7 @@
   <div id="app">
     <Header v-bind:userType = "userType" v-on:loggout="userType = 'loggin'" />
     <Loggin v-bind:userType = "userType" v-if="userType === 'loggin'" v-on:loggedIn="updateUserType"/>
-    <Consumer v-if="userType === 'consumer'" />
+    <Consumer v-if="userType === 'consumer'" :id="id" />
     <Prosumer v-if="userType === 'prosumer'" />
     <Manager v-if="userType === 'manager'" />
   </div>
@@ -29,12 +29,14 @@ export default {
   },
   data () {
     return {
-      userType: 'loggin' // put 'loggin' by default
+      userType: 'loggin', // put 'loggin' by default
+      id: ''
     }
   },
   methods: {
-    updateUserType(type) {
+    updateUserType(type, id) {
       this.userType = type;
+      this.id = id;
     }
   }
 }

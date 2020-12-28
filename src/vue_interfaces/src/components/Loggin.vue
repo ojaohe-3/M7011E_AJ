@@ -13,6 +13,7 @@
 
 
 <script>
+import FetchComponent from './FetchComponent';
 export default {
   name: 'loggin',
   data: function() {
@@ -20,21 +21,25 @@ export default {
       username: '',
       password: '',
       userInfo: {
-        "username": '',
-        "password": ''
+        "username": "",
+        "password": ""
       }
     }
   },
   methods: {
     valuesIntoJson() {
-      //this.userInfo = {
-      //  "username": this.username,
-      //  "password": this.password
-      //}
+      this.userInfo = {
+       "username": this.username,
+       "password": this.password
+      }
+
+      const login = FetchComponent._post('login api', this.userInfo);
+      const token = login.accessToken;
+      newUserType = login.clientType;
+      //temporary
       var newUserType = ''
       if (this.username === 'consumer1') {
         newUserType = 'consumer';
-<<<<<<< HEAD
       }
       else if (this.username === 'prosumer1') {
         newUserType = 'prosumer';
@@ -42,15 +47,7 @@ export default {
       else if (this.username === 'manager1') {
         newUserType = 'manager';
       }
-=======
-      }
-      else if (this.username === 'prosumer1') {
-        newUserType = 'prosumer';
-      }
-      else if (this.username === 'manager1') {
-        newUserType = 'manager';
-      }
->>>>>>> e7744606b7b5c848cadc50536abae3643afd574f
+
       this.$emit('loggedIn', newUserType);
     }
   }
