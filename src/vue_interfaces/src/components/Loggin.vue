@@ -13,7 +13,7 @@
 
 
 <script>
-import FetchComponent from './FetchComponent';
+// import FetchComponent from './FetchComponent';
 export default {
   name: 'loggin',
   data: function() {
@@ -32,23 +32,24 @@ export default {
        "username": this.username,
        "password": this.password
       }
+      // const login = FetchComponent._post('login api', this.userInfo);
+      console.log(process.env.VUE_APP_TEST);
 
-      const login = FetchComponent._post('login api', this.userInfo);
-      const token = login.accessToken;
-      newUserType = login.clientType;
+      // const token = login.accessToken;
+      // newUserType = login.clientType;
       //temporary
-      var newUserType = ''
-      if (this.username === 'consumer1') {
-        newUserType = 'consumer';
-      }
-      else if (this.username === 'prosumer1') {
-        newUserType = 'prosumer';
-      }
-      else if (this.username === 'manager1') {
-        newUserType = 'manager';
-      }
+      // var newUserType = ''
+      // if (this.username === 'consumer1') {
+      //   newUserType = 'consumer';
+      // }
+      // else if (this.username === 'prosumer1') {
+      //   newUserType = 'prosumer';
+      // }
+      // else if (this.username === 'manager1') {
+      //   newUserType = 'manager';
+      // }
 
-      this.$emit('loggedIn', newUserType);
+      // this.$emit('loggedIn', newUserType);
     }
   }
 }

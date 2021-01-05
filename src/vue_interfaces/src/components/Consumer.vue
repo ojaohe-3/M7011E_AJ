@@ -27,7 +27,6 @@
 import FetchComponent from './FetchComponent';
 export default {
   name: 'Consumer',
- props: ["id"],
   data() {
       return {
           consumption: 3500,
@@ -39,12 +38,13 @@ export default {
   mounted () {
         const update = () => {
 
-            const market = FetchComponent._get("market/price", 'token');
-            const simulator = FetchComponent._get("simulator/data", 'token');
-            const consumer = FetchComponent._get("simulator/:id", 'token');
+            const market = FetchComponent._get(process.env.MARKET_ENDPOINT+"/price", 'token');
+            const simulator = FetchComponent._get(process.env.SIM_ENDPOINT+"/data", 'token');
+            const consumer = FetchComponent._get(process.env.SIM_ENDPOINT+'/'+ this.id, 'token');
 
             this.cost = consumer.demand * market.price;
             this.elecPrice = market.price;
+            
             this.elecDemand = simulator.totalDemand;
         }
         setInterval(update, 1000);

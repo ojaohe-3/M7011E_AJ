@@ -131,8 +131,8 @@ export default {
     mounted() {
         const update = () => {
 
-            const market = FetchComponent._get("market/price", 'token');
-            const manager = FetchComponent._get("manager/"+this.id, 'token');
+            const market = FetchComponent._get(process.env.MARKET_ENDPOINT+"/price", 'token');
+            const manager = FetchComponent._get(process.env.MANAGER_ENDPOINT+"/"+this.id, 'token');
 
             this.elecPrice = market.price;
             this.production = manager.production;
@@ -147,8 +147,8 @@ export default {
     },
     methods: {
         productionStep(){
-            const ratio = this.production/this.maxProduction;
-            FetchComponent._post("manger/control", {"ratio": ration}, 'token');
+            const r = this.production/this.maxProduction;
+            FetchComponent._post(process.env.MANAGER_ENDPOINT+"/control", {"ratio": r}, 'token');
         }
     },
     
