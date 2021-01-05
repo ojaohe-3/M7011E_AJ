@@ -2,7 +2,6 @@
   "name": "m7011e_aj",
   "version": "1.0.0",
   "description": "School project in distributed dynamic websites",
-
   "scripts": {
     "test_all": "jest",
     "test_cons": "jest consumer_test",
@@ -28,6 +27,7 @@
   },
   "homepage": "https://github.com/ojaohe-3/M7011E_AJ#readme",
   "dependencies": {
+    "@okta/jwt-verifier": "0.0.12",
     "@types/axios": "^0.14.0",
     "@types/cors": "^2.8.8",
     "@types/dotenv": "^8.2.0",

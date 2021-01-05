@@ -1,27 +1,34 @@
-
 import express = require("express");
 import { DB } from "./DB-Connector/db-connector";
 import { Types } from "mongoose";
 import { UserSchema } from "./DB-Connector/loggin";
 
-new DB({User : new UserSchema().model});
+interface userdata {
+	email: String;
+	username: String;
+	password: String;
+	last_login: Date;
+}
 
-let logger = (req, res, next) =>{
-    console.log(`at ${(new Date()).toString()}: ${req.protocol}://${req.get("host")}${req.originalUrl}: ${req.method} request`)
-    next();
-}; 
+new DB({ User: new UserSchema().model });
+
+let logger = (req, res, next) => {
+	console.log(
+		`at ${new Date().toString()}: ${req.protocol}://${req.get("host")}${
+			req.originalUrl
+		}: ${req.method} request`
+	);
+	next();
+};
 const app = express();
 app.use(logger);
+app.use(express.json());
 
-
-
-app.get('/member/:id', async ()=>{
+app.post("/loggin/:name", async (req, res) => {
     
 });
 
-
-
 const PORT = +process.env.PORT | 5000;
-app.listen(PORT, ()=>{
-    console.log(`lisening on ${PORT}`)
+app.listen(PORT, () => {
+	console.log(`lisening on ${PORT}`);
 });

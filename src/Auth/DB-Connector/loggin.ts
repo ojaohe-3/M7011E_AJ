@@ -13,9 +13,9 @@ export class UserSchema{
 
     constructor(){
         const userSchema = new Schema({
-            email: String,
-            username: String,
-            password: String,
+            email: { type : String , unique : true, required : true },
+            username: { type : String , unique : true, required : true },
+            password: { type : String , unique : false, required : true },
             last_login: Date,
         });
         this._model = model<IUser>('User', userSchema)
