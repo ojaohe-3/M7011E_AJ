@@ -165,6 +165,11 @@ Tuesday 05 January: 2PM - 5PM </br>
 
 ---
 
+Wednesday 06 January: 4PM - 5PM </br>
+* Redaction of the report
+
+---
+
 ## Total amount of time
 
-2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 7 + 3 + 5 + 5 + 2 + 3 + 3 + 3 = 99h
+2,5 + 1,5 + 3 + 2 + 5 + 5 + 5 + 1 + 5,5 + 6,5 + 7 + 7 + 5 + 5 + 2 + 5 + 7 + 3 + 5 + 5 + 2 + 3 + 3 + 3 + 1 = 100h
