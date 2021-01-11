@@ -1,13 +1,14 @@
 import express = require("express");
 import { DB } from "./DB-Connector/db-connector";
-import { Types } from "mongoose";
-import { UserSchema } from "./DB-Connector/loggin";
+import { UserSchema } from "./DB-Connector/user";
 
 interface userdata {
-	email: String;
-	username: String;
-	password: String;
-	last_login: Date;
+	username: String,
+    clientid: String,
+    managers?: Array<string>,
+    prosumers?: Array<string>,
+    consumers?: Array<string>,
+    last_login: Date,
 }
 
 new DB({ User: new UserSchema().model });
@@ -24,9 +25,23 @@ const app = express();
 app.use(logger);
 app.use(express.json());
 
-app.post("/loggin/:name", async (req, res) => {
-    
+app.get("/loggin/:name", async (req, res) => {
+	const Cid = req.params.name;
+	const entry = await DB.Models.User.find({"clientid": Cid});
+	if(entry){
+		res.json(entry);
+	}else{
+		res.status(401).send("no such user " + Cid);
+	}
 });
+
+if(process.env.NODE_ENV == 'development'){
+	app.post("/loggin/", async (req, res)=>{
+		const data: userdata = req.body;
+		await DB.Models.User.create(data);
+		console.log(data);
+	});
+}
 
 const PORT = +process.env.PORT | 5000;
 app.listen(PORT, () => {

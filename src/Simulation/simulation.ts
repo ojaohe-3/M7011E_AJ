@@ -21,7 +21,7 @@ export class Simulator{
         this.managers = new Map<String, Manager>();
         this.manager_name = manager_name;
         this.prosumer_name = prosumer_name;
-        this.weather = Weather.getInstance();
+        this.weather = new Weather(pos);
         this.name = process.env.NAME;
         this.pos = pos;
         Simulator.singelton = this;

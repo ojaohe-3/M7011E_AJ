@@ -1,3 +1,5 @@
+import { Simulator } from "./simulation";
+
 const axios = require('axios');
 export interface Location{
     lat : number;
@@ -31,7 +33,7 @@ export class Weather{
     }
     static getInstance() : Weather {
         if(!Weather.singleton)
-            Weather.singleton = new Weather({lat: +process.env.LAT, lon: +process.env.LAT});
+            Weather.singleton = Simulator.singelton.weather;
         return Weather.singleton;
     }
     

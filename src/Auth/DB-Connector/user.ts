@@ -1,9 +1,12 @@
 import { Schema,  model, Document, Model, Types } from 'mongoose';
 
+
 declare interface IUser extends Document{
-    email: String,
     username: String,
-    password: String,
+    clientid: String,
+    managers?: Array<string>,
+    prosumers?: Array<string>,
+    consumers?: Array<string>,
     last_login: Date,
 }
 export interface UserModel extends Model<IUser>{};
@@ -13,9 +16,9 @@ export class UserSchema{
 
     constructor(){
         const userSchema = new Schema({
-            email: { type : String , unique : true, required : true },
             username: { type : String , unique : true, required : true },
-            password: { type : String , unique : false, required : true },
+            clientid: { type : String , unique : false, required : true },
+          
             last_login: Date,
         });
         this._model = model<IUser>('User', userSchema)

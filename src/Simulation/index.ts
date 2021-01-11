@@ -8,6 +8,9 @@ require('dotenv').config();
 import cors = require("cors");
 import { Types } from "mongoose";
 import { Consumer } from "./consumer";
+import { Weather } from "./weather";
+
+
 //todo create modules to clean this file
 const app: express.Application = express();
 app.use(express.json());
@@ -49,9 +52,11 @@ app.listen(PORT, function () {
 async function fetchAll() {
     try { //todo fix initial condition, in case of newly generated nodes
         const sim_data = await DB.Models.Cell.findById(Types.ObjectId(id)).exec();
+        console.log(sim_data)
         const sim = new Simulator({lat: +sim_data.lat, lon: +sim_data.lon}, sim_data.manager_dest, sim_data.prosumer_dest);
         console.log("simulator loaded!");
         Simulator.singelton = sim;
+        Weather.getInstance()
         const data = await DB.Models.Consumer.find({name: process.env.NAME}).exec();
         data.forEach(c => sim.consumers.set(c.id, new Consumer(c.id,c.timefn, c.demand, c.profile)));
         setInterval(Simulator.singelton.tick, 1000);

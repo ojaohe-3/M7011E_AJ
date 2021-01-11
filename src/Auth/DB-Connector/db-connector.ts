@@ -3,7 +3,7 @@
 import { connect, connection, Connection } from 'mongoose';
 import { CellModel, CellSchema } from './cell';
 import { ConsumerModel, ConsumerSchema } from './consumer';
-import { UserModel, UserSchema } from './loggin';
+import { UserModel, UserSchema } from './user';
 import { ManagerModel, ManagerSchema } from './manager';
 import { MarketModel, MarketSchema } from './market';
 import { ProsumerModel, ProsumerSchema } from './prosumer';
@@ -34,7 +34,7 @@ export class DB{
         Manager: new ManagerSchema().model,
         User: new UserSchema().model
       }
-    connect(process.env.DB_CONNECT,{useNewUrlParser: true});//secure access tokens etc todo
+    connect(process.env.DB_CONNECT,{useNewUrlParser: true});
     this._db = connection;
     this._db.on('open', this.connected);
     this._db.on('error', this.error);
