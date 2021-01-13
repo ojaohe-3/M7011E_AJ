@@ -1,10 +1,6 @@
 <template>
   <div id="app">
-    <Header v-bind:userType = "userType" v-on:loggout="userType = 'loggin'" />
-    <Loggin v-bind:userType = "userType" v-if="userType === 'loggin'" v-on:loggedIn="updateUserType"/>
-    <Consumer v-if="userType === 'consumer'" :id="id" />
-    <Prosumer v-if="userType === 'prosumer'" />
-    <Manager v-if="userType === 'manager'" />
+    <Header v-bind:userType = "userType" v-on:loggout="userType = 'login'" />
   </div>
 </template>
 
@@ -13,30 +9,20 @@
 
 <script>
 import Header from './components/Header.vue'
-import Loggin from './components/Loggin.vue'
-import Consumer from './components/Consumer.vue'
-import Prosumer from './components/Prosumer.vue'
-import Manager from './components/Manager.vue'
+import auth from './auth'
 
 export default {
   name: 'App',
   components: {
-    Header,
-    Loggin,
-    Consumer,
-    Prosumer,
-    Manager
-  },
-  data () {
+    Header
+  },data () {
     return {
-      userType: 'loggin', // put 'loggin' by default
-      id: ''
+      loggedIn: auth.loggedIn()
     }
   },
-  methods: {
-    updateUserType(type, id) {
-      this.userType = type;
-      this.id = id;
+  created () {
+    auth.onChange = loggedIn => {
+      this.loggedIn = loggedIn
     }
   }
 }

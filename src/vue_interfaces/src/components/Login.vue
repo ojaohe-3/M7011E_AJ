@@ -4,7 +4,7 @@
     <input type="text" id="username" v-model="username">
     <h3>Password:</h3>
     <input type="password" id="password" v-model="password" />
-    <button id="submit" v-on:click="valuesIntoJson()">Loggin</button>
+    <button id="submit" v-on:click="login()">Login</button>
     <div class="yellowLine"></div>
     <div class="blueLine"></div>
   </div>
@@ -20,37 +20,20 @@ export default {
     return {
       username: '',
       password: '',
-      userInfo: {
-        "username": "",
-        "password": ""
-      }
+      error: false
     }
   },
   methods: {
-    valuesIntoJson() {
-      this.userInfo = {
-       "username": this.username,
-       "password": this.password
+    
+      login () {
+        auth.login(this.email, this.pass, loggedIn => {
+          if (!loggedIn) {
+            this.error = true
+          } else {
+            this.$router.replace(this.$route.query.redirect || '/')
+          }
+        })
       }
-      // const login = FetchComponent._post('login api', this.userInfo);
-      console.log(process.env.VUE_APP_TEST);
-
-      // const token = login.accessToken;
-      // newUserType = login.clientType;
-      //temporary
-      // var newUserType = ''
-      // if (this.username === 'consumer1') {
-      //   newUserType = 'consumer';
-      // }
-      // else if (this.username === 'prosumer1') {
-      //   newUserType = 'prosumer';
-      // }
-      // else if (this.username === 'manager1') {
-      //   newUserType = 'manager';
-      // }
-
-      // this.$emit('loggedIn', newUserType);
-    }
   }
 }
 </script>
