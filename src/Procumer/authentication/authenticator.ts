@@ -34,9 +34,9 @@ export default class Authenticator {
                     issuer: process.env.ISSUER,
                     clientId: process.env.CLIENT_ID,
                 });
-
-
-                const data = await (await axios.get(process.env.LOGIN_API+'/login/'+)).data;
+                const verifyer = oktaJwtVerifier.verifyIdToken(token)
+                
+                const data = await (await axios.get(process.env.LOGIN_API+'/login/')).data;
                 const res = data.userdata.prosumers.forEach(e => {
                     if(e.id === id){
                         return e;

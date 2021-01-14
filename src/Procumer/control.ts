@@ -5,8 +5,7 @@ import { ModuleKind } from "typescript";
 
 dotenv.config({path: "./.env"});  
 
-
-const app: express.Application = express();
+const app = express.Router();;
 app.get('/:id', (req, res)=>{
     const id = req.params.id;
     const procumer = ProsumerHandler.Instance.getById(id);

@@ -7,7 +7,7 @@ import { Types } from "mongoose";
 import ProsumerHandler from "./ProsumerHandler";
 dotenv.config({ path: "./.env" });
 
-const app: express.Application = express();
+const app = express.Router();
 
 interface batteries {
 	capacity: number;
