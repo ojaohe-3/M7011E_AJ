@@ -126,16 +126,55 @@ Sunday 4pm-8pm
 * Database setup
 * unit tests
 ---
-Tuesday 4pm - 4am
+Tuesday 4pm - 4am 
 * Docker files
 * making production code more ready
 * Deploying on nomad
-
+* fail to deploy nomad proceed to lose 15 year of life time
+* massive bugfixing in the backend
 ---
-Wensday
+Wensday 2h
 * Presentation
 * Some vision graphics
 * Creating a link between backend and front end.
+---
+Wensday 21-01-06 6h
+* bugfixing
+* okta setup
+---
+
+Thuesday 21-01-07 6h
+* bugfixing
+* okta setup
+
+---
+friday 21-01-08 8h
+* bugfixing
+* okta setup (mostly reading through documentation)
+---
+saturday 21-01-09 6h
+* bugfixing
+* okta setup
+* connecting to the backend with vue and connection components (started earlier but dont recal when)
+---
+Monday 21-01-11 9h
+* fixing okta application settings
+* authentication on the backend prototyping
+* Vue authentication, fixing cors issues, working on the IMRAD report.
+
+---
+Wenday 21-01-13 8h
+* fixing okta application settings
+* authentication on the backend prototyping
+* Vue authentication, fixing cors issues, 
+* working on the IMRAD report.
+---
+Thuesday 21-01-13 10h
+* formating the backend modules to look nicer, also makes it easier to extend codewise. better structure etc.
+* even more authentication on the backend prototyping 
+* Stuck on oauth, application settings is really badly documented and trubelshooting is taking too much time. Why can i not just get a normal error code that dont just say lol you have error?, fixing the groundworks for plan B
+*
+
 
 Total: 
-2.5 + 4 + 2 + 2 + 4 + 2 + 5 + 8 + 8 + 1 + 3 +4= 45h30 (till tuesday 24) (some entries are missing, total is an underestimated number)
+2.5 + 4 + 2 + 2 + 4 + 2 + 5 + 8 + 8 + 1 + 3 + 4 + 12 + 6 + 6 + 8 + 6 + 9 + 8 + 10= 110h30  (i have forgoten to add several days, this is possibly an understaded time)
