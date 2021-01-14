@@ -1,12 +1,16 @@
 import express = require("express");
 import { DB } from "./DB-Connector/db-connector";
 import { UserSchema } from "./DB-Connector/user";
-
+interface privilage{
+	level: Number,
+    access?: String,
+    id: String
+}
 interface userdata {
 	username: String,
     clientid: String,
-    managers?: Array<string>,
-    prosumers?: Array<string>,
+    managers?: Array<privilage>,
+    prosumers?: Array<privilage>,
     consumers?: Array<string>,
     last_login: Date,
 }
@@ -25,13 +29,13 @@ const app = express();
 app.use(logger);
 app.use(express.json());
 
-app.get("/loggin/:name", async (req, res) => {
+app.get("/login/:name", async (req, res) => {
 	const Cid = req.params.name;
 	const entry = await DB.Models.User.find({"clientid": Cid});
 	if(entry){
 		res.json(entry);
 	}else{
-		res.status(401).send("no such user " + Cid);
+		res.status(401).send("no such user with id " + Cid);
 	}
 });
 
