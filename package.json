@@ -14,6 +14,7 @@
     "devw": "npx tsc -w | nodemon ./build/src/Weather-Module/index.js ",
     "devMan": "npx tsc -w | nodemon ./build/src/Manager/index.js ",
     "devMar": "npx tsc -w | nodemon ./build/src/Market/index.js ",
+    "devlogin": "npx tsc -w | nodemon ./build/src/Auth/index.js ",
     "start": "npx tsc &&"
   },
   "repository": {

@@ -3,7 +3,6 @@ import { Simulator } from "../simulation";
 import { Consumer } from "../consumer";
 import { Types } from "mongoose";
 import { Weather } from "../weather";
-const verifier = require("./../oktaModule");
 const app = express.Router();
 
 app.get("/", (req, res) => {
@@ -24,7 +23,7 @@ app.get("/:id", (req, res) => {
 		});
 });
 
-app.post("/", verifier,(req, res) => {
+app.post("/",(req, res) => {
 	const format = [ "timefn"]; //enforced members
 	const sim = Simulator.singelton;
 

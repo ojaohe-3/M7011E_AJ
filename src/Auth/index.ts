@@ -45,9 +45,14 @@ if(process.env.NODE_ENV == 'development'){
 		await DB.Models.User.create(data);
 		console.log(data);
 	});
+
+	app.all('/login/callback', (req,res) =>{
+		console.log(req.body);
+		console.log(req.params);
+	});
 }
 
-const PORT = +process.env.PORT | 5000;
+const PORT = +process.env.PORT | 8080;
 app.listen(PORT, () => {
 	console.log(`lisening on ${PORT}`);
 });

@@ -34,6 +34,7 @@ export class Manager{
             );
             await this.document();
             setTimeout(this.tick, 1000);
+            return;
         }
     }
 
