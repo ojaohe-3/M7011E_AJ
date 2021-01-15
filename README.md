@@ -123,7 +123,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
         }
       ```
     * ``` POST ``` /api/members/
-      post a single member, will update the service aswell as the database
+      post a single member, will update the registed simulation service as well as the database
       payload format:
       ```js
       {
@@ -166,27 +166,94 @@ All services, exluding the front-end uses typscript Express modules handle reque
       gets all members. Format:
       ```json
        {
-          "turbines": [number];
-	        "batteries": [ {
-            "capacity": number;
-            "maxOutput": number;
-            "maxCharge": number;
-            "current?": number;
-            },
-        ...
-        ],
-         "_id?": String;
+	[
+		{
+		"turbines": [number],
+		"batteries": [ {
+			"capacity": number,
+			"maxOutput": number,
+			"maxCharge": number,
+			"current?": number,
+		    },
+		...
+		],
+		 "_id?": String,
+		}
+	]
        }
       ```
       The number for turbine is the max poweroutput it can produce.
-      the batterie object format:
 
     
     * ``` GET ``` /api/members/<id>
+	get individual prosumer object with id
+	format:
+	```json
+      	{
+	"turbines": [number],
+	"batteries": [ {
+		"capacity": number,
+		"maxOutput": number,
+		"maxCharge": number,
+		"current?": number,
+	    },
+	...
+	],
+	 "_id?": String,
+	}
+       ```
     * ``` POST ``` /api/members/
+	Post a new prosumer to be published in the simulation service and database, format for the payload:
+	```json
+      	{
+	"turbines": [number],
+	"batteries": [ {
+		"capacity": number,
+		"maxOutput": number,
+		"maxCharge": number,
+		"current?": number,
+	    },
+	...
+	],
+	 "_id?": String,
+	}
+       ```
     * ``` PUT ``` /api/members/<id>
+	updates an entry by the id.
+	the payload required format:
+	```json
+      	{
+	"turbines": [number],
+	"batteries": [ {
+		"capacity": number,
+		"maxOutput": number,
+		"maxCharge": number,
+		"current?": number,
+	    },
+	...
+	]
+	}
+       ```
     * ``` GET ``` /api/control/<id>
+	Gets the control from member with <id>. 
+	format:
+	```json
+	{
+		"input_ratio": number,
+        	"output_ratio": number,
+        	"status": boolean,
+	}
+	```
     * ``` PUT ``` /api/control/<id>
+	updates the control from member with <id> in the url. 
+	format:
+	```json
+	{
+		"input_ratio": number,
+        	"output_ratio": number,
+        	"status": boolean,
+	}
+	```
   
   * Market API
     * ``` GET ``` /api/members/
