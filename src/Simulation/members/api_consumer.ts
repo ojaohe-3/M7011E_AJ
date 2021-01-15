@@ -2,7 +2,7 @@ import express = require("express");
 import { Simulator } from "../simulation";
 import { Consumer } from "../consumer";
 import { Types } from "mongoose";
-
+import { Weather } from "../weather";
 const app = express.Router();
 
 app.get("/", (req, res) => {
@@ -23,7 +23,7 @@ app.get("/:id", (req, res) => {
 		});
 });
 
-app.post("/", (req, res) => {
+app.post("/",(req, res) => {
 	const format = [ "timefn"]; //enforced members
 	const sim = Simulator.singelton;
 
@@ -44,6 +44,7 @@ app.post("/", (req, res) => {
 				
 				const id = item.id ? item.id : Types.ObjectId().toHexString();
 				const consumer = new Consumer(id, item.timefn);
+				consumer.demand = consumer.consumption(Weather.getInstance().temp);
 				sim.consumers.set(id, consumer);
 				await consumer.document();
 			}
@@ -56,5 +57,5 @@ app.post("/", (req, res) => {
 
 	res.json({ message: "memebers added!", data: data });
 });
-
+ 
 module.exports = app;

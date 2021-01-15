@@ -1,34 +1,33 @@
 import { Procumer } from './procumer';
 import { Consumer } from './consumer';
 import { Manager } from './manager';
-import { Weather, GeoLocation} from './weather';
+import { Weather, Location} from './weather';
 const axios = require('axios');
 export class Simulator{
     consumers: Map<String, Consumer>;
     prosumers: Map<String, Procumer>;
     managers: Map<String, Manager>;
     weather: Weather;//its a singleton so make it appear as such
-    pos : GeoLocation;
+    pos : Location;
 
     static singelton: Simulator;
     name: String;
     manager_name: String;
     prosumer_name: String;
 
-    constructor(pos: GeoLocation, manager_name: String, prosumer_name: String){
+    constructor(pos: Location, manager_name: String, prosumer_name: String){
         this.consumers = new Map<String, Consumer>();
         this.prosumers = new Map<String, Procumer>();
         this.managers = new Map<String, Manager>();
         this.manager_name = manager_name;
         this.prosumer_name = prosumer_name;
         this.weather = new Weather(pos);
-        Weather.singleton = this.weather;
         this.name = process.env.NAME;
         this.pos = pos;
         Simulator.singelton = this;
     }
 
-
+    //depricated for now
     async tick(){ //todo add caching here 
 
         // const prosumers = Simulator.singelton.prosumers;
@@ -80,7 +79,7 @@ export class Simulator{
 
     getTotalDemand() : number{
         let acc  = 0;
-        Simulator.singelton.consumers.forEach(e => acc += e.consumption(Weather.singleton.temp));
+        Simulator.singelton.consumers.forEach(e => acc += e.consumption(Weather.getInstance().temp));
         return acc;
     }
 

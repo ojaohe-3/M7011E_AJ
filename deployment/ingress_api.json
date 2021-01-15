@@ -1,0 +1,63 @@
+{
+  "Kind" : "service-router",
+  "Name" : "api",
+  "TLS" : {
+    "Enable" : true
+  },
+  "Routes" : [
+    {
+      "Match" : {
+        "HTTP" : {
+          "PathPrefix" : "/simulator01"
+        }
+      },
+      "Destination" : {
+        "Service" : "simulator01"
+      }
+    },
+    {
+      "Match" : {
+        "HTTP" : {
+          "PathPrefix" : "/prosumer01"
+        }
+      },
+
+      "Destination" : {
+        "Service" : "prosumer01"
+      }
+    },
+    {
+      "Match" : {
+        "HTTP" : {
+          "PathPrefix" : "/manager01"
+        }
+      },
+
+      "Destination" : {
+        "Service" : "manager01"
+      }
+    },
+    {
+      "Match" : {
+        "HTTP" : {
+          "PathPrefix" : "/interface"
+        }
+      },
+
+      "Destination" : {
+        "Service" : "interface01"
+      }
+    },
+    {
+      "Match" : {
+        "HTTP" : {
+          "PathPrefix" : "/market01"
+        }
+      },
+
+      "Destination" : {
+        "Service" : "market01"
+      }
+    }
+  ]
+}

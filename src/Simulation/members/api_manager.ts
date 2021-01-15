@@ -29,9 +29,8 @@ app.get("/", (req, res) => {
 
 app.post("/",(req,res) =>{
     const sim = Simulator.singelton;
-    const format = ["id","maxProduction","current","status"] //enforced members
+    const format = ["id","maxProduciton","current","status"] //enforced members
     const data= req.body;
-
     data.body.forEach(item => {
         //look if all enforced key exists
         if(Object.keys(item).filter(k=>format.some(e => k === e)).length === format.length){

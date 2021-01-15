@@ -8,6 +8,9 @@ require('dotenv').config();
 import cors = require("cors");
 import { Types } from "mongoose";
 import { Consumer } from "./consumer";
+import { Weather } from "./weather";
+
+
 //todo create modules to clean this file
 const app: express.Application = express();
 app.use(express.json());
@@ -30,7 +33,7 @@ const manager = require('./members/api_manager');
 const simdata = require('./members/api_collected_data');
 
 app.use(logger);
-app.use(cors())
+app.use(cors());// vanurability, cross origin sharing, allows some xss
 
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);
@@ -43,20 +46,17 @@ app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
 
-//todo fetch simulation data from managers
-//todo fetch siumlation data from procumers
-
-//todo publish change to database async
-//todo async get weather module data and simulate tick.
 
 //keep profiles updates
 
 async function fetchAll() {
     try { //todo fix initial condition, in case of newly generated nodes
         const sim_data = await DB.Models.Cell.findById(Types.ObjectId(id)).exec();
+        console.log(sim_data)
         const sim = new Simulator({lat: +sim_data.lat, lon: +sim_data.lon}, sim_data.manager_dest, sim_data.prosumer_dest);
         console.log("simulator loaded!");
         Simulator.singelton = sim;
+        Weather.getInstance()
         const data = await DB.Models.Consumer.find({name: process.env.NAME}).exec();
         data.forEach(c => sim.consumers.set(c.id, new Consumer(c.id,c.timefn, c.demand, c.profile)));
         setInterval(Simulator.singelton.tick, 1000);

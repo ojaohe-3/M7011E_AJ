@@ -14,7 +14,7 @@ export class Turbine{
                 if(speed >= 12){
                     ratio = 1.0;
                 }else{
-                    ratio = 0.077*speed;
+                    ratio = 1/12*speed;
                 }
             }
             return maxPower*ratio;

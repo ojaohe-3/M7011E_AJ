@@ -4,7 +4,8 @@
     <input type="text" id="username" v-model="username">
     <h3>Password:</h3>
     <input type="password" id="password" v-model="password" />
-    <button id="submit" v-on:click="valuesIntoJson()">Loggin</button>
+    <button id="submit" v-on:click="login()">Login</button>
+    <p v-if="error" class="error">Bad login information</p>
     <div class="yellowLine"></div>
     <div class="blueLine"></div>
   </div>
@@ -13,29 +14,30 @@
 
 
 <script>
+// import FetchComponent from './FetchComponent';
+import auth from '@/auth'
 export default {
   name: 'loggin',
-  data() {
+  data: function() {
     return {
       username: '',
       password: '',
-      userInfo: {},
-      newUserType: ''
+      error: false
     }
   },
   methods: {
-    valuesIntoJson() {
-      //const saltedSha256 = require('salted-sha256');
-      this.userInfo = {
-        "username": this.username,
-        //"password": saltedSha256(password)
-        "password": this.password
+    
+      login () {
+        console.log(this.username)
+        console.log(this.password)
+        auth.login(this.username, this.password, loggedIn => {
+          if (!loggedIn) {
+            this.error = true
+          } else {
+            this.$router.replace(this.$route.query.redirect || '/')
+          }
+        })
       }
-      this.newUserType = 'consumer'
-      //this.newUserType = 'consumer'
-      //this.$emit('loggedIn', this.newUserType)
-      // if this is correct, define userType and $emit('loggedIn', newUserType)
-    }
   }
 }
 </script>

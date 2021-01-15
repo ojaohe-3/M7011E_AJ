@@ -23,7 +23,7 @@
                 <td v-bind="ratio">
                     <h3>Ratio to my Battery</h3>
                     <h4>{{ ratio }} %</h4>
-                    <input type="number" min="0" max="100" v-model="ratio" placeholder="70">
+                    <input type="number" min="0" max="100" v-model="ratio" v-on:input="ratioStep" placeholder="70">
                     <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 <td v-bind="marketConsumption">
@@ -53,7 +53,7 @@
                 <td v-bind="ratio">
                     <h3>My Ratio Battery/market</h3>
                     <h4>{{ ratio }} %</h4>
-                    <input type="number" min="0" max="100" v-model="ratio" placeholder="70">
+                    <input type="number" min="0" max="100" v-model="ratio"  v-on:input="ratioStep" placeholder="70">
                     <!--<button style="display: inline;">Submit</button>-->
                 </td>
                 
@@ -75,18 +75,51 @@
 
 
 <script>
+import FetchComponent from './FetchComponent';
+
 export default {
   name: 'Prosumer',
+ props: ["id"],
   data() {
     return {
         production: 2400,
         battery: 74,
         elecPrice: 0.73,
         consumption: 3140,
+        cost: 0,
         ratio: 70,
         marketConsumption: 0
     }
-  }
+  },
+   mounted () {
+        const update = () => {
+
+            const market = FetchComponent._get(process.env.MARKET_ENDPOINT+"/price", 'token');
+            const simulator = FetchComponent._get(process.env.SIM_ENDPOINT+"/data", 'token');
+            const prosumer = FetchComponent._get(process.env.PROSUMER_ENDPOINT+"/"+this.id, 'token');
+            const consumer = FetchComponent._get(process.env.SIM_ENDPOINT+"/"+this.id, 'token');
+
+            this.cost = (consumer.demand - this.production ) * market.price;
+            
+            this.elecPrice = market.price;
+            this.elecDemand = simulator.totalDemand;
+            this.ratio = prosumer.ratio;
+            this.production = prosumer.totalProduction;
+            this.consumption = consumer.demand;
+
+            this.marketConsumption = this.production - this.consumption;
+
+            this.battery = prosumer.totalCapacity;
+            
+
+        }
+        setInterval(update, 1000);
+    },
+    methods: {
+        ratioStep(){
+            FetchComponent._post(process.env.PROSUMER_ENDPOINT+"/control", {"ratio": this.ratio});
+        }
+    },
 }
 </script>
 
