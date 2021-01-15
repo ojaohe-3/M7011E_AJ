@@ -46,16 +46,21 @@ All services, exluding the front-end uses typscript Express modules handle reque
   ```
   The current property is the output of the simulated reactor. The tick method, is asyncronus as it updates the database, aswell as the simulation service via api calls. the tick updates all values and runs every second for each object. When deployed, they will all fire in unison, this is not very optimal.
   * Market Service
-    This api gathers all connected simulation services, gather the total demand vs supply and calculates its price
+    This api gathers all connected simulation services, gather the total demand vs supply and calculates its price.
+    Its members are called cell objects, they keep track of an simulation endpoint and continuly fetches from its api to keep up to date.
+    
   * Prosumer Service
     Unaptly named procumer, manages much like manager, in many ways almost identical, however. It cannot dictade what it produces, it can disable but is dictaded by wind speed for its location. The production can be stored in batteries and is controlled.  
     
    * Simulation service
    Simulation is what keeps track of all prosumers, it recives from the other apis calls to store current data on production. The idea is it will scale to multiple instances, but for now one is to be deployed.
+   
    * Weather-Module
     Keeps track on weather through https://openweathermap.org/api
+    
    * Vue-interface
    A Vue interface, a landing page for the entire site. it calls the backend apis and keeps track of your dashboard. Currently not finished. Requires it to connect to your openid issuer.
+
 #### API
   General pricinple is that all calls, is its prefix /api/ followed to what module you want the data from. 
   for example to get the members of a service /api/members, it would respond to all available object members.
@@ -147,11 +152,91 @@ All services, exluding the front-end uses typscript Express modules handle reque
         "status?" : boolean
       }
       ```
+     * ``` POST ``` /api/control/<id>
+      Changes current production ration, and or deactivates the process.
+      required payload format:
+      ```json
+      {
+        "ratio?" : number,
+        "status?" : boolean
+      }
+      ```
   * Prosumer API
+    * ``` GET ``` /api/members/
+      gets all members. Format:
+      ```json
+       {
+          "turbines": [number];
+	        "batteries": [ {
+            "capacity": number;
+            "maxOutput": number;
+            "maxCharge": number;
+            "current?": number;
+            },
+        ...
+        ],
+         "_id?": String;
+       }
+      ```
+      The number for turbine is the max poweroutput it can produce.
+      the batterie object format:
+
     
-  * Market API
+    * ``` GET ``` /api/members/<id>
+    * ``` POST ``` /api/members/
+    * ``` PUT ``` /api/members/<id>
+    * ``` GET ``` /api/control/<id>
+    * ``` PUT ``` /api/control/<id>
   
+  * Market API
+    * ``` GET ``` /api/members/
+       Gets all cell objects,
+       respons format:
+       ```json
+          {
+            [
+            "destination" : string,
+            ...
+            ]
+          }
+       ```
+       
+    * ``` POST ``` /api/members/
+      post a new cell instance that will update the database,
+      the destination should point to an actual service as it does not validate them concurrently.
+      required format
+      ```json
+          {
+            "body": [
+              "destination" : string
+            
+          }
+       ```
+    * ``` GET ``` /api/members/<id>
+      Get individual cell,
+      format:
+      ```json
+          {
+            "destination" : string,
+          }
+       ```
+  
+    * ``` GET ``` /api/price/
+      fetch te calculated price and sampled aggregated data of the entire simulation.
+      Format:
+      ```json
+          {
+            "price" : number,
+            "stats" : {
+              "totalDemand" : number,
+              "totalProduciton : number
+            }
+          }
+       ```
+    
   * Simulator API
+  
+  
 #### Modules
 
 * DB-Connector
@@ -160,3 +245,4 @@ All services, exluding the front-end uses typscript Express modules handle reque
 * Control
 * Data
 * Price
+
