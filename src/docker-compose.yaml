@@ -11,7 +11,7 @@ services:
   weather:
     build: ./Weather-Module
     ports: 
-      - "2555:5000"
+      - "2555:2555"
     env_file: w.env
 
 
