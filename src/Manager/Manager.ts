@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import { Types } from 'mongoose';
 import { DB } from './DB-Connector/db-connector';
-export class Manager{
+export default class Manager{
     
     id: String;
     current: number;
@@ -20,8 +20,10 @@ export class Manager{
         this.tick = async () => {
             if(this.status){
                 this.current = this.current <= 0 ? 1 : this.current;
-                this.current *= 1.05;
-                this.current = this.current > this.maxProduciton ? this.maxProduciton : this.current;
+                if(this.maxProduciton*this.ratio > this.current)
+                    this.current *= 1.05;
+                else
+                    this.current *= 0.95;
             }else{
                 this.current *= 0.95;
                 this.current = this.current < 1.0 ? 0 : this.current;

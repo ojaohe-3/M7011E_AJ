@@ -1,7 +1,7 @@
 
 
 import express = require("express");
-import { Manager } from "./Manager";
+import  Manager  from "./Manager";
 import { Types } from "mongoose";
 import ManagerHandler from "./ManagerHandler";
 import { DB } from "./DB-Connector/db-connector";
@@ -15,7 +15,7 @@ app.get('/',(req, res)=>{
 });
 
 
-app.get('/:id/prosumers', async (req,res)=>{ //todo, this will be tied to the jwt, possibly might be removed
+app.get('/:id/prosumers', async (req,res)=>{ //todo, this will be tied to the jwt, this is very temporary
     const data = await DB.Models.Prosumer.find({name: "this.sim"}); //todo manager prosumer controller
     res.json(data);
 });

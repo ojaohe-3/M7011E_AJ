@@ -3,6 +3,7 @@
 import { connect, connection, Connection } from 'mongoose';
 import { CellModel, CellSchema } from './cell';
 import { ConsumerModel, ConsumerSchema } from './consumer';
+import { UserModel, UserSchema } from './user';
 import { ManagerModel, ManagerSchema } from './manager';
 import { MarketModel, MarketSchema } from './market';
 import { ProsumerModel, ProsumerSchema } from './prosumer';
@@ -11,7 +12,8 @@ export declare interface IModels {
   Consumer?: ConsumerModel,
   Prosumer?: ProsumerModel,
   Market?: MarketModel,
-  Manager?: ManagerModel
+  Manager?: ManagerModel,
+  User?: UserModel
 }
 export class DB{
   
@@ -29,9 +31,10 @@ export class DB{
         Consumer: new ConsumerSchema().model,
         Prosumer: new ProsumerSchema().model,
         Market: new MarketSchema().model,
-        Manager: new ManagerSchema().model
+        Manager: new ManagerSchema().model,
+        User: new UserSchema().model
       }
-    connect(process.env.DB_CONNECT,{useNewUrlParser: true});//secure access tokens etc todo
+    connect(process.env.DB_CONNECT,{useNewUrlParser: true});
     this._db = connection;
     this._db.on('open', this.connected);
     this._db.on('error', this.error);

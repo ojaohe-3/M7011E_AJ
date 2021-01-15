@@ -1,7 +1,6 @@
 import express = require("express");
 import * as dotenv from "dotenv";
 import ProsumerHandler from "./ProsumerHandler";
-import { ModuleKind } from "typescript";
 
 dotenv.config({path: "./.env"});  
 
