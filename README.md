@@ -48,15 +48,85 @@ All services, exluding the front-end uses typscript Express modules handle reque
   * Market Service
     This api gathers all connected simulation services, gather the total demand vs supply and calculates its price
   * Prosumer Service
-    Unaptly named procumer, manages much like manager, in many ways almost identical, however. It cannot dictade what it produces. The production can be stored in batteries
+    Unaptly named procumer, manages much like manager, in many ways almost identical, however. It cannot dictade what it produces, it can disable but is dictaded by wind speed for its location. The production can be stored in batteries and is controlled.  
     
    * Simulation service
+   Simulation is what keeps track of all prosumers, it recives from the other apis calls to store current data on production. The idea is it will scale to multiple instances, but for now one is to be deployed.
    * Weather-Module
+    Keeps track on weather through https://openweathermap.org/api
    * Vue-interface
+   A Vue interface, a landing page for the entire site. it calls the backend apis and keeps track of your dashboard. Currently not finished. Requires it to connect to your openid issuer.
 #### API
+  General pricinple is that all calls, is its prefix /api/ followed to what module you want the data from. 
+  for example to get the members of a service /api/members, it would respond to all available object members.
+
   * Authentication API
-    
-  * Manager API
+      * ``` GET ``` /api/login
+      supports post and get
+      respons:
+      ```js
+      {
+          username: string,
+          clientid: string,
+          managers?: Array<privilage>,
+          prosumers?: Array<privilage>,
+          consumers?: Array<string>,
+          last_login: Date,
+    }
+      ```
+      where **privilage** is an js object of the following format:
+      ```ts
+      {
+      	level: number,
+        access?: string,
+        id: string
+      }
+      ```
+      Currently no token is required, but will in the future
+      
+      * ``` Post ``` /api/login
+        disabled during production, post a body with format:
+        ```js
+        {
+          username: String,
+          clientid: String,
+          managers?: Array<privilage>,
+          prosumers?: Array<privilage>,
+          consumers?: Array<string>,
+          last_login: Date,
+        }
+       ``` 
+      and it will publish this user on the database. 
+      Currently no token is required, but will in the future
+      
+  * Manager API 
+    * ``` GET ``` /api/members/
+      gets all manager objects as an array
+      response format:
+      ```js
+        {
+          body: [
+            {
+              id : String
+              current : number
+              maxProduciton :	number
+              status :	boolen
+              ratio :	number
+            }
+            ...
+          ]
+        }
+      ```
+    * ``` Post ``` /api/members/
+      post a single member, will update the service aswell as the database
+      payload format:
+      ```js
+      {
+        id? : string,
+        maxProduction : number
+      }
+      ```
+     * 
   
   * Prosumer API
   
