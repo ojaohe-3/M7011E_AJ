@@ -59,41 +59,41 @@ All services, exluding the front-end uses typscript Express modules handle reque
 #### API
   General pricinple is that all calls, is its prefix /api/ followed to what module you want the data from. 
   for example to get the members of a service /api/members, it would respond to all available object members.
-
+  For reference ``` <variableName>? ``` indicates its optional.
   * Authentication API
       * ``` GET ``` /api/login
       supports post and get
       respons:
-      ```js
+      ```json
       {
-          username: string,
-          clientid: string,
-          managers?: Array<privilage>,
-          prosumers?: Array<privilage>,
-          consumers?: Array<string>,
-          last_login: Date,
+          "username" : string,
+          "clientid" : string,
+          "managers?" : Array<privilage>,
+          "prosumers?" : Array<privilage>,
+          "consumers?" : Array<string>,
+          "last_login" : Date,
     }
       ```
       where **privilage** is an js object of the following format:
-      ```ts
+      ```json
       {
-      	level: number,
-        access?: string,
-        id: string
+        "level" : number,
+        "access?" : string,
+        "id" : string
       }
       ```
       Currently no token is required, but will in the future
       
-      * ``` Post ``` /api/login
+      * ``` POST ``` /api/login
         disabled during production, post a body with format:
-        ```js
+        ```json
         {
-          username: String,
-          clientid: String,
-          managers?: Array<privilage>,
-          prosumers?: Array<privilage>,
-          consumers?: Array<string>,
-          last_login: Date,
+          "username" : String,
+          "clientid" : String,
+          "managers?" : Array<privilage>,
+          "prosumers?" : Array<privilage>,
+          "consumers?" : Array<string>,
+          "last_login" : Date,
         }
        ``` 
       and it will publish this user on the database. 
@@ -103,33 +103,52 @@ All services, exluding the front-end uses typscript Express modules handle reque
     * ``` GET ``` /api/members/
       gets all manager objects as an array
       response format:
-      ```js
+      ```json
         {
-          body: [
+          "body": [
             {
-              id : String
-              current : number
-              maxProduciton :	number
-              status :	boolen
-              ratio :	number
+              "id" : String
+              "current" : number
+              "maxProduciton" :	number
+              "status" :	boolen
+              "ratio" :	number
             }
             ...
           ]
         }
       ```
-    * ``` Post ``` /api/members/
+    * ``` POST ``` /api/members/
       post a single member, will update the service aswell as the database
       payload format:
       ```js
       {
-        id? : string,
-        maxProduction : number
+        "id?" : string,
+        "maxProduction" : number
       }
       ```
-     * 
-  
+     * ``` GET ``` /api/members/<id>
+      get specific member with id in the url.
+      respons format:
+      ```json
+      {
+        "id" : String
+        "current" : number
+        "maxProduciton" :	number
+        "status" :	boolen
+        "ratio" :	number
+      }
+      ```
+    * ``` GET ``` /api/control/<id>
+      control interface, get current controls of a manager
+      respons format:
+      ```json
+      {
+        "ratio?" : number,
+        "status?" : boolean
+      }
+      ```
   * Prosumer API
-  
+    
   * Market API
   
   * Simulator API
