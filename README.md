@@ -131,7 +131,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
         "maxProduction" : number
       }
       ```
-     * ``` GET ``` /api/members/<id>
+     * ``` GET ``` /api/members/id
       get specific member with id in the url.
       respons format:
       ```json
@@ -143,7 +143,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
         "ratio" :	number
       }
       ```
-    * ``` GET ``` /api/control/<id>
+    * ``` GET ``` /api/control/id
       control interface, get current controls of a manager
       respons format:
       ```json
@@ -152,7 +152,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
         "status?" : boolean
       }
       ```
-     * ``` POST ``` /api/control/<id>
+     * ``` POST ``` /api/control/id
       Changes current production ration, and or deactivates the process.
       required payload format:
       ```json
@@ -184,7 +184,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
       The number for turbine is the max poweroutput it can produce.
 
     
-    * ``` GET ``` /api/members/<id>
+    * ``` GET ``` /api/members/id
 	get individual prosumer object with id
 	format:
 	```json
@@ -217,7 +217,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
 	 "_id?": String,
 	}
        ```
-    * ``` PUT ``` /api/members/<id>
+    * ``` PUT ``` /api/members/id
 	updates an entry by the id.
 	the payload required format:
 	```json
@@ -233,8 +233,8 @@ All services, exluding the front-end uses typscript Express modules handle reque
 	]
 	}
        ```
-    * ``` GET ``` /api/control/<id>
-	Gets the control from member with <id>. 
+    * ``` GET ``` /api/control/id
+	Gets the control from member with id. 
 	format:
 	```json
 	{
@@ -243,8 +243,8 @@ All services, exluding the front-end uses typscript Express modules handle reque
         	"status": boolean,
 	}
 	```
-    * ``` PUT ``` /api/control/<id>
-	updates the control from member with <id> in the url. 
+    * ``` PUT ``` /api/control/id
+	updates the control from member with id in the url. 
 	format:
 	```json
 	{
@@ -278,7 +278,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
             
           }
        ```
-    * ``` GET ``` /api/members/<id>
+    * ``` GET ``` /api/members/id
       Get individual cell,
       format:
       ```json
@@ -365,7 +365,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
 		    ]
 		}
 		```
-	* ``` GET ``` /api/members/consumers/<id>
+	* ``` GET ``` /api/members/consumers/id
 	
 		get consumer member of ID, see the /api/members on how each consumer is constructed
 
@@ -417,7 +417,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
 		}
 		```
 	
-	* ``` GET ``` /api/members/prosumers/<id>
+	* ``` GET ``` /api/members/prosumers/id
 	
 		gets specific prosumer.
 		```json
@@ -433,7 +433,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
 			}
 		```
 	
-	* ``` PUT ``` /api/members/prosumers/<id>
+	* ``` PUT ``` /api/members/prosumers/id
 	
 		updates specific memebers data.
 		```json
@@ -479,7 +479,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
 			}
 		```
 
-	* ``` GET ``` /api/members/managers/<id>
+	* ``` GET ``` /api/members/managers/id
 	
 		Get specific memeber
 		```json
@@ -491,7 +491,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
 				"name?": String,
 			}
 		```
-	* ``` PUT ``` /api/members/managers/<id>
+	* ``` PUT ``` /api/members/managers/id
 	
 		Updates Specific member
 
