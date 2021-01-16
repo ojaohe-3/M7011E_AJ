@@ -94,10 +94,10 @@ export default {
    mounted () {
         const update = () => {
 
-            const market = FetchComponent._get(process.env.MARKET_ENDPOINT+"/price", 'token');
-            const simulator = FetchComponent._get(process.env.SIM_ENDPOINT+"/data", 'token');
-            const prosumer = FetchComponent._get(process.env.PROSUMER_ENDPOINT+"/"+this.id, 'token');
-            const consumer = FetchComponent._get(process.env.SIM_ENDPOINT+"/"+this.id, 'token');
+            const market = FetchComponent._get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price", 'token');
+            const simulator = FetchComponent._get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/data", 'token');
+            const prosumer = FetchComponent._get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/members/"+this.id, 'token');
+            const consumer = FetchComponent._get(process.env.VUE_APP_SIM_ENDPOINT+"/api/members/consumers/"+this.id, 'token'); //todo fix the prefix with the aformentioned deployment
 
             this.cost = (consumer.demand - this.production ) * market.price;
             
@@ -117,7 +117,7 @@ export default {
     },
     methods: {
         ratioStep(){
-            FetchComponent._post(process.env.PROSUMER_ENDPOINT+"/control", {"ratio": this.ratio});
+            FetchComponent._post(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control", {"ratio": this.ratio});//todo validate this
         }
     },
 }

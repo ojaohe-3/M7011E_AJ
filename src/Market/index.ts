@@ -50,11 +50,11 @@ app.get("/api/member/:id", (req, res) => {
         );
 
 app.post("/api/member/", async (req, res) => {
-	const format = ["dest"]; // fix this to inteface
+	const format = ["destination"]; // todo fix this 
 	const data = req.body;
 	if (Object.keys(data).filter((k) => format.some((e) => k === e)).length === format.length) {
 		const id = data.id ? data.id : Types.ObjectId().toHexString();
-		const cell = new Cell(data.dest);
+		const cell = new Cell(data.destination);
 		cells.set(id, cell);
 		await document();
 	} else 

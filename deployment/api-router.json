@@ -1,6 +1,6 @@
 {
   "Kind" : "service-router",
-  "Name" : "api",
+  "Name" : "service-ingress",
   "TLS" : {
     "Enable" : true
   },

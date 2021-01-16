@@ -38,14 +38,14 @@ export default {
   mounted () {
         const update = () => {
 
-            const market = FetchComponent._get(process.env.MARKET_ENDPOINT+"/price", 'token');
-            const simulator = FetchComponent._get(process.env.SIM_ENDPOINT+"/data", 'token');
-            const consumer = FetchComponent._get(process.env.SIM_ENDPOINT+'/'+ this.id, 'token');
+            const market = FetchComponent._get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price", 'token');
+            const consumer = FetchComponent._get(process.env.VUE_APP_SIM_ENDPOINT+'/api/members/consumers/'+ this.id, 'token');//todo fix the prefix with the aformentioned deployment
+
 
             this.cost = consumer.demand * market.price;
             this.elecPrice = market.price;
             
-            this.elecDemand = simulator.totalDemand;
+            this.elecDemand = market.stats.totalDemand;
         }
         setInterval(update, 1000);
     }

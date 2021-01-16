@@ -131,8 +131,8 @@ export default {
     mounted() {
         const update = () => {
 
-            const market = FetchComponent._get(process.env.MARKET_ENDPOINT+"/price", 'token');
-            const manager = FetchComponent._get(process.env.MANAGER_ENDPOINT+"/"+this.id, 'token');
+            const market = FetchComponent._get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price", 'token');
+            const manager = FetchComponent._get(process.env.VUE_APP_MANAGER_ENDPOINT+"/api/members/"+this.id, 'token');
 
             this.elecPrice = market.price;
             this.production = manager.production;
@@ -148,7 +148,7 @@ export default {
     methods: {
         productionStep(){
             const r = this.production/this.maxProduction;
-            FetchComponent._post(process.env.MANAGER_ENDPOINT+"/control", {"ratio": r}, 'token');
+            FetchComponent._post(process.env.VUE_APP_MANAGER_ENDPOINT+"/api/control", {"ratio": r}, 'token');
         }
     },
     

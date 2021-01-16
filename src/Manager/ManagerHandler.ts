@@ -49,7 +49,7 @@ export default class ManagerHandler{
      * returns all managers as an array
      */
     public getAll(){
-        return Array.from(this.managers);
+        return Array.from(this.managers.values());
     }
     private async fetchAll(){
         try {

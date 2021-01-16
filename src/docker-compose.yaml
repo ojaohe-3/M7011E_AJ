@@ -32,3 +32,9 @@ services:
     ports: 
       - "5003:5000"
     env_file: man.env
+  
+  front-end:
+    build: ./vue_interfaces
+    ports:
+      - "8080:8080"
+    
