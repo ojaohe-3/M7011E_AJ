@@ -66,41 +66,41 @@ All services, exluding the front-end uses typscript Express modules handle reque
   for example to get the members of a service /api/members, it would respond to all available object members.
   For reference ``` <variableName>? ``` indicates its optional.
   * Authentication API
-      * ``` GET ``` /api/login
-      supports post and get
-      respons:
-      ```json
+    * ``` GET ``` /api/login
+    supports post and get
+    respons:
+    ```json
       {
-          "username" : string,
-          "clientid" : string,
-          "managers?" : Array<privilage>,
-          "prosumers?" : Array<privilage>,
-          "consumers?" : Array<string>,
-          "last_login" : Date,
-    }
-      ```
-      where **privilage** is an js object of the following format:
-      ```json
-      {
-        "level" : number,
-        "access?" : string,
-        "id" : string
+      "username" : string,
+      "clientid" : string,
+      "managers?" : Array<privilage>,
+      "prosumers?" : Array<privilage>,
+      "consumers?" : Array<string>,
+      "last_login" : Date,
       }
-      ```
-      Currently no token is required, but will in the future
+    ```
+    where **privilage** is an js object of the following format:
+    ```json
+    {
+      "level" : number,
+      "access?" : string,
+      "id" : string
+    }
+    ```
+    Currently no token is required, but will in the future
       
-      * ``` POST ``` /api/login
-        disabled during production, post a body with format:
-        ```json
-        {
-          "username" : String,
-          "clientid" : String,
-          "managers?" : Array<privilage>,
-          "prosumers?" : Array<privilage>,
-          "consumers?" : Array<string>,
-          "last_login" : Date,
-        }
-       ``` 
+    * ``` POST ``` /api/login
+      disabled during production, post a body with format:
+      ```json
+      {
+        "username" : String,
+        "clientid" : String,
+        "managers?" : Array<privilage>,
+        "prosumers?" : Array<privilage>,
+        "consumers?" : Array<string>,
+        "last_login" : Date,
+      }
+     ``` ```
       and it will publish this user on the database. 
       Currently no token is required, but will in the future
       
@@ -332,7 +332,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
 			"status": boolean,
 		}
 		```
-		Managers
+		Managers:
 		```json
 		{
 			"id" : String,
@@ -342,8 +342,8 @@ All services, exluding the front-end uses typscript Express modules handle reque
 			"name?": String,
 		}
 		```
-		
-		
+
+
 	* ``` GET ``` /api/data/
 		Gets the summation of all data
 		```json
@@ -366,10 +366,12 @@ All services, exluding the front-end uses typscript Express modules handle reque
 		}
 		```
 	* ``` GET ``` /api/members/consumers/<id>
-		get consumer member of ID, see the /api/members on how each consumer is constructed
 	
+		get consumer member of ID, see the /api/members on how each consumer is constructed
+
 	
 	* ``` POST ``` /api/members/consumers/
+	
 		publish a new consumer,
 		Required format:
 		```json
@@ -381,7 +383,9 @@ All services, exluding the front-end uses typscript Express modules handle reque
 		}
 		```
 		note timefn have to be length of 24, one for each hour. A optin to include **profile** variable is missing in currently.
+		
 	* ``` GET ``` /api/members/prosumers/
+	
 		gets all members of they type prosumers
 		format:
 		```json
@@ -397,6 +401,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
 		}
 		```
 	* ``` POST ``` /api/members/prosumers/
+	
 		Add new members of the prosumer type, also on the side updates or creates a new consumer entry.
 		Require payload format:
 		```json
@@ -413,86 +418,94 @@ All services, exluding the front-end uses typscript Express modules handle reque
 		```
 	
 	* ``` GET ``` /api/members/prosumers/<id>
-	gets specific prosumer.
-	```json
-		{
-		    
-			"id": String,
-			"totalProduction": number,
-			"totalCapacity": number,
-			"currentCapacity": number,
-			"name?": String,
-			"status": boolean,
-		    
-		}
+	
+		gets specific prosumer.
+		```json
+			{
+
+				"id": String,
+				"totalProduction": number,
+				"totalCapacity": number,
+				"currentCapacity": number,
+				"name?": String,
+				"status": boolean,
+
+			}
 		```
 	
 	* ``` PUT ``` /api/members/prosumers/<id>
-	updates specific memebers data.
-	```json
-		{
-		    
-			"id": String,
-			"totalProduction": number,
-			"totalCapacity": number,
-			"currentCapacity": number,
-			"name?": String,
-			"status": boolean,
-		    
-		}
+	
+		updates specific memebers data.
+		```json
+			{
+
+				"id": String,
+				"totalProduction": number,
+				"totalCapacity": number,
+				"currentCapacity": number,
+				"name?": String,
+				"status": boolean,
+
+			}
 		```
 	
 	* ``` GET ``` /api/members/managers/
-	Gets all members of the type manager.
-	```json
-		{
-		   [
-			"id" : String,
-			"current" :number,
-			"maxProduction" :number,
-			"status": boolean,
-			"name?": String,
-		    ]
-		}
-	```
+	
+		Gets all members of the type manager.
+		```json
+			{
+			   [
+				"id" : String,
+				"current" :number,
+				"maxProduction" :number,
+				"status": boolean,
+				"name?": String,
+			    ]
+			}
+		```
 	* ``` POST ``` /api/members/managers/
-	Creates new members for the service.
-	Required format of the payload.
-	```json
-		{
-		   "body" : [
-			"id" : String,
-			"current" :number,
-			"maxProduction" :number,
-			"status": boolean,
-			"name?": String,
-		    ]
-		}
-	```
+	
+		Creates new members for the service.
+		Required format of the payload.
+		```json
+			{
+			   "body" : [
+				"id" : String,
+				"current" :number,
+				"maxProduction" :number,
+				"status": boolean,
+				"name?": String,
+			    ]
+			}
+		```
+
 	* ``` GET ``` /api/members/managers/<id>
-	Get specific memeber
-	```json
-		{
-			"id" : String,
-			"current" :number,
-			"maxProduction" :number,
-			"status": boolean,
-			"name?": String,
-		}
+	
+		Get specific memeber
+		```json
+			{
+				"id" : String,
+				"current" :number,
+				"maxProduction" :number,
+				"status": boolean,
+				"name?": String,
+			}
 		```
 	* ``` PUT ``` /api/members/managers/<id>
-	Updates Specific member
-	```json
-		{
-			"id" : String,
-			"current" :number,
-			"maxProduction" :number,
-			"status": boolean,
-			"name?": String,
-		}
-		```
 	
-		
+		Updates Specific member
+
+		```json
+			{
+				"id" : String,
+				"current" :number,
+				"maxProduction" :number,
+				"status": boolean,
+				"name?": String,
+			}
+		```
+
+
   
 #### Modules
 
