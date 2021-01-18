@@ -29,7 +29,7 @@ const app = express();
 app.use(logger);
 app.use(express.json());
 
-app.get("/login/:name", async (req, res) => {
+app.get("/api/login/:name", async (req, res) => {
 	const Cid = req.params.name;
 	const entry = await DB.Models.User.find({"clientid": Cid});
 	if(entry){
@@ -40,7 +40,7 @@ app.get("/login/:name", async (req, res) => {
 });
 
 if(process.env.NODE_ENV == 'development'){
-	app.post("/loggin/", async (req, res)=>{
+	app.post("/api/login/", async (req, res)=>{
 		const data: userdata = req.body;
 		await DB.Models.User.create(data);
 		console.log(data);
