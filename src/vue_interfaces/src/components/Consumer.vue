@@ -24,7 +24,7 @@
 
 
 <script>
-import FetchComponent from './FetchComponent';
+import axios from 'axios'
 export default {
   name: 'Consumer',
   data() {
@@ -36,18 +36,17 @@ export default {
       }
   },
   mounted () {
-        const update = () => {
+        const update = async () => {
 
-            const market = FetchComponent._get(process.env.MARKET_ENDPOINT+"/price", 'token');
-            const simulator = FetchComponent._get(process.env.SIM_ENDPOINT+"/data", 'token');
-            const consumer = FetchComponent._get(process.env.SIM_ENDPOINT+'/'+ this.id, 'token');
-
+            const market = await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price");
+            const consumer = await axios.get(process.env.VUE_APP_SIM_ENDPOINT+'/api/members/consumers/'+ this.id);
+            console.log(`this: ${market}, ${consumer}`)
             this.cost = consumer.demand * market.price;
             this.elecPrice = market.price;
             
-            this.elecDemand = simulator.totalDemand;
+            this.elecDemand = market.stats.totalDemand;
         }
-        setInterval(update, 1000);
+        setInterval(update, 10000);
     }
   }
 

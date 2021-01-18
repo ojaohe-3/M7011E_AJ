@@ -10,7 +10,7 @@ const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
-    { path: '/dashboard', component: Dashboard, beforeEnter: requireAuth },
+    { path: '/dashboard', component: Dashboard },
     { path: '/login', component: Login },
     { path: '/logout',
       beforeEnter (to, from, next) {
@@ -21,16 +21,16 @@ const router = new VueRouter({
   ]
 })
 
-function requireAuth (to, from, next) {
-  if (!auth.loggedIn()) {
-    next({
-      path: '/login',
-      query: { redirect: to.fullPath }
-    })
-  } else {
-    next()
-  }
-}
+// function requireAuth (to, from, next) {
+//   if (!auth.loggedIn()) {
+//     next({
+//       path: '/login',
+//       query: { redirect: to.fullPath }
+//     })
+//   } else {
+//     next()
+//   }
+// }
 
 Vue.config.productionTip = false
 Vue.directive('focus', {

@@ -2,6 +2,7 @@ import express = require("express");
 import {Cell, Stats} from "./cell";
 import {DB} from "./DB-Connector/db-connector";
 import {Types} from "mongoose";
+import cors = require("cors");
 
 
 // todo refactor this entire service
@@ -35,6 +36,7 @@ const tick = async () => { // this is serious need of caching
 setInterval(tick, 60000); // update every minute
 fetchAll();
 
+app.use(cors);
 app.use(express.json());
 app.use(logger);
 app.get("/api/members/", (req, res) => {
@@ -50,11 +52,11 @@ app.get("/api/member/:id", (req, res) => {
         );
 
 app.post("/api/member/", async (req, res) => {
-	const format = ["dest"]; // fix this to inteface
+	const format = ["destination"]; // todo fix this 
 	const data = req.body;
 	if (Object.keys(data).filter((k) => format.some((e) => k === e)).length === format.length) {
 		const id = data.id ? data.id : Types.ObjectId().toHexString();
-		const cell = new Cell(data.dest);
+		const cell = new Cell(data.destination);
 		cells.set(id, cell);
 		await document();
 	} else 

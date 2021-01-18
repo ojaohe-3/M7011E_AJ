@@ -11,7 +11,7 @@ require('dotenv').config();
 
 const app = express.Router();
 app.get('/',(req, res)=>{
-    res.json(ManagerHandler.Instance.getAll()); 
+    res.json( {body: ManagerHandler.Instance.getAll()}); 
 });
 
 
@@ -33,10 +33,11 @@ app.get('/:id',async (req, res)=>{
 });
 
 app.post('/', async (req, res)=>{
-    const data= req.body;
+    const data = req.body;
     try {
         const id = data.id ? data.id: Types.ObjectId().toHexString();
         const manager = new Manager(id, data.maxProduction);
+        ManagerHandler.Instance.put(id, manager);
         res.json({data: data, message: "success!"});
     } catch (error) {
         res.status(400).json({message: "API Error!", expected_format: "maxProduction"});
