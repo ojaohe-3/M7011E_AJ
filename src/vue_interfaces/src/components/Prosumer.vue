@@ -75,8 +75,7 @@
 
 
 <script>
-import FetchComponent from './FetchComponent';
-
+import axios from 'axios'
 export default {
   name: 'Prosumer',
  props: ["id"],
@@ -92,12 +91,12 @@ export default {
     }
   },
    mounted () {
-        const update = () => {
+        const update = async () => {
 
-            const market = FetchComponent._get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price", 'token');
-            const simulator = FetchComponent._get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/data", 'token');
-            const prosumer = FetchComponent._get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/members/"+this.id, 'token');
-            const consumer = FetchComponent._get(process.env.VUE_APP_SIM_ENDPOINT+"/api/members/consumers/"+this.id, 'token'); //todo fix the prefix with the aformentioned deployment
+            const market = await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price");
+            const simulator = await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/data");
+            const prosumer = await axios.get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/members/"+this.id);
+            const consumer = await axios.get(process.env.VUE_APP_SIM_ENDPOINT+"/api/members/consumers/"+this.id); //todo fix the prefix with the aformentioned deployment
 
             this.cost = (consumer.demand - this.production ) * market.price;
             
@@ -117,7 +116,7 @@ export default {
     },
     methods: {
         ratioStep(){
-            FetchComponent._post(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control", {"ratio": this.ratio});//todo validate this
+            axios.post(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control", {"ratio": this.ratio});//todo fix this
         }
     },
 }

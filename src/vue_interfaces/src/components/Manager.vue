@@ -111,8 +111,7 @@
 
 
 <script>
-import FetchComponent from './FetchComponent';
-
+import axios from 'axios'
 export default {
     name: 'Manager',
     props: ["id"],
@@ -129,10 +128,10 @@ export default {
         }
     },
     mounted() {
-        const update = () => {
+        const update = async () => {
 
-            const market = FetchComponent._get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price", 'token');
-            const manager = FetchComponent._get(process.env.VUE_APP_MANAGER_ENDPOINT+"/api/members/"+this.id, 'token');
+            const market = await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price");
+            const manager = await axios.get(process.env.VUE_APP_MANAGER_ENDPOINT+"/api/members/"+this.id);
 
             this.elecPrice = market.price;
             this.production = manager.production;
@@ -148,7 +147,7 @@ export default {
     methods: {
         productionStep(){
             const r = this.production/this.maxProduction;
-            FetchComponent._post(process.env.VUE_APP_MANAGER_ENDPOINT+"/api/control", {"ratio": r}, 'token');
+            axios.post(process.env.VUE_APP_MANAGER_ENDPOINT+"/api/control", {"ratio": r});
         }
     },
     

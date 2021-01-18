@@ -2,7 +2,7 @@
   <header>
     <img src="../assets/logo.png" alt="logo" id="logo">
     <h1>Green Lean Electric, {{ userType }}</h1>
-    <img src="../assets/exit.png" alt="exit" id="exit" v-if="userType === 'consumer' || userType === 'prosumer' || userType === 'manager'" v-on:click="$emit('loggout')">
+    <img src="../assets/exit.png" alt="exit" id="exit" v-if="loggedin" v-on:click="$emit('loggout')">
     <div class="headerLine"></div>
   </header>
 </template>
@@ -13,7 +13,7 @@
 <script>
 export default {
   name: 'Header',
-  props: ['userType']
+  props: ['loggedin']
 }
 </script>
 

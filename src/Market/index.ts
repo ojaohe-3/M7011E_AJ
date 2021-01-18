@@ -2,6 +2,7 @@ import express = require("express");
 import {Cell, Stats} from "./cell";
 import {DB} from "./DB-Connector/db-connector";
 import {Types} from "mongoose";
+import cors = require("cors");
 
 
 // todo refactor this entire service
@@ -35,6 +36,7 @@ const tick = async () => { // this is serious need of caching
 setInterval(tick, 60000); // update every minute
 fetchAll();
 
+app.use(cors);
 app.use(express.json());
 app.use(logger);
 app.get("/api/members/", (req, res) => {
