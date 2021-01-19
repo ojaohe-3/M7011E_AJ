@@ -4,7 +4,7 @@
             <tr>
                 <td v-bind="production">
                     <h3>My Production</h3>
-                    <h4>{{ production }} kw/h</h4>
+                    <h4>{{ production.toFixed(2) }} kw/h</h4>
                 </td>
                 <td v-bind="battery">
                     <h3>My Battery</h3>
@@ -12,13 +12,13 @@
                 </td>
                 <td v-bind="elecPrice">
                     <h3>Price of Electricity</h3>
-                    <h4>{{ elecPrice }} kr/kw</h4>
+                    <h4>{{ elecPrice.toFixed(2) }} kr/kw</h4>
                 </td>
             </tr>
             <tr>
                 <td v-bind="consumption">
                     <h3>My Consumption</h3>
-                    <h4>{{ consumption }} kw/h</h4>
+                    <h4>{{ consumption.toFixed(2) }} kw/h</h4>
                 </td>
                 <td v-bind="ratio">
                     <h3>Ratio to my Battery</h3>
@@ -28,7 +28,7 @@
                 </td>
                 <td v-bind="marketConsumption">
                     <h3>My Consumption from the Market</h3>
-                    <h4>{{ marketConsumption }} kw/h</h4>
+                    <h4>{{ marketConsumption.toFixed(2) }} kw/h</h4>
                 </td>
             </tr>
         </table>
@@ -37,11 +37,11 @@
             <tr>
                 <td v-bind="production">
                     <h3>My Production</h3>
-                    <h4>{{ production }} kw/h</h4>
+                    <h4>{{ production.toFixed(2) }} kw/h</h4>
                 </td>
                 <td v-bind="elecPrice">
                     <h3>Price of Electricity</h3>
-                    <h4>{{ elecPrice }} kr/kw</h4>
+                    <h4>{{ elecPrice.toFixed(2) }} kr/kw</h4>
                 </td>
                 
             </tr>
@@ -61,11 +61,11 @@
             <tr>
                 <td v-bind="consumption">
                     <h3>My Consumption</h3>
-                    <h4>{{ consumption }} kw/h</h4>
+                    <h4>{{ consumption.toFixed(2) }} kw/h</h4>
                 </td>
                 <td v-bind="marketConsumption">
                     <h3>My Consumption from the Market</h3>
-                    <h4>{{ marketConsumption }} kw/h</h4>
+                    <h4>{{ marketConsumption.toFixed(2) }} kw/h</h4>
                 </td>
             </tr>
         </table>
@@ -90,33 +90,35 @@ export default {
         marketConsumption: 0
     }
   },
-   mounted () {
-        const update = async () => {
-
-            const market = await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price");
-            const simulator = await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/data");
-            const prosumer = await axios.get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/members/"+this.id);
-            const consumer = await axios.get(process.env.VUE_APP_SIM_ENDPOINT+"/api/members/consumers/"+this.id); //todo fix the prefix with the aformentioned deployment
-
+   created () {
+       
+        setInterval(this.update, 1000);
+    },
+    methods: {
+        async ratioStep(){
+            await axios.put(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control/"+this.id, {"input_ratio": this.ratio/100, "output_ratio": 1 - this.ratio/100});
+        },
+         async update(){
+            let market, prosumer, control,consumer = null;
+            await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price").then(res=> market = res.data).catch(err => console.log(err));
+            await axios.get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/members/"+this.id).then(res=> prosumer = res.data).catch(err => console.log(err));
+            await axios.get(process.env.VUE_APP_SIM_ENDPOINT+"/api/members/consumers/"+this.id).then(res=> consumer = res.data).catch(err => console.log(err));
+            await axios.get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control/"+this.id).then(res=> control = res.data).catch(err => console.log(err));
             this.cost = (consumer.demand - this.production ) * market.price;
-            
             this.elecPrice = market.price;
-            this.elecDemand = simulator.totalDemand;
-            this.ratio = prosumer.ratio;
+            this.elecDemand = market.stats.totalDemand;
+ 
+            this.ratio = control.input_ratio*100;
             this.production = prosumer.totalProduction;
             this.consumption = consumer.demand;
 
             this.marketConsumption = this.production - this.consumption;
 
-            this.battery = prosumer.totalCapacity;
+            let current = 0;
+            prosumer.batteries.forEach(e => current += e.current)
+            this.battery = current / prosumer.totalCapacity;
             
 
-        }
-        setInterval(update, 1000);
-    },
-    methods: {
-        ratioStep(){
-            axios.post(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control", {"ratio": this.ratio});//todo fix this
         }
     },
 }

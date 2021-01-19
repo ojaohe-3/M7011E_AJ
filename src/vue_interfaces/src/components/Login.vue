@@ -4,8 +4,7 @@
     <input type="text" id="username" v-model="username">
     <h3>Password:</h3>
     <input type="password" id="password" v-model="password" />
-    <button id="submit" v-on:click="login()">Login</button>
-    <p v-if="error" class="error">Bad login information</p>
+    <button id="Login" v-on:click="login()">Login</button>
     <div class="yellowLine"></div>
     <div class="blueLine"></div>
   </div>
@@ -15,28 +14,12 @@
 
 <script>
 // import FetchComponent from './FetchComponent';
-import auth from '@/auth'
 export default {
-  name: 'loggin',
-  data: function() {
-    return {
-      username: '',
-      password: '',
-      error: false
-    }
-  },
+  name: 'login',
   methods: {
     
       login () {
-        console.log(this.username)
-        console.log(this.password)
-        auth.login(this.username, this.password, loggedIn => {
-          if (!loggedIn) {
-            this.error = true
-          } else {
-            this.$router.replace(this.$route.query.redirect || '/')
-          }
-        })
+        this.$auth.signInWithRedirect('/')
       }
   }
 }

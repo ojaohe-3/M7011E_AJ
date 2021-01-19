@@ -3,6 +3,7 @@ import { Weather, Location } from "./weather";
 import * as dotenv from "dotenv";
 import {DB} from './DB-Connector/db-connector';
 import { ProsumerSchema } from "./DB-Connector/prosumer";
+import cors = require("cors");
 const members = require('./members');
 const control = require('./control');
 dotenv.config({path: "./.env"});  
@@ -23,6 +24,7 @@ let logger = (req, res, next) =>{
 }; 
 app.use(logger);
 app.use(express.json());
+app.use(cors());
 
 app.use("/api/members", members);
 app.use("/api/control", control);

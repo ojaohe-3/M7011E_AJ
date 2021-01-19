@@ -1,8 +1,8 @@
 <template>
   <div id="dashboard">
-    <Prosumer v-bind="id" v-if="userType === 'prosumer'"/>
-    <Manager v-bind="id" v-if="userType === 'manager'"/>
-    <Consumer v-bind="id" v-if="userType === 'consumer'"/>
+    <Prosumer v-bind:id="this.id" v-if="userType === 'prosumer'"/>
+    <Manager v-bind:id="this.id" v-if="userType === 'manager'"/>
+    <Consumer v-bind:id="this.id" v-if="userType === 'consumer'"/>
   </div>
 </template>
 
@@ -14,7 +14,6 @@ import Manager from './Manager.vue'
 import Prosumer from './Prosumer.vue'
 import Consumer from './Consumer.vue'
 
-// import auth from '../auth'
 
 export default {
   name: 'Dashboard',
@@ -25,9 +24,9 @@ export default {
     
   },data () {
     return {
-      userType: 'consumer',
-      loggedin: true, //this is temporary untill oauth is fixed
-      id: ''
+      userType: 'prosumer',
+      loggedin: true, //this is temporary until oauth is fixed
+      id: '5fda7a29b6921cba5370a03a'
     }
   },
   created () {

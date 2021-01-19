@@ -4,14 +4,16 @@ import auth from './auth';
 import Dashboard from './components/Dashboard.vue';
 import Login from './components/Login.vue';
 import App from './App.vue'
+import { LoginCallback } from '@okta/okta-vue'
 Vue.use(VueRouter)
-
+Vue.productionTip = false;
 const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
     { path: '/dashboard', component: Dashboard },
     { path: '/login', component: Login },
+    { path: '/login/callback', component: LoginCallback },
     { path: '/logout',
       beforeEnter (to, from, next) {
         auth.logout()

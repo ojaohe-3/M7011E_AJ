@@ -1,13 +1,10 @@
 <template>
   <div id="app">
-    <Header/>
+    <Header  v-bind="loggedIn" v-on:logout="auth.logout()"/>
     <ul>
       <li>
         <router-link v-if="loggedIn" to="/logout">Log out</router-link>
         <router-link v-if="!loggedIn" to="/login">Log in</router-link>
-      </li>
-      <li>
-        <router-link to="/about">About</router-link>
       </li>
       <li>
         <router-link to="/dashboard">Dashboard</router-link>
@@ -28,22 +25,16 @@
 
 <script>
 import Header from './components/Header.vue'
-import auth from './auth'
-
 export default {
   name: 'App',
   components: {
     Header
   },data () {
     return {
-      loggedIn: auth.loggedIn()
-    }
-  },
-  created () {
-    auth.onChange = loggedIn => {
-      this.loggedIn = loggedIn
+      loggedIn: false
     }
   }
+  
 }
 </script>
 

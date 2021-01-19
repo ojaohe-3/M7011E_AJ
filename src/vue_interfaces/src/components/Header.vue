@@ -1,8 +1,8 @@
 <template>
   <header>
     <img src="../assets/logo.png" alt="logo" id="logo">
-    <h1>Green Lean Electric, {{ userType }}</h1>
-    <img src="../assets/exit.png" alt="exit" id="exit" v-if="loggedin" v-on:click="$emit('loggout')">
+    <h1>Green Lean Electric</h1>
+    <img src="../assets/exit.png" alt="exit" id="exit" v-if="loggedIn" v-on:click="$emit('logout')">
     <div class="headerLine"></div>
   </header>
 </template>
@@ -13,7 +13,7 @@
 <script>
 export default {
   name: 'Header',
-  props: ['loggedin']
+  props: ['loggedIn']
 }
 </script>
 

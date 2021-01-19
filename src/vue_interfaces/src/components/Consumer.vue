@@ -27,15 +27,16 @@
 import axios from 'axios'
 export default {
   name: 'Consumer',
+  props : ['id'],
   data() {
+
       return {
           consumption: 3500,
           elecPrice: 0.73,
-          cost: 0.73*3500,
-          id : "temporary"
+          cost: 0.73*3500
       }
   },
-  mounted () {
+  created () {
         const update = async () => {
 
             const market = await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price");
@@ -46,7 +47,7 @@ export default {
             
             this.elecDemand = market.stats.totalDemand;
         }
-        setInterval(update, 10000);
+        setInterval(update, 1000);
     }
   }
 
