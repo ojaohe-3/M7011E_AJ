@@ -1,22 +1,18 @@
 <template>
   <div id="app">
-    <Header  v-bind="loggedIn" v-on:logout="auth.logout()"/>
+    <Header  v-bind:loggedIn="false" v-on:logout="auth.logout()"/>
     <ul>
       <li>
-        <router-link v-if="loggedIn" to="/logout">Log out</router-link>
-        <router-link v-if="!loggedIn" to="/login">Log in</router-link>
+        <div> 
+        <router-link to="/login">Log in</router-link>
+        </div>
       </li>
       <li>
+        <div>
         <router-link to="/dashboard">Dashboard</router-link>
-        (authenticated)
+        </div>
       </li>
     </ul>
-    <template v-if="$route.matched.length">
-      <router-view></router-view>
-    </template>
-    <template v-else>
-      <p>You are logged {{ loggedIn ? 'in' : 'out' }}</p>
-    </template>
   </div>
 </template>
 
@@ -51,4 +47,5 @@ export default {
     font-size: 24px;    
     font-family: 'Dosis', sans-serif;
   }
+  
 </style>

@@ -13,13 +13,12 @@
 
 
 <script>
-// import FetchComponent from './FetchComponent';
 export default {
   name: 'login',
   methods: {
     
       login () {
-        this.$auth.signInWithRedirect('/')
+        this.$auth.signInWithRedirect('/dashboard')
       }
   }
 }

@@ -13,7 +13,7 @@
 import Manager from './Manager.vue'
 import Prosumer from './Prosumer.vue'
 import Consumer from './Consumer.vue'
-
+// import axios from 'axios'
 
 export default {
   name: 'Dashboard',
@@ -25,12 +25,8 @@ export default {
   },data () {
     return {
       userType: 'prosumer',
-      loggedin: true, //this is temporary until oauth is fixed
       id: '5fda7a29b6921cba5370a03a'
     }
-  },
-  created () {
-    // axios.get(process.env.VUE_APP_LOGIN_API, auth.getToken())
   }
 }
 </script>
