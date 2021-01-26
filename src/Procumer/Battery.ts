@@ -1,4 +1,4 @@
-export class Battery{
+export default class Battery{
     capacity: number; // in kwh
     current: number; // current power in batteries 
     maxOutput: number; // maximum output in kwh

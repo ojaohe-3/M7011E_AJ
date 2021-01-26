@@ -1,4 +1,4 @@
-export class Turbine{
+export default class Turbine{
     maxPower: number; 
     profile: (speed: number) => number; //speed in kph, outputs current power, does not take into consideration time to spin with change of wind speed
 

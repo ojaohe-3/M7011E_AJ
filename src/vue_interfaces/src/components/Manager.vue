@@ -111,19 +111,23 @@
         <td colspan="2">
           <h3>My prosumers</h3>
           <ul id="prosumers">
+              <div class="listBlock">
             <li v-bind:key="prosumer.id" v-for="prosumer in prosumers">
-              Id : {{ prosumer.id }} ; Consumption from the market :
-              {{ prosumer.marketConsumption }} ; Production to the market :
-              {{ prosumer.marketProduction }}
+              Id : {{ prosumer.id }} ; Production to the market :
+              {{ prosumer.totalProduction }}
               <img src="../assets/thinArrow.png" width="20px" />
               <input type="checkbox" id="disableMarketProd" /> disabled
             </li>
+              </div>
           </ul>
           <h3>My consumers</h3>
           <ul id="consumer">
             <li v-bind:key="consumer.id" v-for="consumer in consumers">
-              Id : {{ consumer.id }} ; Consumption from the market :
-              {{ consumer.marketConsumption }}
+                <div class ="listBlock">
+                    {{consumer}}
+                    <!-- Id : {{ consumer.id }} ; Consumption from the market :
+                    {{ consumer.demand }} -->
+                </div>
             </li>
           </ul>
         </td>
@@ -182,24 +186,33 @@ export default {
       }],
       maxProduction: 0,
       consumption: 0,
-      status: true
+      status: true,
+      consumers:[],
+      prosumers:[]
     };
   },
   created() {
     setInterval(this.update, 1000);
-    setInterval(this.updateCharts, 5000);
     axios
         .get(process.env.VUE_APP_MANAGER_ENDPOINT + "/api/control/" + this.id)
-        .then((res) =>{ this.ratio = res.data.ratio*100; this.status = res.data.ratio;})
+        .then((res) =>{ this.ratio = res.data.ratio*100; this.status = res.data.status;})
         .catch((err) => console.log(err));
+    axios
+            .get(process.env.VUE_APP_SIM_ENDPOINT + "/api/members/")
+            .then((res) => {this.prosumers = res.data.prosumers; this.consumers = res.data.consumers})
+            .catch((err) => console.log(err));
+
+    
   },
+
+  
   methods: {
     updateCharts() {
-        this.priceSeries[0].data.push(this.price.toFixed(0))
-        this.productionSeries[0].data.push(this.production.toFixed(0))
-        this.incomeSeries[0].data.push(this.income.toFixed(0))
-        this.totalSeries[0].data.push(this.totalAvailable.toFixed(0))
-        this.demandSeries[0].data.push(this.demandSeries.toFixed(0))
+        this.priceSeries[0].data.push(this.price)
+        this.productionSeries[0].data.push(this.production)
+        this.incomeSeries[0].data.push(this.income)
+        this.totalSeries[0].data.push(this.totalAvailable)
+        this.demandSeries[0].data.push(this.demandSeries)
     },
     async productionStep() {
       console.log(this.ratio);
@@ -229,7 +242,7 @@ export default {
         .then((res) => (manager = res.data))
         .catch((err) => console.log(err));
     
-   
+    
 
       this.elecPrice = market.price.toFixed(2);
       this.production = manager.current.toFixed(2);
@@ -238,6 +251,7 @@ export default {
       this.income = this.production * this.elecPrice;
       this.income = this.income.toFixed(2);
       this.totalAvailable = market.stats.totalProduction;
+      this.updateCharts();
     },
   },
 };
@@ -263,6 +277,12 @@ td {
 
 .smallScreen {
   display: none;
+}
+
+.listBlock {
+    padding: 10px;
+    width: 200px;
+    box-shadow: 0 3px 3px rgba(0,0,0,0.2);
 }
 
 @media screen and (max-width: 1200px) {

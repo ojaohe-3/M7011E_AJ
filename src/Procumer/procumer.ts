@@ -1,5 +1,5 @@
-import { Battery } from "./Battery";
-import { Turbine } from "./Turbine";
+import  Battery  from "./Battery";
+import  Turbine  from "./Turbine";
 import { IBattery, ITurbine } from "./DB-Connector/prosumer";
 import { DB } from "./DB-Connector/db-connector";
 import { Types } from "mongoose";
@@ -44,11 +44,11 @@ export class Procumer{
             if(this.status){
                 this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(Weather.getInstance().speed));
                 this.batteries.forEach((b) => {
-                    let tot = this.totalProduction;
+                    const tot = this.totalProduction;
                     this.totalProduction -= b.Input(tot*(this.input_ratio/this.batteries.length)); //distribute input equally among all batteries
-                    this.totalProduction += b.Output(1);
+                    this.totalProduction += b.Output(1)*this.output_ratio;
                 });
-                this.totalProduction*this.output_ratio;
+                this.totalProduction;
     
                 const capacity = this.currentCapacity();
                 await Axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching

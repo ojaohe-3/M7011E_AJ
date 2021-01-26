@@ -117,7 +117,6 @@ export default {
             let current = 0;
             prosumer.batteries.forEach(e => current += e.current)
             this.battery = current / prosumer.totalCapacity;
-            console.log(this.id)
 
         }
     },
