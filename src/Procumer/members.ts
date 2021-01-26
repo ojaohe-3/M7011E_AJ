@@ -1,7 +1,7 @@
 import express = require("express");
 import { Procumer } from "./procumer";
-import { Battery } from "./Battery";
-import { Turbine } from "./Turbine";
+import  Battery  from "./Battery";
+import  Turbine  from "./Turbine";
 import * as dotenv from "dotenv";
 import { Types } from "mongoose";
 import ProsumerHandler from "./ProsumerHandler";
