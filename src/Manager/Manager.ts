@@ -35,9 +35,10 @@ export default class Manager{
                 }
             );
             await this.document();
-            setTimeout(this.tick, 1000);
             return;
         }
+        setInterval(this.tick, 1000);
+
     }
 
     async document() {
