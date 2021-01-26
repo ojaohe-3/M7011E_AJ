@@ -81,17 +81,17 @@ export default {
  props: ["id"],
   data() {
     return {
-        production: 2400,
-        battery: 74,
-        elecPrice: 0.73,
-        consumption: 3140,
+        production: 0,
+        battery: 0,
+        elecPrice: 0.0,
+        consumption: 0,
         cost: 0,
-        ratio: 70,
+        ratio: 0,
         marketConsumption: 0
     }
   },
    created () {
-       
+        axios.get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control/"+this.id).then(res=> this.ratio = res.data.input_ratio).catch(err => console.log(err));
         setInterval(this.update, 1000);
     },
     methods: {
@@ -99,16 +99,19 @@ export default {
             await axios.put(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control/"+this.id, {"input_ratio": this.ratio/100, "output_ratio": 1 - this.ratio/100});
         },
          async update(){
-            let market, prosumer, control,consumer = null;
+            let market, prosumer, consumer = null;
+            console.log("market fetch: "+process.env.VUE_APP_MARKET_ENDPOINT+"/api/price")
+
             await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price").then(res=> market = res.data).catch(err => console.log(err));
-            await axios.get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/members/"+this.id).then(res=> prosumer = res.data).catch(err => console.log(err));
+            console.log("sim fetch: "+process.env.VUE_APP_SIM_ENDPOINT+"/api/members/consumers/"+this.id)
+
             await axios.get(process.env.VUE_APP_SIM_ENDPOINT+"/api/members/consumers/"+this.id).then(res=> consumer = res.data).catch(err => console.log(err));
-            await axios.get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/control/"+this.id).then(res=> control = res.data).catch(err => console.log(err));
+            console.log("prosumer fetch: "+process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/members/"+this.id)
+            await axios.get(process.env.VUE_APP_PROSUMER_ENDPOINT+"/api/members/"+this.id).then(res=> prosumer = res.data).catch(err => console.log(err));
             this.cost = (consumer.demand - this.production ) * market.price;
             this.elecPrice = market.price;
             this.elecDemand = market.stats.totalDemand;
  
-            this.ratio = control.input_ratio*100;
             this.production = prosumer.totalProduction;
             this.consumption = consumer.demand;
 

@@ -50,14 +50,7 @@ export class Procumer{
                 });
                 this.totalProduction;
     
-                const capacity = this.currentCapacity();
-                await Axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
-                    {
-                        currentCapacity: capacity,
-                        totalProduction: this.totalProduction, 
-                        status: this.status
-                    }
-                );
+               
             }
             else{
                 const reactivate = () => this.status = true;
@@ -66,6 +59,14 @@ export class Procumer{
     
             }
             await this.document();
+            const capacity = this.currentCapacity();
+            await Axios.put(process.env.SIM + "/api/members/prosumers/"+this.id, //todo caching
+            {
+                currentCapacity: capacity,
+                totalProduction: this.totalProduction, 
+                status: this.status
+            }
+        );
         };
         setInterval(this.update, 60000);
     }
