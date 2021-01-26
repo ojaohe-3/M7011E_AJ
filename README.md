@@ -53,7 +53,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
     Unaptly named procumer, manages much like manager, in many ways almost identical, however. It cannot dictade what it produces, it can disable but is dictaded by wind speed for its location. The production can be stored in batteries and is controlled.  
     
    * Simulation service
-   Simulation is what keeps track of all prosumers, it recives from the other apis calls to store current data on production. The idea is it will scale to multiple instances, but for now one is to be deployed.
+   Simulation is what keeps track of all prosumers, it recives from the other apis calls to store current data on production. The idea is it will scale to multiple instances, but for now one is to be deployed. The simulation keeps a datastack for all members in the manager and prosumer services, that they publish and update on the simulation. The simulation do not care about simulating it only calculate the current usage and current production for all services. Meaning it will keep having output even if connected services goes down. Though they can contribute at anypoint.
    
    * Weather-Module
     Keeps track on weather through https://openweathermap.org/api
@@ -66,41 +66,41 @@ All services, exluding the front-end uses typscript Express modules handle reque
   for example to get the members of a service /api/members, it would respond to all available object members.
   For reference ``` <variableName>? ``` indicates its optional.
   * Authentication API
-      * ``` GET ``` /api/login
-      supports post and get
-      respons:
-      ```json
+    * ``` GET ``` /api/login
+    supports post and get
+    respons:
+    ```json
       {
-          "username" : string,
-          "clientid" : string,
-          "managers?" : Array<privilage>,
-          "prosumers?" : Array<privilage>,
-          "consumers?" : Array<string>,
-          "last_login" : Date,
-    }
-      ```
-      where **privilage** is an js object of the following format:
-      ```json
-      {
-        "level" : number,
-        "access?" : string,
-        "id" : string
+      "username" : string,
+      "clientid" : string,
+      "managers?" : Array<privilage>,
+      "prosumers?" : Array<privilage>,
+      "consumers?" : Array<string>,
+      "last_login" : Date,
       }
-      ```
-      Currently no token is required, but will in the future
+    ```
+    where **privilage** is an js object of the following format:
+    ```json
+    {
+      "level" : number,
+      "access?" : string,
+      "id" : string
+    }
+    ```
+    Currently no token is required, but will in the future
       
-      * ``` POST ``` /api/login
-        disabled during production, post a body with format:
-        ```json
-        {
-          "username" : String,
-          "clientid" : String,
-          "managers?" : Array<privilage>,
-          "prosumers?" : Array<privilage>,
-          "consumers?" : Array<string>,
-          "last_login" : Date,
-        }
-       ``` 
+    * ``` POST ``` /api/login
+      disabled during production, post a body with format:
+      ```json
+      {
+        "username" : String,
+        "clientid" : String,
+        "managers?" : Array<privilage>,
+        "prosumers?" : Array<privilage>,
+        "consumers?" : Array<string>,
+        "last_login" : Date,
+      }
+     ``` ```
       and it will publish this user on the database. 
       Currently no token is required, but will in the future
       
@@ -123,7 +123,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
         }
       ```
     * ``` POST ``` /api/members/
-      post a single member, will update the service aswell as the database
+      post a single member, will update the registed simulation service as well as the database
       payload format:
       ```js
       {
@@ -131,7 +131,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
         "maxProduction" : number
       }
       ```
-     * ``` GET ``` /api/members/<id>
+     * ``` GET ``` /api/members/id
       get specific member with id in the url.
       respons format:
       ```json
@@ -143,7 +143,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
         "ratio" :	number
       }
       ```
-    * ``` GET ``` /api/control/<id>
+    * ``` GET ``` /api/control/id
       control interface, get current controls of a manager
       respons format:
       ```json
@@ -152,7 +152,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
         "status?" : boolean
       }
       ```
-     * ``` POST ``` /api/control/<id>
+     * ``` POST ``` /api/control/id
       Changes current production ration, and or deactivates the process.
       required payload format:
       ```json
@@ -165,28 +165,94 @@ All services, exluding the front-end uses typscript Express modules handle reque
     * ``` GET ``` /api/members/
       gets all members. Format:
       ```json
-       {
-          "turbines": [number];
-	        "batteries": [ {
-            "capacity": number;
-            "maxOutput": number;
-            "maxCharge": number;
-            "current?": number;
-            },
-        ...
-        ],
-         "_id?": String;
-       }
+	    {
+	      [
+          {
+          "turbines": [number],
+          "batteries": [ {
+            "capacity": number,
+            "maxOutput": number,
+            "maxCharge": number,
+            "current?": number,
+              },
+            "_id?": String
+          }
+		    ...
+	     ],
+      }
       ```
       The number for turbine is the max poweroutput it can produce.
-      the batterie object format:
 
     
-    * ``` GET ``` /api/members/<id>
+    * ``` GET ``` /api/members/id
+	get individual prosumer object with id
+	format:
+	```json
+		{
+		"turbines": [number],
+		"batteries": [ {
+			"capacity": number,
+			"maxOutput": number,
+			"maxCharge": number,
+			"current?": number,
+		    },
+		...
+		],
+		 "_id?": String,
+		}
+       ```
     * ``` POST ``` /api/members/
-    * ``` PUT ``` /api/members/<id>
-    * ``` GET ``` /api/control/<id>
-    * ``` PUT ``` /api/control/<id>
+	Post a new prosumer to be published in the simulation service and database, format for the payload:
+	```json
+      	{
+	"turbines": [number],
+	"batteries": [ {
+		"capacity": number,
+		"maxOutput": number,
+		"maxCharge": number,
+		"current?": number,
+	    },
+	...
+	],
+	 "_id?": String,
+	}
+       ```
+    * ``` PUT ``` /api/members/id
+	updates an entry by the id.
+	the payload required format:
+	```json
+      	{
+	"turbines": [number],
+	"batteries": [ {
+		"capacity": number,
+		"maxOutput": number,
+		"maxCharge": number,
+		"current?": number,
+	    },
+	...
+	]
+	}
+       ```
+    * ``` GET ``` /api/control/id
+	Gets the control from member with id. 
+	format:
+	```json
+	{
+		"input_ratio": number,
+        	"output_ratio": number,
+        	"status": boolean,
+	}
+	```
+    * ``` PUT ``` /api/control/id
+	updates the control from member with id in the url. 
+	format:
+	```json
+	{
+		"input_ratio": number,
+        	"output_ratio": number,
+        	"status": boolean,
+	}
+	```
   
   * Market API
     * ``` GET ``` /api/members/
@@ -212,7 +278,7 @@ All services, exluding the front-end uses typscript Express modules handle reque
             
           }
        ```
-    * ``` GET ``` /api/members/<id>
+    * ``` GET ``` /api/members/id
       Get individual cell,
       format:
       ```json
@@ -235,7 +301,211 @@ All services, exluding the front-end uses typscript Express modules handle reque
        ```
     
   * Simulator API
-  
+  	* ``` GET ``` /api/members/
+		Gets all members
+		Format:
+		```json
+		{
+			"consumers": [Consumer]
+			"prosumers": [Prosumer]
+			"managers": [Manager]
+		}
+		```
+		The format of consumer is 
+		```json
+		{
+			"id": String,
+			"timefn": [number],
+			"demand" : number,
+			"profile": number,
+		}
+		```
+		note that timefn requires an 24 length array of numbers between 0-1
+		For Prosumer members:
+		```json
+		{
+			"id": String,
+			"totalProduction": number,
+			"totalCapacity": number,
+			"currentCapacity": number,
+			"name?": String,
+			"status": boolean,
+		}
+		```
+		Managers:
+		```json
+		{
+			"id" : String,
+			"current" :number,
+			"maxProduction" :number,
+			"status": boolean,
+			"name?": String,
+		}
+		```
+
+
+	* ``` GET ``` /api/data/
+		Gets the summation of all data
+		```json
+		{
+			"totalProduction" : number,
+			"totalDemand" :number
+			
+		}
+		```
+	* ``` GET ``` /api/members/consumers/
+		gets all consumers members
+		```json
+		{
+		   [
+			"id": String,
+			"timefn": [number],
+			"demand" : number,
+			"profile": number,
+		    ]
+		}
+		```
+	* ``` GET ``` /api/members/consumers/id
+	
+		get consumer member of ID, see the /api/members on how each consumer is constructed
+
+	
+	* ``` POST ``` /api/members/consumers/
+	
+		publish a new consumer,
+		Required format:
+		```json
+		{
+		   "body": [
+			"id?": String,
+			"timefn": [number]
+		    ]
+		}
+		```
+		note timefn have to be length of 24, one for each hour. A optin to include **profile** variable is missing in currently.
+		
+	* ``` GET ``` /api/members/prosumers/
+	
+		gets all members of they type prosumers
+		format:
+		```json
+		{
+		    [
+			"id": String,
+			"totalProduction": number,
+			"totalCapacity": number,
+			"currentCapacity": number,
+			"name?": String,
+			"status": boolean,
+		    ]
+		}
+		```
+	* ``` POST ``` /api/members/prosumers/
+	
+		Add new members of the prosumer type, also on the side updates or creates a new consumer entry.
+		Require payload format:
+		```json
+		{
+		    "body" : [
+			"id": String,
+			"totalProduction": number,
+			"totalCapacity": number,
+			"currentCapacity": number,
+			"name?": String,
+			"status": boolean,
+		    ]
+		}
+		```
+	
+	* ``` GET ``` /api/members/prosumers/id
+	
+		gets specific prosumer.
+		```json
+			{
+
+				"id": String,
+				"totalProduction": number,
+				"totalCapacity": number,
+				"currentCapacity": number,
+				"name?": String,
+				"status": boolean,
+
+			}
+		```
+	
+	* ``` PUT ``` /api/members/prosumers/id
+	
+		updates specific memebers data.
+		```json
+			{
+
+				"id": String,
+				"totalProduction": number,
+				"totalCapacity": number,
+				"currentCapacity": number,
+				"name?": String,
+				"status": boolean,
+
+			}
+		```
+	
+	* ``` GET ``` /api/members/managers/
+	
+		Gets all members of the type manager.
+		```json
+			{
+			   [
+				"id" : String,
+				"current" :number,
+				"maxProduction" :number,
+				"status": boolean,
+				"name?": String,
+			    ]
+			}
+		```
+	* ``` POST ``` /api/members/managers/
+	
+		Creates new members for the service.
+		Required format of the payload.
+		```json
+			{
+			   "body" : [
+				"id" : String,
+				"current" :number,
+				"maxProduction" :number,
+				"status": boolean,
+				"name?": String,
+			    ]
+			}
+		```
+
+	* ``` GET ``` /api/members/managers/id
+	
+		Get specific memeber
+		```json
+			{
+				"id" : String,
+				"current" :number,
+				"maxProduction" :number,
+				"status": boolean,
+				"name?": String,
+			}
+		```
+	* ``` PUT ``` /api/members/managers/id
+	
+		Updates Specific member
+
+		```json
+			{
+				"id" : String,
+				"current" :number,
+				"maxProduction" :number,
+				"status": boolean,
+				"name?": String,
+			}
+		```
+
+
   
 #### Modules
 
