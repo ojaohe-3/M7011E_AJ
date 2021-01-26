@@ -9,7 +9,7 @@ interface format{
     status?: boolean
 }
 
-app.post('/:id', (req, res)=>{
+app.put('/:id', (req, res)=>{
     const id = req.params.id;
     const data : format = req.body;
     const manager = ManagerHandler.Instance.getById(id);
