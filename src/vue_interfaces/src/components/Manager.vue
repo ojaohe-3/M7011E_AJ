@@ -5,14 +5,14 @@
         <td v-bind="elecPrice">
           <h3>Price of Electricity</h3>
           <h4>{{ elecPrice }} kr/kw</h4>
-          <VueApexCharts width="300" type="line" :options="options" :series="priceSeries"/>
+          <VueApexCharts width="400" type="line" :options="options" :series="priceSeries"/>
           <!-- <input type="text" v-model="elecPrice" placeholder="1.5"> -->
           <!--<button style="display: inline;">Submit</button>-->
         </td>
         <td v-bind="production">
           <h3>My Production</h3>
           <h4>{{ production }} kw/h</h4>
-          <VueApexCharts width="300" type="line" :options="options" :series="productionSeries"/>
+          <VueApexCharts width="400" type="line" :options="options" :series="productionSeries"/>
 
           <!-- <input type="number" min="0" v-model="production"  v-on:input="productionStep" placeholder="3500"> -->
           <!--<button style="display: inline;">Submit</button>-->
@@ -20,7 +20,7 @@
         <td v-bind="elecDemand">
           <h3>Electricity Demand</h3>
           <h4>{{ elecDemand }} kw/h</h4>
-          <VueApexCharts width="300" type="line" :options="options" :series="demandSeries"/>
+          <VueApexCharts width="400" type="line" :options="options" :series="demandSeries"/>
           
         </td>
       </tr>
@@ -42,13 +42,13 @@
         <td v-bind="income">
           <h3>Income</h3>
           <h4>{{ income }} kr/h</h4>
-          <VueApexCharts width="300" type="line" :options="options" :series="incomeSeries"/>
+          <VueApexCharts width="400" type="line" :options="options" :series="incomeSeries"/>
 
         </td>
         <td v-bind="totalAvailable">
           <h3>Total Electicity Available</h3>
           <h4>{{ totalAvailable.toFixed(2) }} kw/h</h4>
-          <VueApexCharts width="300" type="line" :options="options" :series="totalSeries"/>
+          <VueApexCharts width="400" type="line" :options="options" :series="totalSeries"/>
 
         </td>
       </tr>
@@ -155,7 +155,18 @@ export default {
           chart: {
             id: 'timeSeries'
           },
+          animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+              speed: 1000
+            }
+          },
           xaxis: {
+              labels: {
+                  show:false
+              },
+
               catagories: []
           }
       },
@@ -208,11 +219,29 @@ export default {
   
   methods: {
     updateCharts() {
-        this.priceSeries[0].data.push(this.price)
+        this.priceSeries[0].data.push(this.elecPrice)
+        if(this.priceSeries[0].length > 50)
+            this.priceSeries[0].data.shift();
+
         this.productionSeries[0].data.push(this.production)
+         if(this.productionSeries[0].length > 50)
+            this.productionSeries[0].shift();
+
+        
         this.incomeSeries[0].data.push(this.income)
+         if(this.incomeSeries[0].length > 50)
+            this.incomeSeries[0].shift()
+            
+        
         this.totalSeries[0].data.push(this.totalAvailable)
-        this.demandSeries[0].data.push(this.demandSeries)
+         if(this.totalSeries[0].length > 50)
+            this.totalSeries[0].data.shift();
+
+        this.demandSeries[0].data.push(this.elecDemand)
+         if(this.demandSeries[0].length > 50)
+            this.demandSeries[0].data.shift();
+
+
     },
     async productionStep() {
       console.log(this.ratio);
@@ -251,6 +280,7 @@ export default {
       this.income = this.production * this.elecPrice;
       this.income = this.income.toFixed(2);
       this.totalAvailable = market.stats.totalProduction;
+
       this.updateCharts();
     },
   },
