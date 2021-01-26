@@ -1,6 +1,6 @@
 <template>
   <div id="dashboard">
-    <Prosumer v-bind:id="this.id" v-if="userType === 'prosumer'"/>
+    <Prosumer :id="id" v-if="userType === 'prosumer'"/>
     <Manager v-bind:id="this.id" v-if="userType === 'manager'"/>
     <Consumer v-bind:id="this.id" v-if="userType === 'consumer'"/>
   </div>
@@ -17,6 +17,7 @@ import Consumer from './Consumer.vue'
 
 export default {
   name: 'Dashboard',
+  props: ['id', 'userType'],
   components: {
     Manager,
     Prosumer,
@@ -24,8 +25,8 @@ export default {
     
   },data () {
     return {
-      userType: 'prosumer',
-      id: '5fda7a29b6921cba5370a03a'
+      // userType: 'prosumer',
+      // id: '5fda7a29b6921cba5370a03a'
     }
   }
 }

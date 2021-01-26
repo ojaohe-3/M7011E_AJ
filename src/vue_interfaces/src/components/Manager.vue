@@ -151,6 +151,7 @@ export default {
         async update () {
             let market = null;
             let manager = null;
+            console.log('calling '+ process.env.VUE_APP_MARKET_ENDPOINT+"/api/price and " +process.env.VUE_APP_MANAGER_ENDPOINT+"/api/members/"+this.id )
             await axios.get(process.env.VUE_APP_MARKET_ENDPOINT+"/api/price").then(res => market = res.data).catch(err => console.log(err));
             await axios.get(process.env.VUE_APP_MANAGER_ENDPOINT+"/api/members/"+this.id).then(res => manager = res.data).catch(err => console.log(err));
 

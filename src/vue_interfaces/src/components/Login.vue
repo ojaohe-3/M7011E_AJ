@@ -15,12 +15,18 @@
 <script>
 export default {
   name: 'login',
+  data() {
+        return {
+          loggedIn : false,
+        }
+  },
   methods: {
     
       login () {
-        this.$auth.signInWithRedirect('/dashboard')
+        this.$auth.signInWithRedirect('/')
       }
   }
+
 }
 </script>
 
