@@ -8,7 +8,7 @@ static_resources:
         port_value: 4000
     filter_chains:
       - filters:
-        - name: envoy.http_connection_manager
+        - name: envoy.filters.network.http_connection_manager
         "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
         codec_type: http1
         stat_prefix: ingress_http
@@ -53,7 +53,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-            adress:
+              adress:
               socket_address:
                 address: 192.168.1.7
                 port_value: 5000
@@ -67,7 +67,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-            adress:
+              adress:
               socket_address:
                 address: 192.168.1.7
                 port_value: 5001
@@ -81,7 +81,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-            adress:
+              adress:
               socket_address:
                 address: 192.168.1.7
                 port_value: 5002
@@ -95,7 +95,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-            adress:
+              adress:
               socket_address:
                 address: 192.168.1.7
                 port_value: 5003
@@ -109,7 +109,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-            adress:
+              adress:
               socket_address:
                 address: 192.168.1.7
                 port_value: 8080
