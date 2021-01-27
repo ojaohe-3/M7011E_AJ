@@ -1,0 +1,16 @@
+{
+    "Kind": "ingress-gateway",
+    "Name": "service-ingress",
+
+    "Listeners": [
+        {
+            "Port": 443,
+            "Protocol": "http",
+            "Services": [
+                {
+                    "Name": "api"
+                }
+            ]
+        }
+    ]
+}
