@@ -20,19 +20,19 @@ static_resources:
                   domains:
                     - "*"
                   routes:
-                    - match: {prefix: "/simulator" }
+                    - match: {prefix: "/simulator." }
                       route:
                         prefix_rewrite: "/"
                         cluster: simulator
-                    - match: {prefix: "/market" }
+                    - match: {prefix: "/market." }
                       route:
                         prefix_rewrite: "/"
                         cluster: market
-                    - match: { prefix: "/prosumer" }
+                    - match: { prefix: "/prosumer." }
                       route:
                         prefix_rewrite: "/"
                         cluster: prosumer
-                    - match: { prefix: "/manager" }
+                    - match: { prefix: "/manager." }
                       route:
                         prefix_rewrite: "/"
                         cluster: manager
