@@ -198,11 +198,11 @@ export default {
   created() {
     setInterval(this.update, 1000);
     axios
-        .get(process.env.VUE_APP_MANAGER_ENDPOINT + "/api/control/" + this.id)
+        .get(process.env.VUE_APP_MANAGER_ENDPOINT + "/control/" + this.id)
         .then((res) =>{ this.ratio = res.data.ratio*100; this.status = res.data.status;})
         .catch((err) => console.log(err));
     axios
-            .get(process.env.VUE_APP_SIM_ENDPOINT + "/api/members/")
+            .get(process.env.VUE_APP_SIM_ENDPOINT + "/members/")
             .then((res) => {this.prosumers = res.data.prosumers; this.consumers = res.data.consumers})
             .catch((err) => console.log(err));
 
@@ -239,7 +239,7 @@ export default {
     async productionStep() {
       console.log(this.ratio);
       await axios.put(
-        process.env.VUE_APP_MANAGER_ENDPOINT + "/api/control/" + this.id,
+        process.env.VUE_APP_MANAGER_ENDPOINT + "/control/" + this.id,
         { ratio: this.ratio / 100, status: this.status}
       );
     },
@@ -249,11 +249,11 @@ export default {
       let manager = null;
 
       await axios
-        .get(process.env.VUE_APP_MARKET_ENDPOINT + "/api/price")
+        .get(process.env.VUE_APP_MARKET_ENDPOINT + "/price")
         .then((res) => (market = res.data))
         .catch((err) => console.log(err));
       await axios
-        .get(process.env.VUE_APP_MANAGER_ENDPOINT + "/api/members/" + this.id)
+        .get(process.env.VUE_APP_MANAGER_ENDPOINT + "/members/" + this.id)
         .then((res) => (manager = res.data))
         .catch((err) => console.log(err));
     
