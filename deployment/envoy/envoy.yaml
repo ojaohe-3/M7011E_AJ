@@ -37,9 +37,9 @@ static_resources:
                       route:
                         cluster: manager
                     - match: 
-                        prefix: "/"
-                        route:
-                          cluster: frontend
+                      prefix: "/"
+                      route:
+                        cluster: frontend
               http_filters:
                 - name: envoy.filters.http.router
 
