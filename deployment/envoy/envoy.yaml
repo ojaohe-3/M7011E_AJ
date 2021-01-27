@@ -22,21 +22,21 @@ static_resources:
                   routes:
                     - match: {prefix: "/simulator" }
                       route:
-                        prefix_rewrite: ""
+                        prefix_rewrite: "/"
                         cluster: simulator
                     - match: {prefix: "/market" }
                       route:
-                        prefix_rewrite: ""
+                        prefix_rewrite: "/"
                         cluster: market
                     - match: { prefix: "/prosumer" }
                       route:
-                        prefix_rewrite: ""
+                        prefix_rewrite: "/"
                         cluster: prosumer
                     - match: { prefix: "/manager" }
                       route:
-                        prefix_rewrite: ""
+                        prefix_rewrite: "/"
                         cluster: manager
-                    - match: { prefix: "" }
+                    - match: { prefix: "/" }
                       route:
                         cluster: frontend
             http_filters:
