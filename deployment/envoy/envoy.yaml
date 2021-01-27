@@ -23,21 +23,31 @@ static_resources:
                     - match: {prefix: "/simulator." }
                       route:
                         prefix_rewrite: "/"
+                        cors:
+                          allow_origin : http://www.green-lean-electric.org
                         cluster: simulator
                     - match: {prefix: "/market." }
                       route:
                         prefix_rewrite: "/"
+                        cors:
+                          allow_origin : http://www.green-lean-electric.org
                         cluster: market
                     - match: { prefix: "/prosumer." }
                       route:
                         prefix_rewrite: "/"
+                        cors:
+                          allow_origin : http://www.green-lean-electric.org
                         cluster: prosumer
                     - match: { prefix: "/manager." }
                       route:
                         prefix_rewrite: "/"
+                        cors:
+                          allow_origin : http://www.green-lean-electric.org
                         cluster: manager
                     - match: { prefix: "/" }
                       route:
+                        cors:
+                          allow_origin : http://www.green-lean-electric.org
                         cluster: frontend
             http_filters:
               - name: envoy.router
