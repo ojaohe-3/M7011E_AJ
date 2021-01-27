@@ -35,10 +35,10 @@ static_resources:
                     - match: { prefix: "/" }
                       route:
                         cluster: frontend
-          http_filters:
-            - name: envoy.filters.http.router
-              typed_config: 
-                {}
+            http_filters:
+              - name: envoy.filters.http.router
+                typed_config: 
+                  {}
 
   clusters:
     - name: simulator
