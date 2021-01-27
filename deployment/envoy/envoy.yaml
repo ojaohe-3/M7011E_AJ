@@ -54,7 +54,6 @@ static_resources:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 5000
-                  ipv_compat: true
     - name: market
       connect_timeout: 5.00s
       type: strict_dns
@@ -68,7 +67,6 @@ static_resources:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 5001
-                  ipv_compat: true 
     - name: prosumer
       connect_timeout: 5.00s
       type: strict_dns
@@ -81,8 +79,7 @@ static_resources:
               address:
                 socket_address:
                   address: 192.168.1.7
-                  port_value: 5002
-                  ipv_compat: true      
+                  port_value: 5002 
     - name: manager
       connect_timeout: 5.00s
       type: strict_dns
@@ -96,7 +93,6 @@ static_resources:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 5003
-                  ipv_compat: true
     - name: frontend
       connect_timeout: 5.00s
       type: strict_dns
@@ -110,4 +106,3 @@ static_resources:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 8080
-                  ipv_compat: true    
