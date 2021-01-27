@@ -36,7 +36,7 @@ static_resources:
                       route:
                         cluster: frontend
             http_filters:
-              - name: envoy.filters.http.router
+              - name: envoy.router
                 typed_config: 
                   {}
 
