@@ -55,7 +55,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-              adress:
+              address:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 5000
@@ -69,7 +69,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-              adress:
+              address:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 5001
@@ -83,7 +83,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-              adress:
+              address:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 5002
@@ -97,7 +97,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-              adress:
+              address:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 5003
@@ -111,7 +111,7 @@ static_resources:
         endpoints:
         - lb_endpoints:
           - endpoint:
-              adress:
+              address:
                 socket_address:
                   address: 192.168.1.7
                   port_value: 8080
