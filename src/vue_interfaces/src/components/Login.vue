@@ -25,8 +25,7 @@ export default {
       login () {
         this.$auth.signInWithRedirect('/')
       }
-  }
-
+  },
 }
 </script>
 
