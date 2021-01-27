@@ -40,10 +40,8 @@ static_resources:
                         prefix: "/"
                         route:
                           cluster: frontend
-          http_filters:
-          - name: envoy.router
-            typed_config: {}
-
+              http_filters:
+                - name: envoy.filters.http.router
 
   clusters:
     - name: simulator
