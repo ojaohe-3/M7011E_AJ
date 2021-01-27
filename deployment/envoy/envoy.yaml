@@ -20,24 +20,19 @@ static_resources:
                   domains:
                     - "*"
                   routes:
-                    - match:
-                      prefix: "/simulator"
+                    - match: {prefix: "/simulator" }
                       route:
                         cluster: simulator
-                    - match:
-                      prefix: "/market"
+                    - match: {prefix: "/market" }
                       route:
                         cluster: market
-                    - match: 
-                      prefix: "/prosumer"
+                    - match: { prefix: "/prosumer" }
                       route:
                         cluster: prosumer
-                    - match:
-                      prefix: "/manager"
+                    - match: { prefix: "/manager" }
                       route:
                         cluster: manager
-                    - match: 
-                      prefix: "/"
+                    - match: { prefix: "/" }
                       route:
                         cluster: frontend
           http_filters:
