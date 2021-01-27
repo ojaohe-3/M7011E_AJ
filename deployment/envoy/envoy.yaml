@@ -42,6 +42,8 @@ static_resources:
                         cluster: frontend
               http_filters:
                 - name: envoy.filters.http.router
+                  typed_config: 
+                    {}
 
   clusters:
     - name: simulator
