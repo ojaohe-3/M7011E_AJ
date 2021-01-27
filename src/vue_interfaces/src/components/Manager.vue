@@ -155,17 +155,10 @@ export default {
           chart: {
             id: 'timeSeries'
           },
-          animations: {
-            enabled: true,
-            easing: 'linear',
-            dynamicAnimation: {
-              speed: 1000
-            }
-          },
           xaxis: {
-              labels: {
-                  show:false
-              },
+            //   labels: {
+            //       show:false
+            //   },
 
               catagories: []
           }
@@ -225,12 +218,12 @@ export default {
 
         this.productionSeries[0].data.push(this.production)
          if(this.productionSeries[0].length > 50)
-            this.productionSeries[0].shift();
+            this.productionSeries[0].data.shift();
 
         
         this.incomeSeries[0].data.push(this.income)
          if(this.incomeSeries[0].length > 50)
-            this.incomeSeries[0].shift()
+            this.incomeSeries[0].data.shift()
             
         
         this.totalSeries[0].data.push(this.totalAvailable)
@@ -254,14 +247,7 @@ export default {
     async update() {
       let market = null;
       let manager = null;
-    //   console.log(
-    //     "calling " +
-    //       process.env.VUE_APP_MARKET_ENDPOINT +
-    //       "/api/price and " +
-    //       process.env.VUE_APP_MANAGER_ENDPOINT +
-    //       "/api/members/" +
-    //       this.id
-    //   );
+
       await axios
         .get(process.env.VUE_APP_MARKET_ENDPOINT + "/api/price")
         .then((res) => (market = res.data))
