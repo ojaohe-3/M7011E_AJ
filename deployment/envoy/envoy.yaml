@@ -24,30 +24,35 @@ static_resources:
                       route:
                         prefix_rewrite: "/"
                         cors:
-                          allow_origin : http://www.green-lean-electric.org
+                          allow_origin: ["*"]
+                          allow_headers: "content-type, application/json"
                         cluster: simulator
                     - match: {prefix: "/market." }
                       route:
                         prefix_rewrite: "/"
                         cors:
-                          allow_origin : http://www.green-lean-electric.org
+                          allow_origin: ["*"]
+                          allow_headers: "content-type, application/json"
                         cluster: market
                     - match: { prefix: "/prosumer." }
                       route:
                         prefix_rewrite: "/"
                         cors:
-                          allow_origin : http://www.green-lean-electric.org
+                          allow_origin: ["*"]
+                          allow_headers: "content-type, application/json"
                         cluster: prosumer
                     - match: { prefix: "/manager." }
                       route:
                         prefix_rewrite: "/"
                         cors:
-                          allow_origin : http://www.green-lean-electric.org
+                          allow_origin: ["*"]
+                          allow_headers: "content-type, application/json"
                         cluster: manager
                     - match: { prefix: "/" }
                       route:
                         cors:
-                          allow_origin : http://www.green-lean-electric.org
+                          allow_origin: ["*"]
+                          allow_headers: "content-type, application/json"
                         cluster: frontend
             http_filters:
               - name: envoy.router
