@@ -20,7 +20,7 @@ let logger = (req, res, next) => {
 	next();
 };
 
-app.use(cors);
+app.use(cors());
 app.use(logger);
 app.use(express.json());
 

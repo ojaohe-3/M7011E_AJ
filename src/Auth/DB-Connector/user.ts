@@ -9,6 +9,7 @@ declare interface Iprivilage{
 declare interface IUser extends Document{
     username: String,
     clientid: String,
+    main: String
     managers?: Array<Iprivilage>,
     prosumers?: Array<Iprivilage>,
     consumers?: Array<string>,
@@ -29,6 +30,7 @@ export class UserSchema{
         const userSchema = new Schema({
             username: { type : String , unique : true, required : true },
             clientid: { type : String , unique : false, required : true },
+            main: { type : String , unique : false, required : true },
             managers: { type : [privlage] , unique : false, required : false },
             prosumers: { type : [privlage] , unique : false, required : false },
             consumers: { type : String , unique : false, required : false },
