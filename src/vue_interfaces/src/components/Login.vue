@@ -23,7 +23,6 @@ export default {
   methods: {
     
       login () {
-        this.$auth.signInWithRedirect('/')
       }
   },
 }
