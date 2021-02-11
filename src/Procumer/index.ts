@@ -24,7 +24,7 @@ let logger = (req, res, next) =>{
 }; 
 app.use(logger);
 app.use(express.json());
-app.use(cors);
+app.use(cors());
 
 app.use("/api/members", members);
 app.use("/api/control", control);

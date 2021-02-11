@@ -109,7 +109,7 @@ export default {
   created() {
     setInterval(this.update, 1000);
     axios
-      .get(process.env.VUE_APP_PROSUMER_ENDPOINT + "/api/control/" + this.id)
+      .get(process.env.VUE_APP_PROSUMER_ENDPOINT + "/control/" + this.id)
       .then((res) => {
         this.ratio = res.data.input_ratio;
         this.status = res.data.status;
@@ -119,7 +119,7 @@ export default {
   methods: {
     async ratioStep() {
       await axios.put(
-        process.env.VUE_APP_PROSUMER_ENDPOINT + "/api/control/" + this.id,
+        process.env.VUE_APP_PROSUMER_ENDPOINT + "/control/" + this.id,
         {
           input_ratio: this.ratio / 100,
           output_ratio: 1 - this.ratio / 100,
@@ -132,17 +132,17 @@ export default {
         prosumer,
         consumer = null;
       await axios
-        .get(process.env.VUE_APP_MARKET_ENDPOINT + "/api/price")
+        .get(process.env.VUE_APP_MARKET_ENDPOINT + "/price")
         .then((res) => (market = res.data))
         .catch((err) => console.log(err));
       await axios
         .get(
-          process.env.VUE_APP_SIM_ENDPOINT + "/api/members/consumers/" + this.id
+          process.env.VUE_APP_SIM_ENDPOINT + "/members/consumers/" + this.id
         )
         .then((res) => (consumer = res.data))
         .catch((err) => console.log(err));
       await axios
-        .get(process.env.VUE_APP_PROSUMER_ENDPOINT + "/api/members/" + this.id)
+        .get(process.env.VUE_APP_PROSUMER_ENDPOINT + "/members/" + this.id)
         .then((res) => (prosumer = res.data))
         .catch((err) => console.log(err));
       this.cost = (consumer.demand - this.production) * market.price;

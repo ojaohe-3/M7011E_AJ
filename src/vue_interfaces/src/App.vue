@@ -18,7 +18,9 @@
            </div>
          </td>
       </tr>
+      
     </table>
+    <Login/>
     <Dashboard v-if="showDashboard" :id="id" :userType="userType"/>
   </div>
 </template>
@@ -29,11 +31,13 @@
 <script>
 import Header from './components/Header.vue'
 import Dashboard from './components/Dashboard.vue'
+import Login from './components/Login.vue'
 export default {
   name: 'App',
   components: {
     Header,
-    Dashboard
+    Dashboard,
+    Login
   },data () {
     return {
       showDashboard: false,

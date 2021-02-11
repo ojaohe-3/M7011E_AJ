@@ -1,56 +1,56 @@
 import axios from "axios";
-import Privilege, { User } from "./Iauth";
+import UserData from "./userdata";
 
-export default class Authenticator {
-	private static instance: Authenticator;
-	private privilege: Privilege;
-    private valid_to: Date;
-    
-    constructor(privilege: Privilege, valid_to: Date){
 
-        this.privilege
-        this.valid_to = valid_to;
-    }
-
-    public static get Valid(): boolean{
-        if(!this.instance)
-            return false;
-        else
-            return this.instance.valid_to.getTime() - Date.now() >= 0;
-    }
-
-	public static async Authenticate(token: string, id: string) : Promise<Authenticator>{
-		
-
+export default function Authenticate(key: string, lvl: number){
+    return async function (req, res, next) { //todo TLS protocols
+        const id = req.params.id;
         try {
-           
-            if(this.instance.valid_to.getTime() > Date.now()){
-                return this.instance;
+        const token = (req.headers.authorization).split(' ')[1];
+        if(!token)
+            res.status(403).json({message: 'no valid credential'});
+            
+        if (id) {
+            const user = await verify(token);
+            const credence = getPrivilage(key, user, id, lvl);
+
+            if(credence){
+                next();
             }else{
-
-                const OktaJwtVerifier = require("@okta/jwt-verifier");
-
-                const oktaJwtVerifier = new OktaJwtVerifier({
-                    issuer: process.env.ISSUER,
-                    clientId: process.env.CLIENT_ID,
-                });
-                const verifyer = oktaJwtVerifier.verifyIdToken(token)
-                
-                const data = await (await axios.get(process.env.LOGIN_API+'/login/')).data;
-                const res = data.userdata.prosumers.forEach(e => {
-                    if(e.id === id){
-                        return e;
-                    }
-                });
-                if(res){
-                    const data = res[0]; //if we have multiple, first is the only one that matters, since it is undefined behavior
-                    this.instance = new Authenticator(data, new Date(Date.now() + 3600*1000));
-                    return this.instance;
-                }
+                res.status(403).json({message: "no access to this endpoint", status : 0})
             }
-          } catch (error) {
-            console.log(error.message)
-          }
+            
+        } else {
+            throw new Error("invalid use of Middleware"); //todo, add Attribute based access control for iterables.
+
+        } 
+        next();
+        } catch (error) {
+            res.status(403).json({message: 'authentication header required!'});
+        }
         
-	}
+        
+    }
+}
+
+function getPrivilage(key : string, user: UserData, id: string, lvl: number): any{
+    for(const [k, value] of Object.entries(user)){
+        if(k === key){
+            for(const item in value){
+                console.log(item);
+            }
+        }
+    }
+    return null;
+}
+
+async function verify(token: string): Promise<UserData>{
+    try {
+        const data = await (await axios.post(process.env.AUTH_ENDPOINT + '/api/validate', {token: token})).data;
+        if(data.status){
+            return  data.data;
+        }
+    } catch (error) {
+        return null;
+    }
 }

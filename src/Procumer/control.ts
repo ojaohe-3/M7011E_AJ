@@ -1,11 +1,13 @@
 import express = require("express");
 import * as dotenv from "dotenv";
 import ProsumerHandler from "./ProsumerHandler";
+import Authenticate from "./authentication/authenticator";
 
 dotenv.config({path: "./.env"});  
 
-const app = express.Router();;
-app.get('/:id', (req, res)=>{
+const app = express.Router();
+
+app.get('/:id',Authenticate("prosumers", 5), (req, res)=>{
     const id = req.params.id;
     const procumer = ProsumerHandler.Instance.getById(id);
 
