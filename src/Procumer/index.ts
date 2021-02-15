@@ -19,7 +19,7 @@ const app: express.Application = express();
 app.use(express.json());
 
 let logger = (req, res, next) =>{ 
-    console.log(`${req.protocol}://${req.get("host")}${req.originalUrl}: got  ${req.method}`)
+    console.log(`${req.protocol}://${req.get("host")}${req.originalUrl}: got ${req.method}`)
     next();
 }; 
 app.use(logger);
@@ -31,6 +31,6 @@ app.use("/api/control", control);
 
 let PORT =  process.env.PORT || 5000;
 app.listen(PORT, function () {
-    console.log(`App is listening on port ${PORT}`);
+    console.log(`App is listening on port ${PORT}`); 
 });
 

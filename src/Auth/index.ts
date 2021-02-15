@@ -53,15 +53,14 @@ app.use(logger);
 app.use(express.json());
 
 
-app.post("/api/validate",  async (req, res) => {
-    const payload = req.body;
+app.get("/api/validate",  async (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
     try {
-        jwt.verify(payload.token, process.env.JWT_SECRET)
-        const data = jwt.decode(payload.token)
-        console.log(data);
-        res.json({message: "Valid Token!", status: 1, data: data}) //todo enforce TLS 
+        jwt.verify(token, process.env.JWT_SECRET)
+        const data = jwt.decode(token)
+        res.json({message: "Valid Token!", status: 1, body: data}) //todo enforce TLS 
     } catch (error) {
-        res.json({message: "Invalid Token!"})
+        res.json({message: "Invalid Token!", status: 0, reason: error.message})
         
     }
 
