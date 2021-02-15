@@ -1,5 +1,6 @@
 
 import express = require("express");
+import Authenticate from "./authentication/authenticator";
 import ManagerHandler from "./ManagerHandler";
 require('dotenv').config();
 const app = express.Router();
@@ -9,7 +10,7 @@ interface format{
     status?: boolean
 }
 
-app.put('/:id', (req, res)=>{
+app.put('/:id', Authenticate('managers', 5), (req, res)=>{
     const id = req.params.id;
     const data : format = req.body;
     const manager = ManagerHandler.Instance.getById(id);
@@ -22,7 +23,7 @@ app.put('/:id', (req, res)=>{
 });
 
 
-app.get('/:id', (req, res)=>{
+app.get('/:id',  Authenticate('managers', 3), (req, res)=>{
     const id = req.params.id;
     const manager = ManagerHandler.Instance.getById(id);
     if(manager){
