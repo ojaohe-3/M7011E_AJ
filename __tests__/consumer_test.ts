@@ -1,7 +1,7 @@
 
 
 
-import { Consumer } from "../src/Simulation/consumer";
+import { Consumer } from "../src/Simulation/models/consumer";
 
 test("consumption_test", () => {
     let consumer = new Consumer("1", ()=>{ return 1;});

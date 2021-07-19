@@ -1,7 +1,7 @@
 
 import express = require("express");
-import Authenticate from "./authentication/authenticator";
-import ManagerHandler from "./ManagerHandler";
+import Authenticate from "../authentication/authenticator";
+import ManagerHandler from "../handlers/ManagerHandler";
 require('dotenv').config();
 const app = express.Router();
 

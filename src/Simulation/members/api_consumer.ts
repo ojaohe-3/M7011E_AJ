@@ -1,6 +1,6 @@
 import express = require("express");
-import { Simulator } from "../simulation";
-import { Consumer } from "../consumer";
+import { Simulator } from "../handlers/simulation";
+import { Consumer } from "../models/consumer";
 import { Types } from "mongoose";
 import { Weather } from "../weather";
 const app = express.Router();

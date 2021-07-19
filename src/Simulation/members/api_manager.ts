@@ -1,68 +1,51 @@
+
+
 import express = require("express");
-import { Manager } from "../manager";
-import { Simulator } from "../simulation";
+import { Types } from "mongoose";
+import { DB } from "../DB-Connector/db-connector";
+import ManagerHandler from "../handlers/ManagerHandler";
+import Manager from "../models/manager";
+
+require('dotenv').config();
+
 
 const app = express.Router();
-
-
-
-
-app.get("/:id", (req, res) => {//todo fetch from producer source
-    const sim = Simulator.singelton;
-
-    const data =sim.managers.get(req.params.id);
-    if(data)
-        res.json(data);
-    else
-        res.status(404).json({message: `no such manager with id ${req.params.id}`})
-    
-});
-app.get("/", (req, res) => {
-    const sim = Simulator.singelton;
-
-    const data = Array.from(sim.managers.values());
-    
-    res.json(data)
-    
+app.get('/',(req, res)=>{
+    res.json( {body: ManagerHandler.Instance.getAll()}); 
 });
 
 
-app.post("/",(req,res) =>{
-    const sim = Simulator.singelton;
-    const format = ["id","maxProduciton","current","status"] //enforced members
-    const data= req.body;
-    data.body.forEach(item => {
-        //look if all enforced key exists
-        if(Object.keys(item).filter(k=>format.some(e => k === e)).length === format.length){
-            sim.managers.set(item.id, data);
-            res.json({message: "memeber added!", data: data});
-        }else
-            res.status(400).json({message:"Invalid format", required: format});  
-    });
-    
-
-    
+app.get('/:id/prosumers', async (req,res)=>{ //todo, this will be tied to the jwt, this is very temporary
+    const data = await DB.Models.Prosumer.find({name: "this.sim"}); //todo manager prosumer controller
+    res.json(data);
 });
 
-app.put("/:id",(req, res)=>{
-    const data = req.body;
-    const format = ["current","status"]
+
+app.get('/:id',async (req, res)=>{
     const id = req.params.id;
-    
-    if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        if(Simulator.singelton.managers.has(id)){
-            const entry = Simulator.singelton.managers.get(id);
-            entry.current = data.current;
-            entry.status = data.status;
-            res.json({message: "memeber updated!", data: data});
-        }else{
-            res.status(404).json({"message": "no such id!"})
-        }
-    }else{
-        res.status(400).json({message:"Invalid format", required: format});  
+    console.log(id);
+    if(id){
+        const manager = ManagerHandler.Instance.getById(id);
+        res.json(manager);
     }
-    
+    else
+        res.status(404).json({message: "No such id!"}); 
+});
 
+app.post('/', async (req, res)=>{
+    const data = req.body;
+    try {
+        const id = data.id ? data.id: Types.ObjectId().toHexString();
+        const manager = new Manager(id, data.maxProduction);
+        ManagerHandler.Instance.put(id, manager);
+        res.json({data: data, message: "success!"});
+    } catch (error) {
+        res.status(400).json({message: "API Error!", expected_format: "maxProduction"});
+    }
+
+
+        
+    
 });
 
 module.exports = app;

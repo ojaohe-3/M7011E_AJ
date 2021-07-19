@@ -82,7 +82,7 @@
   },
   "include": [
       "**/*"
-  ],
+, "../Legacy/index.ts", "../Legacy/manager-members.ts"  ],
   "exclude": [
       "node_modules",
       "**/*.spec.ts"

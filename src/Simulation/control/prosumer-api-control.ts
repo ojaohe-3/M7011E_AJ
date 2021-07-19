@@ -1,7 +1,7 @@
 import express = require("express");
 import * as dotenv from "dotenv";
-import ProsumerHandler from "./ProsumerHandler";
-import Authenticate from "./authentication/authenticator";
+import ProsumerHandler from "../handlers/ProsumerHandler";
+import Authenticate from "../authentication/authenticator";
 
 dotenv.config({path: "./.env"});  
 

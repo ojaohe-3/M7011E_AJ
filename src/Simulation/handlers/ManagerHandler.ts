@@ -1,6 +1,6 @@
 import Axios from "axios";
-import { DB } from "./DB-Connector/db-connector";
-import  Manager  from "./Manager";
+import { DB } from "../DB-Connector/db-connector";
+import  Manager  from "../models/manager";
 
 export default class ManagerHandler{
     private static instance: ManagerHandler;

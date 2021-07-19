@@ -1,8 +1,8 @@
 import axios from "axios";
-import  Battery  from "./Battery";
-import { DB } from "./DB-Connector/db-connector";
-import { Procumer } from "./procumer";
-import  Turbine  from "./Turbine";
+import  Battery  from "../models/battery";
+import { DB } from "../DB-Connector/db-connector";
+import { Procumer } from "../models/procumer";
+import  Turbine  from "../models/Turbine";
 
 export default class ProsumerHandler{
     /**

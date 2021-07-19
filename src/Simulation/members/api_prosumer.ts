@@ -1,82 +1,99 @@
 import express = require("express");
+import  Battery  from "../models/battery";
+import * as dotenv from "dotenv";
 import { Types } from "mongoose";
-import { Consumer } from "../consumer";
-import { Procumer } from "../procumer";
-import { Simulator } from "../simulation";
-import { Weather } from "../weather";
+import Turbine from "../models/Turbine";
+import ProsumerHandler from "../handlers/ProsumerHandler";
+import { Procumer } from "../models/procumer";
+dotenv.config({ path: "./.env" });
 
 const app = express.Router();
 
+interface batteries {
+	capacity: number;
+	maxOutput: number;
+	maxCharge: number;
+	current?: number;
+}
+interface format {
+	turbines: [number];
+	batteries: [batteries];
+	_id?: String;
+}
 
-app.get("/", (req, res)=>{
-    const sim = Simulator.singelton;
+function getObjectsFromJson(data: format) {
+	const bs = [];
+	const ts = [];
+	data.batteries.forEach((b) =>
+		bs.push(new Battery(b.capacity, b.maxOutput, b.maxCharge, b.current))
+	);
+	data.turbines.forEach((t) => ts.push(new Turbine(t)));
+	return { batteries: bs, turbines: ts };
+}
 
-    const temp = Array.from(sim.consumers.values());
-    let data = temp.map(e => {
-        e.demand = e.consumption(sim.weather.temp);
-        return [e, sim.prosumers.get(e.id)];  
-    })
-    res.json(data);
+app.get("/", (req, res) => {
+	const data = Array.from(ProsumerHandler.Instance.getAll().values());
+	if (data) res.json(data);
+	else res.status(400).json({ messsage: "No memebers!" });
 });
-//api get procumer
-app.get("/:id", (req, res) => {
-    const sim = Simulator.singelton;
-    const data =sim.prosumers.get(req.params.id);
-    if(data)
-        res.json(data);
-    else
-        res.status(404).json({message: `no such produmer with id ${req.params.id}`})
-    
+app.post("/", async (req, res) => {
+
+	try {
+		const data: format = req.body;
+		const obj = getObjectsFromJson(data);
+
+		if (data._id) {
+			await ProsumerHandler.Instance.put(
+				data._id,
+				new Procumer(obj.batteries, obj.turbines, data._id)
+			);
+		} else {
+			const id = Types.ObjectId().toHexString();
+			const prosumer = new Procumer(obj.batteries, obj.turbines, id);
+			await ProsumerHandler.Instance.put(id, prosumer);
+		}
+		//todo api post the new entry to simulation with consumption data, alternative is to simulate localy
+		res.json({ message: " success!", data: data });
+	} catch (error) {
+		console.log(error);
+		res.status(400).json({
+			message: " failed!",
+			exptected_format: [
+				"batteries: [{capacity: number, maxOutput: number, maxCharge: number, current?: number}]",
+				"turbines[maxPower : number]",
+			],
+		});
+	}
 });
 
-app.post("/",(req,res) =>{
-    const sim = Simulator.singelton;
-
-    const format = ["id","timefn","totalProduction","currentCapacity", "status","totalCapacity"] //enforced members
-    const data= req.body;
-    data.body.forEach(item => {
-        //look if all enforced key exists
-        if(Object.keys(item).filter(k=>format.some(e => k === e))){
-            if(item.timefn.length !== 24){
-                res.status(400).json({message:"Invalid format for timefn", required: "24 length array of (mean, deviation)"});  
-            }
-            else{   
-                const consumer = new Consumer(item.id, item.timefn);
-                sim.consumers.set(item.id, consumer);
-                sim.prosumers.set(item.id, {id: item.id, 
-                    status: item.status,  
-                    totalProduction: item.totalProduction, 
-                    currentCapacity: item.currentCapacity,
-                    totalCapacity: item.totalCapacity
-                });
-                consumer.document();
-            }
-        }else
-            res.status(400).json({msg:"Invalid format", required: format});  
-    });
-    res.json({msg: "memeber added!", data: data});
-
+app.get("/:id", async (req, res) => {
+	const data = ProsumerHandler.Instance.getById(req.params.id);
+	if (data) {
+		res.json(data);
+	} else res.status(400).json({ messsage: "No such id" });
 });
 
-app.put("/:id",(req,res) =>{
-    const data = req.body;
-    const format = ["currentCapacity","totalProduction","status"]
-    const id = req.params.id;
-    
-    if(Object.keys(data).filter(k=>format.some(e => k === e)).length === format.length){
-        if(Simulator.singelton.prosumers.has(id)){
-            const entry = Simulator.singelton.prosumers.get(id);
-            entry.currentCapacity = data.currentCapacity;
-            entry.totalProduction = data.totalProduction;
-            entry.status = data.status;
-            res.json({message: "memeber updated!", data: data});
+app.put("/:id", async (req, res) => {
+	const prosumer = ProsumerHandler.Instance.getById(req.params.id);
+	try {
+		const data: format = req.body;
+		if (data) {
+			const obj = getObjectsFromJson(data);
 
-        }else{
-            res.status(404).json({"message": "no such id!"})
-        }
-    }else{
-        res.status(400).json({message:"Invalid format", required: format});  
-    }
+			prosumer.batteries = obj.batteries;
+			prosumer.turbines = obj.turbines;
 
+			res.json({ message: "success!", data: data });
+		} else res.status(400).json({ messsage: "No such id" });
+	} catch (error) {
+		res.status(400).json({
+			message: " failed!",
+			exptected_format: [
+				"batteries: [{capacity: number, maxOutput: number, maxCharge: number, current?: number}]",
+				"turbines[maxPower : number]",
+			],
+		});
+	}
 });
+
 module.exports = app;
