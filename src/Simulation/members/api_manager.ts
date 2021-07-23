@@ -2,6 +2,7 @@
 
 import express = require("express");
 import { Types } from "mongoose";
+import Authenticate from "../authentication/authenticator";
 import { DB } from "../DB-Connector/db-connector";
 import ManagerHandler from "../handlers/ManagerHandler";
 import Manager from "../models/manager";
@@ -16,8 +17,8 @@ app.get('/',(req, res)=>{
 
 
 app.get('/:id/prosumers', async (req,res)=>{ //todo, this will be tied to the jwt, this is very temporary
-    const data = await DB.Models.Prosumer.find({name: "this.sim"}); //todo manager prosumer controller
-    res.json(data);
+    // TODO
+    // res.json(data);
 });
 
 
@@ -32,7 +33,7 @@ app.get('/:id',async (req, res)=>{
         res.status(404).json({message: "No such id!"}); 
 });
 
-app.post('/', async (req, res)=>{
+app.post('/', Authenticate("admin"), async (req, res)=>{
     const data = req.body;
     try {
         const id = data.id ? data.id: Types.ObjectId().toHexString();

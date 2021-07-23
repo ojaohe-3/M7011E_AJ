@@ -1,22 +1,23 @@
 
 
 import { connect, connection, Connection } from 'mongoose';
-import { CellModel, CellSchema } from './cell';
 import { ConsumerModel, ConsumerSchema } from './consumer';
 import { ManagerModel, ManagerSchema } from './manager';
-import { MarketModel, MarketSchema } from './market';
 import { ProsumerModel, ProsumerSchema } from './prosumer';
 export declare interface IModels {
-  Cell?: CellModel;
-  Consumer?: ConsumerModel,
-  Prosumer?: ProsumerModel,
-  Market?: MarketModel,
-  Manager?: ManagerModel
+  Consumer: ConsumerModel,
+  Prosumer: ProsumerModel,
+  Manager: ManagerModel,
+  // Node: NodeModule
 }
 export class DB{
   
-  private static instance: DB;
-    
+  private static instance?: DB;
+  private static get Instance() : DB{
+    if(!this.instance)
+      this.instance = new DB();
+    return this.instance;
+  }
   private _db: Connection; 
   private _models: IModels;
 
@@ -25,13 +26,11 @@ export class DB{
       this._models = model;
     else
       this._models = {
-        Cell: new CellSchema().model,
         Consumer: new ConsumerSchema().model,
         Prosumer: new ProsumerSchema().model,
-        Market: new MarketSchema().model,
         Manager: new ManagerSchema().model
       }
-    connect(process.env.DB_CONNECT,{useNewUrlParser: true});//secure access tokens etc todo
+    connect(process.env.DB_CONNECT!,{useNewUrlParser: true}!);//secure access tokens etc todo
     this._db = connection;
     this._db.on('open', this.connected);
     this._db.on('error', this.error);
@@ -44,7 +43,7 @@ export class DB{
     if(!this.instance)
       this.instance = new DB();
     
-    return DB.instance._models;
+    return DB.instance!._models;
   }
 
   private connected() {

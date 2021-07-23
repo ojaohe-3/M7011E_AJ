@@ -1,58 +1,54 @@
+import assert = require("assert");
 import axios from "axios";
-import UserData from "./userdata";
+import UserData, { Privilage } from "./userdata";
 
-
-export default function Authenticate(key : string, lvl : number) {
+// TODO
+// add a profile setting that allows admin control.
+export default function Authenticate(key: string, lvl?: number) {
     return async function (req, res, next) { // todo TLS protocols
-        const id = req.params.id;
+        const id = req.params.id as string | undefined;
         const token = req.headers.authorization.split(' ')[1];
-        if (! token) 
-            res.status(403).json({message: 'authentication header required!'});
-        
-        if (id) {
-            const user = await verify(token);
-            const credence = getPrivilage(key, user, id, lvl);
+        if (!token)
+            res.status(403).json({ message: 'authentication header required!' });
 
-            if (credence) {
-                next();
-            } else {
-                res.status(403).json({message: "no access to this endpoint"})
-            }
+        const user = await verify(token);
+        assert(user);
+        const credence = isPrivilaged(key, user, id, lvl);
 
+        if (credence) {
+            next();
         } else {
-           // todo, add Attribute based access control for iterables.
-           res.status(403).json({message: 'authentication only valid to an id!'});
+            res.status(403).json({ message: "no access to this endpoint" })
+        }
 
 
-        } next();
+
     }
 
 }
 
-function getPrivilage(key : string, user : UserData, id : string, lvl : number): any {
+function isPrivilaged(key: string, user: UserData, id?: string, lvl?: number): boolean {
     console.log(`getting : ${key}, from ${user}. Member to be found ${id}`)
     for (const [k, value] of Object.entries(user)) {
         if (k === key) {
-            let res = null;
-            value.forEach(v => {
-                if(v.id === id && lvl <= v.level)
-                    res = v
-            });
-            return res;
+            if (key === "admin") return value;
+            if(!lvl || !id) return false;
+            value.filter((v) => v.id === id && lvl <= v.level)
+            return value.length > 0;
         }
     }
-    return null;
+    return false;
 }
 
-async function verify(token : string): Promise < UserData > {
+async function verify(token: string): Promise<UserData | null> {
     try {
-        const data = await (await axios.get(process.env.AUTH_ENDPOINT + '/api/validate', {headers: {'authorization' : 'Bearer '+token}})).data;
-        if (data.status) {
-            return data.body.data;
-        
-        }else
-            return null;
+        const data = await (await axios.get(process.env.AUTH_ENDPOINT + '/api/validate', { headers: { 'authorization': 'Bearer ' + token } })).data; // what did i do here???
+        assert(data.status)
+        return data.body.data;
+
+
     } catch (error) {
         console.log(error);
+        return null;
     }
 }

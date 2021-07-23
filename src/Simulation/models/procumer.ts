@@ -13,22 +13,22 @@ export class Procumer extends Consumer implements IComponent{
     status: boolean;
     batteries: Battery[];
     turbines: Turbine[];
-    id: String;
     input_ratio: number
     output_ratio: number;
-
+    asset: string;    
     currentCapacity: () => number;
-    tick: () => void; 
-    output: number;
-    demand: number;
+    tick: (time?:number) => void; 
+    timeout: number;
     
-    constructor(batteries: Array<Battery>, turbines: Array<Turbine>, id? : String){
+    constructor(batteries: Array<Battery>, turbines: Array<Turbine>, id? : string){
         super(id ? id : Types.ObjectId().toHexString(), Consumer.generateTimeFn());
-
+        this.asset = "windmill";
         this.batteries = batteries;
         this.turbines = turbines;
         this.totalProduction = 0;
         this.totalCapacity = 0;
+        this.timeout = Date.now();
+
         batteries.forEach((e)=> this.totalCapacity += e.capacity)
 
         this.currentCapacity = () : number=> {
@@ -41,26 +41,25 @@ export class Procumer extends Consumer implements IComponent{
         this.output_ratio = 1;
         this.status = true;
         
-        this.tick =  ()=> {
+        this.tick =  (time?: number)=> {
             this.totalProduction = 0;
-            if(this.status){
-                this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(Weather.getInstance().speed));
+            if(this.status && time! > this.timeout){
+                this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(Weather.Instance.speed));
                 this.batteries.forEach((b) => {
                     this.totalProduction -= b.Input(this.totalProduction*(this.input_ratio/this.batteries.length)); //distribute input equally among all batteries
                     this.totalProduction += b.Output(this.output_ratio);
                 });
                 this.totalProduction;
+            }else if(time! > this.timeout){ 
+                this.status = true;
             }
-            // else{
-            //     const reactivate = () => this.status = true;
-            //     setTimeout(reactivate, 600000);//crude
-            //     console.log(`unactive will reactivate in ca 10 min`);
-    
-            // }
             const capacity = this.currentCapacity();           
         };
     }
-
+    dissable(){
+        this.status = false;
+        this.timeout = Date.now() + 600*1000;
+    }
     
     async document() {
         const bc: IBattery[] = [];

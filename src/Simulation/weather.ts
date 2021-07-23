@@ -26,12 +26,12 @@ export class Weather{
                 console.log(error);
             }
         }
-        setImmediate(this.update, 3600000);//update every hour
+        setInterval(this.update, 3600000);//update every hour
 
     }
-    static getInstance() : Weather {
+    static get Instance() : Weather {
         if(!Weather.singleton)
-            Weather.singleton = new Weather({lat: +process.env.LAT, lon: +process.env.LAT});
+            Weather.singleton = new Weather({lat: +process.env.LAT!, lon: +process.env.LON!});
         return Weather.singleton;
     }
     

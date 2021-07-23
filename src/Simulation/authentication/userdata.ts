@@ -1,14 +1,15 @@
 
-declare interface Privilage {
+export interface Privilage {
     level: Number,
-    access?: String,
-    id: String
+    access?: string,
+    id: string
 }
 export default interface UserData {
-    username: String,
-    main: String,
+    username: string,
+    main: string,
     managers?: Array < Privilage >,
     prosumers?: Array < Privilage >,
     consumers?: Array < string >,
+    admin: boolean,
     last_login?: Date
 }

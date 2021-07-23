@@ -1,23 +1,34 @@
 export interface IComponent{
-    tick: () => void;
+    tick: (time?: number) => void;
+    supply : () => number;
     output: number;    
     demand: number;
-    // price: number;
-    
+    asset: string;
+    id: string;
+
 }   
 
-//TODO this need revison
-
-export default class Node{
+export interface INode{
     x: number;
     y: number;
-    
     child: IComponent;
+    tick : (time?: number) => void;
+}
+export default class Node implements INode{
 
-    tick = () => this.child.tick();
+    x: number;
+    y: number;
+
+    child: IComponent;
+    tick = (time?: number) => this.child.tick(time);
     
-    constructor(child : IComponent){
-        this.child = child;
+    constructor(x: number, y:number, child? : IComponent){
+        this.x = x;
+        this.y = y;
+        if(child)
+            this.child = child;
+        else
+            this.child = new DefaultNode();
     }
     
     get demand(){
@@ -28,6 +39,9 @@ export default class Node{
         return this.child.output;
     }
     
+    public isDefault() : boolean {
+        return this.child.id === "NaN";
+    }
 }
 
 
@@ -36,34 +50,16 @@ export class DefaultNode implements IComponent{
     
     output: number;
     demand: number;
-    
+    asset: string;
+    id: string;
+    supply: () => number;
+
     constructor(){
         this.output = 0;
         this.demand = 0;
         this.tick = () => {};
-    }
-}
-
-
-export class SinkNode implements IComponent{
-    tick: () => void;
-    
-    output: number;
-    demand: number;
-    standing_demand: number;
-    standing_output: number;
-
-    constructor(){
-        this.output = 0;
-        this.demand = 0;
-        this.standing_demand = 0;
-        this.standing_output = 0;
-        this.tick = () => {
-            this.standing_output = this.output
-            this.standing_demand = this.demand
-
-            this.output = 0;
-            this.demand = 0;
-        };
+        this.asset = "empty";
+        this.id = "NaN"
+        this.supply = () => this.output - this.demand
     }
 }

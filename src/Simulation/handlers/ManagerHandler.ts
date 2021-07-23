@@ -1,3 +1,4 @@
+import assert = require("assert");
 import Axios from "axios";
 import { DB } from "../DB-Connector/db-connector";
 import  Manager  from "../models/manager";
@@ -8,7 +9,6 @@ export default class ManagerHandler{
 
     constructor(){
         this.managers = new Map<String, Manager>();
-        this.fetchAll(); //async, will be some garbage data first tick, but is acceptable. alternative is to call outside the function at index. 
     }
 
     public static get Instance(): ManagerHandler{
@@ -45,6 +45,18 @@ export default class ManagerHandler{
             return this.managers.get(id);
     }
 
+
+    public get Cheapest() : Manager{
+        const items  = Array.from(this.managers.values()) as  Manager[];
+        let cheapest = items.pop();
+        assert(cheapest);
+        items.forEach((m : Manager) => {
+            if(m.price - cheapest!.price < 0)
+                cheapest = m;
+        });
+        return cheapest;
+    }
+
     /**
      * returns all managers as an array
      */
@@ -53,7 +65,7 @@ export default class ManagerHandler{
     }
     private async fetchAll(){
         try {
-            const entry = await DB.Models.Manager.find({name: process.env.NAME}).exec();
+            const entry = await DB.Models.Manager!.find({name: process.env.NAME}).exec();
             const publisher = [];
             entry.forEach(m => 
                 { 
@@ -64,18 +76,7 @@ export default class ManagerHandler{
                         man.status = true;
                     
                     this.managers.set(m.id, man);
-                    publisher.push({
-                        id: man.id,
-                        maxProduciton: man.maxProduciton,
-                        current: man.current,
-                        status: man.status
-                    });
-                    
                 });
-                await Axios.post(process.env.SIM + '/api/members/managers', {
-                    body: publisher
-                });
-                this.managers.forEach(async (m) => m.tick());
         } catch (error) {
             console.log(error);
         }

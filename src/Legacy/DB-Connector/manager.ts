@@ -8,6 +8,7 @@ declare interface IManager extends Document{
     status: Boolean,
     ratio: number,
     name: String,
+    price: number
 }
 export interface ManagerModel extends Model<IManager>{};
 
@@ -22,6 +23,7 @@ export class ManagerSchema {
             production : Number,
             status: Boolean,
             ratio: Number,
+            price: Number,
             name: {type: String, required : true}
         });
         this._model = model<IManager>('Manager', ManagerSchema)

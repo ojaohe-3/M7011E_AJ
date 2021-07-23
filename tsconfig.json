@@ -75,6 +75,7 @@
       "module": "commonjs",
       "declaration": false,
       "noImplicitAny": false,
+      "strict": true,
       "removeComments": true,
       "noLib": false,
       "outDir": "./build"

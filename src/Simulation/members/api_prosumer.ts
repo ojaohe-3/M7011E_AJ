@@ -22,8 +22,8 @@ interface format {
 }
 
 function getObjectsFromJson(data: format) {
-	const bs = [];
-	const ts = [];
+	const bs : Battery[] = [];
+	const ts : Turbine[] = [];
 	data.batteries.forEach((b) =>
 		bs.push(new Battery(b.capacity, b.maxOutput, b.maxCharge, b.current))
 	);
@@ -45,7 +45,7 @@ app.post("/", async (req, res) => {
 		if (data._id) {
 			await ProsumerHandler.Instance.put(
 				data._id,
-				new Procumer(obj.batteries, obj.turbines, data._id)
+				new Procumer(obj.batteries, obj.turbines, data._id.toString())
 			);
 		} else {
 			const id = Types.ObjectId().toHexString();
@@ -74,9 +74,10 @@ app.get("/:id", async (req, res) => {
 });
 
 app.put("/:id", async (req, res) => {
-	const prosumer = ProsumerHandler.Instance.getById(req.params.id);
 	try {
+		const prosumer = ProsumerHandler.Instance.getById(req.params.id)!;
 		const data: format = req.body;
+	
 		if (data) {
 			const obj = getObjectsFromJson(data);
 

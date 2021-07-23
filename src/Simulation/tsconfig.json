@@ -76,6 +76,7 @@
       "declaration": false,
       "noImplicitAny": false,
       "removeComments": true,
+      "strict": true,
       "noLib": false,
       "outDir": "./build",
       "skipLibCheck": true 

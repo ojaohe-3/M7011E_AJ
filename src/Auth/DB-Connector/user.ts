@@ -13,6 +13,7 @@ declare interface IUser extends Document{
     managers?: Array<IPrivilage>,
     prosumers?: Array<IPrivilage>,
     consumers?: Array<string>,
+    admin: boolean
     last_login?: Date,
 }
 export interface UserModel extends Model<IUser>{};
@@ -34,7 +35,8 @@ export class UserSchema{
             managers: { type : [privlage] , unique : false, required : false },
             prosumers: { type : [privlage] , unique : false, required : false },
             consumers: { type : String , unique : false, required : false },
-            last_login: Date,
+            admin: {type : Boolean, required: true, default: false},
+            last_login: {type: Date, default: Date.now()},
         });
         this._model = model<IUser>('User', userSchema)
     }

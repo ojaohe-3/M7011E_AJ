@@ -20,17 +20,17 @@ declare interface UserData {
     managers?: Array < Privilage >,
     prosumers?: Array < Privilage >,
     consumers?: Array < string >,
+    admin: boolean,
     last_login?: Date
 }
 
 
 
 const options = {
-	algorithm: 'HS384',
+	algorithm: 'HS512',
 	expiresIn: '4h'
 }
 
-new DB({User: new UserSchema().model});
 
 
 
@@ -78,12 +78,13 @@ app.post("/api/login/", async (req, res) => {
 			entry.last_login = new Date();
 			await DB.Models.User.findOneAndUpdate({username: data.username}, entry).exec();
 
-			const display = { //custom solution using hooks on the type is really janky and unreliable. i went with KISS
+			const display = {
                 username: entry.username,
                 main : entry.main,
                 managers: entry.managers,
                 prosumers: entry.prosumers,
                 consumers: entry.consumers,
+                admin: entry.admin,
                 last_login: entry.last_login
             }
 

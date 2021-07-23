@@ -7,7 +7,8 @@ const app = express.Router();
 
 interface format{
     ratio? : number,
-    status?: boolean
+    status?: boolean,
+    price?: number,
 }
 
 app.put('/:id', Authenticate('managers', 5), (req, res)=>{
@@ -15,8 +16,9 @@ app.put('/:id', Authenticate('managers', 5), (req, res)=>{
     const data : format = req.body;
     const manager = ManagerHandler.Instance.getById(id);
     if(manager){
-        manager.ratio = data.ratio;
-        manager.status = data.status;
+        manager.ratio = data.ratio ? data.ratio : manager.ratio;
+        manager.status = data.status ? data.status : manager.status;
+        manager.price = data.price ? data.price : manager.price;
         res.json({message: "success!", data: data})
     }else
         res.status(404).json({message: "member not found!"})

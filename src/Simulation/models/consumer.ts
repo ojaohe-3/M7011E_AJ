@@ -1,40 +1,49 @@
 import { Types } from "mongoose";
 import { DB } from "../DB-Connector/db-connector";
-import { IComponent } from './node';
+import { IComponent, DefaultNode } from './node';
 import { Weather } from '../weather';
 import { assert } from "console";
 
-export class Consumer implements IComponent{
+export class Consumer extends DefaultNode{
 
-    id: String;
     timefn: number[];
     consumption: (temp: number) => number;
-    demand : number;
     profile: number;
-    tick: () => void;
-    output: number;
 
-    constructor(id : String, timefn : number[], demand? : number, profile?: number){
+    constructor(id : string, timefn : number[], demand? : number, profile?: number){
+        super();
         this.id = id;
-        assert(this.timefn.length == 24)
+        assert(timefn.length == 24)
         this.timefn = timefn;
         this.output = 0;
+        this.asset = "consumer";
+        
         if(!profile)
-        {const r = Math.random();
+        {
+            // generate a normal distrobution value on size of household, with accomplacing constant that determine the rate of consumption, 
+            // Larger profile value means it consumes more... multiplicative with weather conditions. 
+            const r = Math.random();
             const rd = Math.random();
-            const size = r*4- r*2+ rd*2 + 4; //pseudo normal distro random
+            // size is the number of individuals in a house hold as a real number, it is 2.7% weighted,
+            const size = r*4- r*2+ rd*2 + 4; 
+            // lamba is the variability of the the consumer to consume, this is much more weighted but tends to be a lower value.
             const lamba =  r- r/2+ rd/2 + 1;
+            // the weights has been predetermined from offical consumption statistics, the lamba is a rough estimate of non consumption including non households
             this.profile = size*.027 + lamba*0.5;
         }else
             this.profile = profile;
 
         
         this.consumption = (temp) => {
-            return this.profile * (0.002*Math.pow(294.15-temp,2))+timefn[(new Date()).getHours()];
+            // The tempreture x in celsius, profile p, profile at time stamp tf:
+            // p * ((21 - x)^2 + tf) + 1
+            // tempreture in our case is in kelvin this 294.15 is 21 celsius
+            return this.profile * (0.002*Math.pow(294.15-temp,2))+timefn[(new Date()).getHours()] + 1;
         }
         this.demand = demand ? demand : 0;
         this.tick = () => {
-            this.demand = this.consumption(Weather.getInstance().temp);
+            this.demand = this.consumption(Weather.Instance.temp);
+
         };
 
     }
@@ -49,7 +58,7 @@ export class Consumer implements IComponent{
                 profile: this.profile,
                 name: process.env.NAME
             }
-            await DB.Models.Consumer.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+            await DB.Models.Consumer!.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
         
         
         } catch (error) {

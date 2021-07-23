@@ -1,61 +1,41 @@
 import express = require("express");
-import { Simulator } from "../handlers/simulation";
 import { Consumer } from "../models/consumer";
-import { Types } from "mongoose";
-import { Weather } from "../weather";
+import ConsumerHandler from "../handlers/ConsumerHandler";
+import Authenticate from "../authentication/authenticator";
 const app = express.Router();
+const handler = ConsumerHandler.instance;
 
-app.get("/", (req, res) => {
-	const sim = Simulator.singelton;
-	sim.consumers.forEach((e) => (e.demand = e.consumption(sim.weather.temp)));
-	const data = Array.from(sim.consumers.values());
-	res.json(data);
+interface userFormat{
+	id : string, 
+	timefn : number[], 
+	demand? : number, 
+	profile?: number
+}
+
+app.get("/", (_, res) => {
+	res.json(handler.getConsumers());
 });
 
 app.get("/:id", (req, res) => {
-	const sim = Simulator.singelton;
-
-	const data = sim.consumers.get(req.params.id);
-	if (data) res.json(data);
-	else
+	try {
+		const id = req.params.id;
+		res.json(handler.getConsumer(id));
+	} catch (error) {
 		res.status(404).json({
-			message: `no such consumer with id ${req.params.id}`,
-		});
+			message: "could not find member",
+			error: error,
+			status: 404
+		})
+	}
 });
 
-app.post("/",(req, res) => {
-	const format = [ "timefn"]; //enforced members
-	const sim = Simulator.singelton;
-
-	const data = req.body;
-	//look if all enforced key exists
-	data.body.forEach(async (item) => {
-		if (
-			Object.keys(item).filter((k) => format.some((e) => k === e))
-				.length === format.length
-		) {
-			if (item.timefn.length !== 24) {
-				res.status(400).json({
-					message: "Invalid format for timefn",
-					required: "24 length array of numbers",
-				});
-				
-			} else {
-				
-				const id = item.id ? item.id : Types.ObjectId().toHexString();
-				const consumer = new Consumer(id, item.timefn);
-				consumer.demand = consumer.consumption(Weather.getInstance().temp);
-				sim.consumers.set(id, consumer);
-				await consumer.document();
-			}
-		} else
-			res.status(400).json({
-				message: "Invalid format",
-				required: format,
-			});
-	});
-
-	res.json({ message: "memebers added!", data: data });
+app.post("/", Authenticate("admin"),(req, res) => {
+	try {
+		const data = req.body as userFormat;
+		handler.addConsumer(new Consumer(data.id, data.timefn, data.demand, data.profile));
+	} catch (error) {
+		
+	}
 });
  
-module.exports = app;
+export default app;
