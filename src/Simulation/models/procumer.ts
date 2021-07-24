@@ -8,6 +8,7 @@ import { DB } from "../DB-Connector/db-connector";
 import { IComponent } from './node';
 import { Consumer } from "./consumer";
 export class Procumer extends Consumer implements IComponent{    
+    //TODO add price to this and connected models, Generate Templates for all classes to simplify the api
     totalProduction: number;
     totalCapacity: number;
     status: boolean;
@@ -22,7 +23,7 @@ export class Procumer extends Consumer implements IComponent{
     
     constructor(batteries: Array<Battery>, turbines: Array<Turbine>, id? : string){
         super(id ? id : Types.ObjectId().toHexString(), Consumer.generateTimeFn());
-        this.asset = "windmill";
+        this.asset = "windturbine";
         this.batteries = batteries;
         this.turbines = turbines;
         this.totalProduction = 0;
@@ -37,11 +38,12 @@ export class Procumer extends Consumer implements IComponent{
             return sum;
         };
 
+        
         this.input_ratio = 0.5;
         this.output_ratio = 1;
         this.status = true;
         
-        this.tick =  (time?: number)=> {
+        this.tick =  (time?: number)=> { //TODO look over and fix
             this.totalProduction = 0;
             if(this.status && time! > this.timeout){
                 this.turbines.forEach((turbine) => this.totalProduction += turbine.profile(Weather.Instance.speed));
@@ -49,11 +51,11 @@ export class Procumer extends Consumer implements IComponent{
                     this.totalProduction -= b.Input(this.totalProduction*(this.input_ratio/this.batteries.length)); //distribute input equally among all batteries
                     this.totalProduction += b.Output(this.output_ratio);
                 });
-                this.totalProduction;
+                this.output = this.totalProduction;
             }else if(time! > this.timeout){ 
                 this.status = true;
             }
-            const capacity = this.currentCapacity();           
+            this.totalCapacity = this.currentCapacity();  //what to do   
         };
     }
     dissable(){

@@ -2,8 +2,6 @@ import { Schema,  model, Document, Model, Number, Types} from 'mongoose';
 
 export interface IComponent extends Document
 {
-    // tick: (time?: number) => void;
-    // supply : () => number;
     type: string;
     output: number;    
     demand: number;
@@ -16,7 +14,7 @@ export interface INode extends Document{
     x: number;
     y: number;
     child: IComponent;
-    // tick : (time?: number) => void;
+    gid: string
 }
 
 
@@ -37,7 +35,8 @@ export class NodeSchema {
         const NodeSchema = new Schema({
             x: {type: Number, required : true},
             y: {type: Number, required : true},
-            child: child
+            child: child,
+            gid: {type: Types.ObjectId, required: true}
         });
         this._model = model<INode>('Node', NodeSchema)
     }

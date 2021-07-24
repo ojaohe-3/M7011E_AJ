@@ -1,8 +1,9 @@
 import { Types } from "mongoose";
 import { DB } from "../DB-Connector/db-connector";
-import { IComponent, DefaultNode } from './node';
+import { IComponent } from './node';
 import { Weather } from '../weather';
 import { assert } from "console";
+import DefaultNode from "./defaultnode";
 
 export class Consumer extends DefaultNode{
 

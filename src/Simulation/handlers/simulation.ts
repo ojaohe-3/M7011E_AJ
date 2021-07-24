@@ -1,4 +1,5 @@
-import Node, { DefaultNode, INode } from '../models/node';
+import Grid from '../models/grid';
+import Node, { INode } from '../models/node';
 import { IComponent } from '../models/node';
 
 export class Simulator {
@@ -16,7 +17,9 @@ export class Simulator {
     }
 
     public process() : void{
-        
+        this._grid.tick();
+        this._grid.balance();
+
     }
 
 
@@ -35,44 +38,3 @@ export class Simulator {
     }
 }
 
-export class Grid {
-    private _nodes: Node[][]
-    width: number
-    height: number
-
-    constructor(width?: number, height?: number) {
-        this._nodes = [[]];
-        this.width = width ? width : 64;
-        this.height = height ? height : 64;
-        for (let y = 0; y < this.height; y++) {
-            for (let x = 0; x < this.width; x++) {
-                this._nodes[y][x] = new Node(x,y, new DefaultNode());
-            }
-        }
-    }
-
-    public getAt(x: number, y: number): Node | undefined {
-        try {
-            return this._nodes[y][x];
-        } catch (error) {
-            console.log('')
-        }
-    }
-
-    public setAt(x: number, y: number, value: Node): void {
-        this._nodes[y][x] = value;
-    }
-
-    public balance() {
-        // The rules: 
-        // * a node takes only from the cheapest source if it is available
-        // * a manager on a node can only set the price, production of prosumers sells only as the closest manager
-        // * all Nodes must have equal supply as its demand, supply is its output.
-    
-
-    }
-
-    public get nodes(){
-        return this._nodes;
-    }
-}

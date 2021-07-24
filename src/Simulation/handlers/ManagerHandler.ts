@@ -46,16 +46,6 @@ export default class ManagerHandler{
     }
 
 
-    public get Cheapest() : Manager{
-        const items  = Array.from(this.managers.values()) as  Manager[];
-        let cheapest = items.pop();
-        assert(cheapest);
-        items.forEach((m : Manager) => {
-            if(m.price - cheapest!.price < 0)
-                cheapest = m;
-        });
-        return cheapest;
-    }
 
     /**
      * returns all managers as an array

@@ -1,6 +1,6 @@
-import { Simulator } from '../handlers/simulation';
+import { Simulator } from '../handlers/Simulation';
 import express = require("express");
-import { IComponent, DefaultNode } from '../models/node';
+import { IComponent } from '../models/node';
 import Authenticate from '../authentication/authenticator';
 import { assert } from 'console';
 

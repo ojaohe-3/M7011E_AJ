@@ -1,7 +1,8 @@
 import Axios from 'axios';
 import { Types } from 'mongoose';
 import { DB } from '../DB-Connector/db-connector';
-import { IComponent, DefaultNode } from './node';
+import DefaultNode from './defaultnode';
+import { IComponent } from './node';
 export default class Manager extends DefaultNode{
     
     current: number;
@@ -35,10 +36,12 @@ export default class Manager extends DefaultNode{
             }
 
             this.output = this.current;
-
         }
 
     }
+
+    
+
     async document() {
         const body = {
             current: this.current,

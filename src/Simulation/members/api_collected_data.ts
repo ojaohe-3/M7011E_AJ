@@ -1,5 +1,5 @@
 import express = require("express");
-import { Simulator } from "../handlers/simulation";
+import { Simulator } from "../handlers/Simulation";
 
 const app = express.Router();
 
