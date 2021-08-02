@@ -11,11 +11,11 @@ const app = express.Router();
 app.get("/", (req, res)=>{
     const sim = Simulator.instance;
     try {
+
     } catch (error) {
         console.log(error);
         res.status(400).json({message:"could not evaluate simulation data, maybe services is missing?", err: error});
     }
 });
 
-
-module.exports = app;
+export default app;

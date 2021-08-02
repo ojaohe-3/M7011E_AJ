@@ -19,6 +19,7 @@ export interface IProcumer extends Document{
     turbines: ITurbine[],
     name: String,
     status: Boolean,
+    price: number
 }
 
 
@@ -45,7 +46,9 @@ export class ProsumerSchema {
             batteries: [battery],
             turbines: [turbin],
             name: String,
-            status: Boolean
+            status: Boolean,
+            price: Number
+
 
         });
         this._model = model<IProcumer>('Prosumer', ProcumerSchema)

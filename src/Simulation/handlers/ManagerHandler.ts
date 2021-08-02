@@ -22,20 +22,8 @@ export default class ManagerHandler{
      * @param id 
      * @param item 
      */
-    public async put(id: String, item: Manager) {
+    public put(id: String, item: Manager) {
         this.managers.set(id, item);
-        await item.tick();
-        await Axios.post(process.env.SIM +'/api/members/managers',{
-            
-                body: [
-                    {
-                        id: id,
-                        maxProduciton: item.maxProduciton,
-                        current: item.current,
-                        status: item.status
-                    }
-                ]
-        });
     }
 
     /** 
@@ -56,7 +44,6 @@ export default class ManagerHandler{
     private async fetchAll(){
         try {
             const entry = await DB.Models.Manager!.find({name: process.env.NAME}).exec();
-            const publisher = [];
             entry.forEach(m => 
                 { 
                     const man = new Manager(m.id, m.maxProduciton);

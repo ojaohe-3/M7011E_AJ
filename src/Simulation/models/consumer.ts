@@ -42,7 +42,7 @@ export class Consumer extends DefaultNode{
             return this.profile * (0.002*Math.pow(294.15-temp,2))+timefn[(new Date()).getHours()] + 1;
         }
         this.demand = demand ? demand : 0;
-        this.tick = () => {
+        this.tick = (time: number) => {
             this.demand = this.consumption(Weather.Instance.temp);
 
         };

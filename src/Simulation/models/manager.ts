@@ -1,9 +1,9 @@
-import Axios from 'axios';
-import { Types } from 'mongoose';
+
 import { DB } from '../DB-Connector/db-connector';
 import DefaultNode from './defaultnode';
-import { IComponent } from './node';
-export default class Manager extends DefaultNode{
+import { IComponent, IProducer } from './node';
+import DataMonitor from '../handlers/DataMonitor';
+export default class Manager extends DefaultNode implements IProducer, IComponent{
     
     current: number;
     maxProduciton: number;
@@ -23,7 +23,7 @@ export default class Manager extends DefaultNode{
         this.asset = "powerplant";
 
 
-        this.tick = () => {
+        this.tick = (time: number) => {
             if(this.status){
                 this.current = this.current <= 0 ? 1 : this.current;
                 if(this.maxProduciton*this.ratio > this.current)
@@ -36,6 +36,11 @@ export default class Manager extends DefaultNode{
             }
 
             this.output = this.current;
+
+            if(this.timeToMonitor < time){
+                this.timeToMonitor = time + 10000;
+                DataMonitor.instance.status(this as IComponent);
+            }
         }
 
     }

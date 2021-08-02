@@ -3,11 +3,17 @@ export interface Location{
     lat : number;
     lon : number;
 }
+
+export interface IWeather{
+    temp: number;
+    speed: number;
+    position: Location;
+}
 export class Weather{
     
     temp: number;
     speed: number;
-    pos: Location;
+    position: Location;
     
     private static singleton: Weather;
     update: () => Promise<void>;
@@ -15,10 +21,10 @@ export class Weather{
     constructor(pos: Location){
         this.temp = 0;
         this.speed = 0;
-        this.pos = pos;
+        this.position = pos;
         this.update = async() => {
             try{
-                const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${this.pos.lat}&lon=${this.pos.lon}`);
+                const req = await axios.get(process.env.WEATHER_MODULE+`?lat=${this.position.lat}&lon=${this.position.lon}`);
                 const data = req.data;
                 this.temp = data.temp;
                 this.speed = data.speed
@@ -35,5 +41,11 @@ export class Weather{
         return Weather.singleton;
     }
     
-  
+    public toJson () {
+        return {
+            temp: this.temp,
+            speed: this.speed,
+            position: this.position
+        }
+    }
 }

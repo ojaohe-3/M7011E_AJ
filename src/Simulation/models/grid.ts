@@ -1,11 +1,12 @@
 import { Types } from "mongoose";
-import Node from "./node";
+import Node, { IProducer } from "./node";
 import { DB } from '../DB-Connector/db-connector';
 import ConsumerHandler from '../handlers/ConsumerHandler';
 import ProsumerHandler from '../handlers/ProsumerHandler';
 import ManagerHandler from '../handlers/ManagerHandler';
 import Manager from "./manager";
 import DefaultNode from "./defaultnode";
+import { IComponent } from './node';
 
 export default class Grid {
     private _nodes: Node[][]
@@ -15,7 +16,7 @@ export default class Grid {
 
     constructor(width?: number, height?: number, id?: string) {
         this.id = id ? id: Types.ObjectId().toHexString();
-        this._nodes = [[]];
+        this._nodes = [];
         this.width = width ? width : 64;
         this.height = height ? height : 64;
         for (let y = 0; y < this.height; y++) {
@@ -29,7 +30,8 @@ export default class Grid {
         try {
             return this._nodes[y][x];
         } catch (error) {
-            console.log('')
+            console.log(error)
+            return undefined;
         }
     }
 
@@ -45,23 +47,24 @@ export default class Grid {
         // TODO fix simulation so that it can extract pricing information on how much a consumer, prosumer is costing, aswell as data for manager on how much money they are earning
         // TODO add datamonitors
 
-        const consumers = ConsumerHandler.instance.getConsumers() as DefaultNode[];
+        const consumers = ConsumerHandler.instance.getConsumers() as IComponent[];
         const prosumers = Array.from(ProsumerHandler.Instance.getAll().values());
-        consumers.concat(prosumers as DefaultNode[]);
+        consumers.concat(prosumers as IComponent[]);
 
         const managers = ManagerHandler.Instance.getAll();
-        // const producers = (prosumers as DefaultNode[]).concat(managers as DefaultNode[]); //TODO fix prosumers becomes competitive aswell, fix after pricing for prosumer is added, also make strukure for producers
+        const producers = (prosumers as IProducer[]).concat(managers as IProducer[]); //TODO fix prosumers becomes competitive aswell, fix after pricing for prosumer is added, also make strukure for producers
 
-        managers.sort((fst: Manager, snd : Manager) => fst.price - snd.price);
+        producers.sort((fst: IProducer, snd : IProducer) => fst.price - snd.price);
 
-
+        //TODO Datamonitor
+        //knapsack to opt
         //rough algorithm to improve, complexity O(P * D), P nr of producers (which is asymtopically small), D nr of demanders (Large number)
         let demander = consumers.pop();
-        let provider = managers.pop();
+        let provider = producers.pop();
         //inb4 hell of fixing
         //no more demand? done, no more supply? done
         while(demander && provider){
-            let supply = provider!.supply();
+            let supply = provider!.output - provider!.demand;
             //demander has demand, provider exist and there is supply
             while(demander && provider && supply > 0){
                 let take = supply - demander.demand;
@@ -72,11 +75,12 @@ export default class Grid {
 
                 }else{
                     demander.demand = 0;
+                    supply -= demander.demand;
                     demander = consumers.pop();
                 }   
                 provider.output -= take;
             }
-            provider = managers.pop();
+            provider = producers.pop();
             
         }
 

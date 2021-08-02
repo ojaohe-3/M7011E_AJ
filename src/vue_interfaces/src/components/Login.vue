@@ -7,6 +7,7 @@
     <button id="Login" v-on:click="login()">Login</button>
     <div class="yellowLine"></div>
     <div class="blueLine"></div>
+    <input type="file" accept="image/*" @change="handleUpload($event)" id="image-input">
   </div>
 </template>
 
@@ -21,8 +22,27 @@ export default {
         }
   },
   methods: {
-    
       login () {
+      },
+      handleUpload(event) {
+        const uri = ''
+        let data = new FormData()
+        data.append('name', 'profilePic')
+        data.append('file', event.target.files[0])
+
+        let config = {
+          header: {
+            'Content-Type':' image/png'
+          }
+        }
+
+        axios.put(
+          uri,
+          data,
+          config
+        ).then(res => {
+          console.log(res)
+        })
       }
   },
 }

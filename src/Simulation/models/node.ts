@@ -1,13 +1,17 @@
 import DefaultNode from "./defaultnode";
 
 export interface IComponent{
-    tick: (time?: number) => void;
+    tick: (time: number) => void;
     output: number;    
     demand: number;
     asset: string;
     id: string;
 
 }   
+
+export interface IProducer extends IComponent{
+    price: number;
+}
 
 export interface INode{
     x: number;

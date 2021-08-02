@@ -1,4 +1,7 @@
-export default class Turbine{
+export interface ITurbine{
+    maxPower: number;
+}
+export default class Turbine implements ITurbine{
     maxPower: number; 
     profile: (speed: number) => number; //speed in kph, outputs current power, does not take into consideration time to spin with change of wind speed
 

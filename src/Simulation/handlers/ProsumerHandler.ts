@@ -24,12 +24,11 @@ export default class ProsumerHandler {
 
     }
     /**
-     * puts a new item into the prosumer registry.
-     * @param id id
+     * set a new item into the prosumer registry.
      * @param item new item to update/create
      */
-    public put(id: String, item: Procumer) {
-        this.procumers.set(id, item);
+    public set(item: Procumer) {
+        this.procumers.set(item.id, item);
     }
 
     public getAll(): Map<String, Procumer> {
@@ -53,7 +52,7 @@ export default class ProsumerHandler {
 
             const prosumer = new Procumer(bc, tc, entry.id);
             prosumer.status = true;
-            this.put(entry.id, prosumer);
+            this.set(prosumer);
         });
 
         // console.log(data);

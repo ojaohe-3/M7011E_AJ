@@ -1,4 +1,10 @@
-export default class Battery{
+export interface IBattery{
+    capacity: number; // in kwh
+    current?: number; // current power in batteries 
+    maxOutput: number; // maximum output in kwh
+    maxCharge: number; // maximum accepted input to chage in kwh
+}
+export default class Battery implements IBattery{
     capacity: number; // in kwh
     current: number; // current power in batteries 
     maxOutput: number; // maximum output in kwh

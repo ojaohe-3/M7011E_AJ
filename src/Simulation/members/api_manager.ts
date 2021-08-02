@@ -16,10 +16,10 @@ app.get('/',(req, res)=>{
 });
 
 
-app.get('/:id/prosumers', async (req,res)=>{ //todo, this will be tied to the jwt, this is very temporary
-    // TODO
-    // res.json(data);
-});
+// app.get('/:id/prosumers', async (req,res)=>{ //todo, this will be tied to the jwt, this is very temporary
+//     // TODO
+//     // res.json(data);
+// });
 
 
 app.get('/:id',async (req, res)=>{
@@ -49,4 +49,4 @@ app.post('/', Authenticate("admin"), async (req, res)=>{
     
 });
 
-module.exports = app;
+export default app;
