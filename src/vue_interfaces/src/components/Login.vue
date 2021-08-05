@@ -19,31 +19,13 @@ export default {
   data() {
         return {
           loggedIn : false,
+          userData : {},
+          token : ''
         }
   },
   methods: {
       login () {
       },
-      handleUpload(event) {
-        const uri = ''
-        let data = new FormData()
-        data.append('name', 'profilePic')
-        data.append('file', event.target.files[0])
-
-        let config = {
-          header: {
-            'Content-Type':' image/png'
-          }
-        }
-
-        axios.put(
-          uri,
-          data,
-          config
-        ).then(res => {
-          console.log(res)
-        })
-      }
   },
 }
 </script>

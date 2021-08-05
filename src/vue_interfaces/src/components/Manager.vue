@@ -5,22 +5,19 @@
         <td v-bind="elecPrice">
           <h3>Price of Electricity</h3>
           <h4>{{ elecPrice }} kr/kw</h4>
-          <VueApexCharts width="400" type="line" :options="options" :series="priceSeries"/>
           <!-- <input type="text" v-model="elecPrice" placeholder="1.5"> -->
           <!--<button style="display: inline;">Submit</button>-->
         </td>
         <td v-bind="production">
           <h3>My Production</h3>
           <h4>{{ production }} kw/h</h4>
-          <VueApexCharts width="400" type="line" :options="options" :series="productionSeries"/>
-
+        
           <!-- <input type="number" min="0" v-model="production"  v-on:input="productionStep" placeholder="3500"> -->
           <!--<button style="display: inline;">Submit</button>-->
         </td>
         <td v-bind="elecDemand">
           <h3>Electricity Demand</h3>
           <h4>{{ elecDemand }} kw/h</h4>
-          <VueApexCharts width="400" type="line" :options="options" :series="demandSeries"/>
           
         </td>
       </tr>
@@ -42,14 +39,12 @@
         <td v-bind="income">
           <h3>Income</h3>
           <h4>{{ income }} kr/h</h4>
-          <VueApexCharts width="400" type="line" :options="options" :series="incomeSeries"/>
-
+        
         </td>
         <td v-bind="totalAvailable">
           <h3>Total Electicity Available</h3>
           <h4>{{ totalAvailable.toFixed(2) }} kw/h</h4>
-          <VueApexCharts width="400" type="line" :options="options" :series="totalSeries"/>
-
+        
         </td>
       </tr>
       <tr>
@@ -140,54 +135,16 @@
 
 <script>
 import axios from "axios";
-import VueApexCharts from "vue-apexcharts";
 
 export default {
   name: "Manager",
   props: ["id"],
   components: {
-    VueApexCharts
     },
   data() {
     return {
       elecPrice: 0,
-      options: {
-          chart: {
-            id: 'timeSeries'
-          },
-          xaxis: {
-            //   labels: {
-            //       show:false
-            //   },
-
-              catagories: []
-          }
-      },
-      priceSeries: [{
-           name: 'price-1',
-        data: []
-      }],
-      production: 0,
-      productionSeries: [{
-           name: 'production-1',
-        data: []
-      }],
-      elecDemand: 0,
-      demandSeries: [{
-           name: 'demand-1',
-        data: []
-      }],
-      ratio: 100,
-      income: 0,
-      incomeSeries: [{
-           name: 'income-1',
-        data: []
-      }],
       totalAvailable: 0,
-      totalSeries:[ {
-           name: 'totalAvailable-1',
-        data: []
-      }],
       maxProduction: 0,
       consumption: 0,
       status: true,
@@ -211,31 +168,7 @@ export default {
 
   
   methods: {
-    updateCharts() {
-        this.priceSeries[0].data.push(this.elecPrice)
-        if(this.priceSeries[0].length > 50)
-            this.priceSeries[0].data.shift();
-
-        this.productionSeries[0].data.push(this.production)
-         if(this.productionSeries[0].length > 50)
-            this.productionSeries[0].data.shift();
-
-        
-        this.incomeSeries[0].data.push(this.income)
-         if(this.incomeSeries[0].length > 50)
-            this.incomeSeries[0].data.shift()
-            
-        
-        this.totalSeries[0].data.push(this.totalAvailable)
-         if(this.totalSeries[0].length > 50)
-            this.totalSeries[0].data.shift();
-
-        this.demandSeries[0].data.push(this.elecDemand)
-         if(this.demandSeries[0].length > 50)
-            this.demandSeries[0].data.shift();
-
-
-    },
+   
     async productionStep() {
       console.log(this.ratio);
       await axios.put(
@@ -248,10 +181,6 @@ export default {
       let market = null;
       let manager = null;
 
-      await axios
-        .get(process.env.VUE_APP_MARKET_ENDPOINT + "/price")
-        .then((res) => (market = res.data))
-        .catch((err) => console.log(err));
       await axios
         .get(process.env.VUE_APP_MANAGER_ENDPOINT + "/members/" + this.id)
         .then((res) => (manager = res.data))

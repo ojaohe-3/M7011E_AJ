@@ -1,8 +1,8 @@
 <template>
   <div id="dashboard">
-    <Prosumer :id="id" v-if="userType === 'prosumer'"/>
-    <Manager v-bind:id="this.id" v-if="userType === 'manager'"/>
-    <Consumer v-bind:id="this.id" v-if="userType === 'consumer'"/>
+    <Prosumer :userData="userData" v-if="userType === 'prosumer'"/>
+    <Manager :userData="userData" v-if="userType === 'manager'"/>
+    <!-- <Consumer v-bind:id="this.id" v-if="userType === 'consumer'"/> -->
   </div>
 </template>
 
@@ -12,16 +12,16 @@
 <script>
 import Manager from './Manager.vue'
 import Prosumer from './Prosumer.vue'
-import Consumer from './Consumer.vue'
+// import Consumer from './Consumer.vue'
 // import axios from 'axios'
 
 export default {
   name: 'Dashboard',
-  props: ['id', 'userType'],
+  props: ['id', 'userType', 'userData'],
   components: {
     Manager,
     Prosumer,
-    Consumer
+    // Consumer
     
   },data () {
     return {
