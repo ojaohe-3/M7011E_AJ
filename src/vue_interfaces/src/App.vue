@@ -1,26 +1,7 @@
 <template>
   <div id="app">
-    <Header  v-bind:loggedIn="false" v-on:logout="auth.logout()"/>
-    <!-- <Login/> -->
-    <h3>Temporary untill callback is fixed!</h3>
-    <table class="largeScreen">
-      <tr>
-         <td>
-           <div class="block">
-           <h3>Prosumer</h3>
-           <button v-on:click ="setProsumer">+</button>
-           </div>
-         </td>
-          <td>
-           <div class="block">
-           <h3>Manager</h3>
-           <button v-on:click ="setManager">+</button>
-           </div>
-         </td>
-      </tr>
-      
-    </table>
-    <Login/>
+    <Header  v-bind:loggedIn="false" v-on:logout="logout()"/>
+    <Login @login="login"/>
     <Dashboard v-if="showDashboard" :id="id" :userType="userType"/>
   </div>
 </template>
@@ -46,16 +27,19 @@ export default {
     }
   },
   methods: {
-    setProsumer(){
-      this.id = "5fda7a29b6921cba5370a03a"
-      this.userType = 'prosumer'
-      this.showDashboard = true
-    },
-    setManager(){
-      this.id = "5fe61e5dc085f56a7fc10199"
-      this.userType = 'manager'
-      this.showDashboard = true
+    logout(){
+      this.showDashboard = false;
+      //TODO set state to default.
+  },
+  login(user){
+    console.log(user);
+    if(user.main){
+      this.id = user.main;
     }
+      this.userType = user.type;
+      this.showDashboard = true; 
+      
+}
   }
   
 }

@@ -6,7 +6,7 @@ export interface Privilage {
 }
 export default interface UserData {
     username: string,
-    main: string,
+    main?: string,
     managers?: Array < Privilage >,
     prosumers?: Array < Privilage >,
     consumers?: Array < string >,

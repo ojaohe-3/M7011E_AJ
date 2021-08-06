@@ -1,4 +1,6 @@
-import express = require("express");
+import { assert } from "console";
+import cors from "cors";
+import express, { Application, NextFunction, Request, Response } from "express";
 import {DB} from "./DB-Connector/db-connector";
 import {UserSchema} from "./DB-Connector/user";
 require('dotenv').config();
@@ -16,10 +18,10 @@ declare interface Privilage {
 declare interface UserData {
     username: String,
     password: String,
-    main: String,
+    type:string,
+    main?: String,
     managers?: Array < Privilage >,
     prosumers?: Array < Privilage >,
-    consumers?: Array < string >,
     admin: boolean,
     last_login?: Date
 }
@@ -48,10 +50,43 @@ let logger = (req, res, next) => {
     } request`);
     next();
 };
+
+
+
 const app = express();
 app.use(logger);
 app.use(express.json());
+const cors_options: cors.CorsOptions = {
+    allowedHeaders: [
+      'Origin',
+      'X-Requested-With', 
+      'Content-Type',
+      'Accept',
+      'X-Access-Token',
+    ],
+    methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+    origin: process.env.API_URL || 'localhost',
+    preflightContinue: false,
+  }
+  
+  app.use(cors(cors_options));
+  
+  
+  app.use(express.urlencoded({
+    extended: false
+  }))
+  
+  
 
+  
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE")
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+    res.set('Content-Type', 'application/json')
+    next()
+  })
+  
 
 app.get("/api/validate",  async (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
@@ -68,45 +103,62 @@ app.get("/api/validate",  async (req, res) => {
 
 
 app.post("/api/login/", async (req, res) => {
-    const data = req.body;
-    const entry: UserData = await DB.Models.User.findOne({username: data.username});
-
-    if (entry) {
-		if(saltedSha256(data.password, data.username) === entry.password)
-		{
-
-			entry.last_login = new Date();
-			await DB.Models.User.findOneAndUpdate({username: data.username}, entry).exec();
-
-			const display = {
-                username: entry.username,
-                main : entry.main,
-                managers: entry.managers,
-                prosumers: entry.prosumers,
-                consumers: entry.consumers,
-                admin: entry.admin,
-                last_login: entry.last_login
+    try {
+        
+        const data = req.body;
+        // console.log(data);
+        const entry: UserData = await DB.Models.User.findOne({username: data.username});
+        // console.log(entry);
+        if (entry) {
+            if(saltedSha256(data.password, data.username) === entry.password)
+            {
+    
+                entry.last_login = new Date();
+                await DB.Models.User.findOneAndUpdate({username: data.username}, entry).exec();
+    
+                const display = {
+                    username: entry.username,
+                    main : entry.main,
+                    managers: entry.managers,
+                    prosumers: entry.prosumers,
+                    admin: entry.admin,
+                    last_login: entry.last_login
+                }
+    
+                const token = jwt.sign({data: display},  process.env.JWT_SECRET, options);
+                res.json({message: 'success!', jwt: token, user: display});
+            } else {
+                res.json({message: "invalid login credentials", reason: 'invalid password or username', status : 0});
             }
-
-            console.log(display)
-        	const token = jwt.sign({data: display},  process.env.JWT_SECRET, options);
-			res.json({message: 'success!', jwt: token, status: 1});
-		} else {
-			res.json({message: "invalid login credentials", reason: 'invalid password or username', status : 0});
-		}
-	} else {
-	res.status(404).send("no such user with id " + data.id);
+        } else {
+        res.status(404).send("no such user with id " + data.id);
+        }
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({message: 'error', error: error, status: 500});
     }
 });
 
 
 app.post("/api/register/", async (req, res) => {
     try {
-		const data: UserData = req.body;
-        data.password = saltedSha256(data.password, data.username, false) //it might be a mistake to salt the password based on the username, but the options are very limited when this is deployed behind a loadbalancer. secret key could be fixed for the sake of brevity
+		const data: Partial<UserData> = req.body;
+        data.password = saltedSha256(data.password!, data.username!, false) //it might be a mistake to salt the password based on the username, but the options are very limited when this is deployed behind a loadbalancer. secret key could be fixed for the sake of brevity
+        if(data.admin){
+            throw new Error("Admin Privilage are not allowed to be set");
+        }
+        if(!data.main){
+            data.type = "empty";
+        }
+        else{
+            data.type!;
+        }
+
         data.last_login = new Date();
+        data.admin = false;
+        console.log(data);
         await DB.Models.User.create(data);
-        res.json({message: 'User created successfully!', jwt: 'token'});
+        res.json({message: 'User created successfully!', jwt: 'token', user: data});
     } catch (error) {
         console.log(error);
         res.json({message: 'Failed to create user', reason: error});
@@ -118,5 +170,5 @@ app.listen(PORT, () => {
     console.log(`lisening on ${PORT}`);
 });
 
-
-function sign_jwt(user: UserData) {}
+DB.Instance;
+function sign_jwt(user: UserData) {}//TODO figure out what the fuck i was smoking here

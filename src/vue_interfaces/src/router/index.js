@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './../App.vue'
+import Empty from './../components/Empty.vue'
 // import Login from './../components/Login.vue'
 import Dashboard from '@/components/Dashboard.vue';
 
@@ -29,6 +30,13 @@ const router = new VueRouter({
             path: '/',
             name: 'Home',
             component: App,
+          },      {
+            path: '/empty',
+            name: 'Empty',
+            component: Empty,
+            meta : {
+                requiresAuth: true
+            }
           },
     ]
 })

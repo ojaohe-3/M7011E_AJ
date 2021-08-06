@@ -7,24 +7,41 @@
     <button id="Login" v-on:click="login()">Login</button>
     <div class="yellowLine"></div>
     <div class="blueLine"></div>
-    <input type="file" accept="image/*" @change="handleUpload($event)" id="image-input">
+    <!-- <input type="file" accept="image/*" @change="handleUpload($event)" id="image-input"> -->
   </div>
 </template>
 
 
 
 <script>
+import axios from "axios";
+
+
 export default {
   name: 'login',
   data() {
         return {
+          username: '',
+          password: '',
           loggedIn : false,
-          userData : {},
-          token : ''
+
         }
   },
   methods: {
       login () {
+        axios.post(process.env.VUE_APP_LOGIN, {username: this.username, password: this.password})
+          .then((res) => { 
+            if(res.status == 200) {
+              this.loggedIn = true;
+              this.$store.commit('LOGIN_TOKEN', res);
+              this.$emit('login', true);
+            }else if (res.status == 404 || res.status == 500){
+              console.log('login failed!')
+              //TODO flash error message in container
+            }
+
+          })
+          .catch((err) => console.log(err))
       },
   },
 }

@@ -1,9 +1,7 @@
 import assert = require("assert");
 import axios from "axios";
-import UserData, { Privilage } from "./userdata";
+import UserData from "./userdata";
 
-// TODO
-// add a profile setting that allows admin control.
 export default function Authenticate(key: string, lvl?: number) {
     return async function (req, res, next) { // todo TLS protocols
         const id = req.params.id as string | undefined;

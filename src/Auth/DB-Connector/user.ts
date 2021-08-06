@@ -9,10 +9,10 @@ declare interface IPrivilage{
 declare interface IUser extends Document{
     username: String,
     password: String,
-    main: String
+    type:string,
+    main?: String
     managers?: Array<IPrivilage>,
     prosumers?: Array<IPrivilage>,
-    consumers?: Array<string>,
     admin: boolean
     last_login?: Date,
 }
@@ -31,10 +31,10 @@ export class UserSchema{
         const userSchema = new Schema({
             username: { type : String , unique : true, required : true },
             password: { type : String , unique : false, required : true },
-            main: { type : String , unique : false, required : true },
+            main: { type : String , unique : false, required : false },
+            type: { type : String , unique : false, required : true },
             managers: { type : [privlage] , unique : false, required : false },
             prosumers: { type : [privlage] , unique : false, required : false },
-            consumers: { type : String , unique : false, required : false },
             admin: {type : Boolean, required: true, default: false},
             last_login: {type: Date, default: Date.now()},
         });

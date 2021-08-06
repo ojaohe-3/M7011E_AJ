@@ -2,6 +2,8 @@
 
 import { connect, connection, Connection } from 'mongoose';
 import { UserModel, UserSchema } from './user';
+require('dotenv').config();
+
 export declare interface IModels {
   User?: UserModel
 }
@@ -21,7 +23,9 @@ export class DB{
       this._models = {
         User: new UserSchema().model
       }
+
     connect(process.env.DB_CONNECT,{useNewUrlParser: true});
+
     this._db = connection;
     this._db.on('open', this.connected);
     this._db.on('error', this.error);

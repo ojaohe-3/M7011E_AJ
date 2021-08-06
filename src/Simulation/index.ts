@@ -37,7 +37,7 @@ app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);
 app.use('/api/members/managers', manager);
 app.use('/api/data', simdata);
-app.use('/api/nodes', simdata);
+app.use('/api/nodes', nodes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, function () {
