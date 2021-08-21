@@ -6,6 +6,7 @@ import { IBattery as IBatteryDocument, ITurbine as ITurbineDocument } from '../D
 import { DB } from "../DB-Connector/db-connector";
 import { IComponent, IProducer } from './node';
 import { Consumer } from "./consumer";
+import DataMonitor from "../handlers/DataMonitor";
 
 
 export interface IProcumer{
