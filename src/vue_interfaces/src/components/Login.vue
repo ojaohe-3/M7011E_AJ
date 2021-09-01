@@ -34,7 +34,7 @@ export default {
             if(res.status == 200) {
               this.loggedIn = true;
               this.$store.commit('LOGIN_TOKEN', res);
-              this.$emit('login', true);
+              this.$emit('login', res.data.user);
             }else if (res.status == 404 || res.status == 500){
               console.log('login failed!')
               //TODO flash error message in container
