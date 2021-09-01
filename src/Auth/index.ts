@@ -12,14 +12,15 @@ const saltedSha256 = require('salted-sha256');
 //todo add TLS, functionallity to only allow certine endpoints if valid certification exist, such as an X509 certification of each service, and that enforced "discovery" and certification can be done in good order.
 declare interface Privilage {
     level: Number,
-    access?: String,
-    id: String
+    access?: string,
+    id: string
 }
 declare interface UserData {
-    username: String,
-    password: String,
+    _id: string,
+    username: string,
+    password: string,
     type:string,
-    main?: String,
+    main?: string,
     managers?: Array < Privilage >,
     prosumers?: Array < Privilage >,
     admin: boolean,
@@ -107,14 +108,26 @@ app.post("/api/login/", async (req, res) => {
         
         const data = req.body;
         // console.log(data);
-        const entry: UserData = await DB.Models.User.findOne({username: data.username});
-        // console.log(entry);
+        const raw = await DB.Models.User.findOne({username: data.username});
+        const str_id:string = raw._id.toString(); //this is some bugg with the packages
+        const entry = {
+            _id: str_id,
+            username: raw.username,
+            password: raw.password,
+            type:raw.type,
+            main: raw.main,
+            managers:raw.managers,
+            prosumers: raw.prosumers,
+            admin: raw.admin,
+            last_login: raw.last_login
+            
+        }
         if (entry) {
             if(saltedSha256(data.password, data.username) === entry.password)
             {
     
-                entry.last_login = new Date();
-                await DB.Models.User.findOneAndUpdate({username: data.username}, entry).exec();
+                raw.last_login = new Date();
+                await DB.Models.User.findOneAndUpdate({username: data.username}, raw).exec();
     
                 const display = {
                     username: entry.username,

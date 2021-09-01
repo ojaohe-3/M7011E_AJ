@@ -6,6 +6,7 @@ import { IBattery as IBatteryDocument, ITurbine as ITurbineDocument } from '../D
 import { DB } from "../DB-Connector/db-connector";
 import { IComponent, IProducer } from './node';
 import { Consumer } from "./consumer";
+import DataMonitor from "../handlers/DataMonitor";
 
 
 export interface IProcumer{
@@ -66,7 +67,7 @@ export class Procumer extends Consumer implements IComponent, IProcumer, IProduc
             this.totalCapacity = this.currentCapacity();  //what to do 
             if(this.timeToMonitor < time){
                 this.timeToMonitor = time + 10000;
-                DataMonitor.instance.status(this as IComponent);
+                DataMonitor.instance.status(this);
             }  
         };
     }
@@ -89,7 +90,6 @@ export class Procumer extends Consumer implements IComponent, IProcumer, IProduc
                 currentCapacity: capacity,
                 batteries: bc,
                 turbines: tc,
-                name: process.env.NAME,
                 status: this.status
             };
             await DB.Models.Prosumer.findByIdAndUpdate(this.id, body , {upsert : true}).exec();

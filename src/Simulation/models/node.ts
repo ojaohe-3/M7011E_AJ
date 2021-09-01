@@ -46,7 +46,7 @@ export default class Node implements INode{
     }
     
     public isDefault() : boolean {
-        return this.child.id === "NaN";
+        return this.child.id === "Null";
     }
     public async document(){
         const body = {

@@ -2,6 +2,7 @@
 
 import { connect, connection, Connection } from 'mongoose';
 import { ConsumerModel, ConsumerSchema } from './consumer';
+import { DataStatusModel, DataStatusSchema } from './data_status';
 import { GridModel, GridSchema } from './grid';
 import { ManagerModel, ManagerSchema } from './manager';
 import { NodeModel, NodeSchema } from './node';
@@ -11,7 +12,8 @@ export declare interface IModels {
   Prosumer: ProsumerModel,
   Manager: ManagerModel,
   Node: NodeModel,
-  Grid: GridModel
+  Grid: GridModel,
+  DataStatus: DataStatusModel,
 }
 export class DB{
   
@@ -33,7 +35,8 @@ export class DB{
         Prosumer: new ProsumerSchema().model,
         Manager: new ManagerSchema().model,
         Node: new NodeSchema().model,
-        Grid: new GridSchema().model
+        Grid: new GridSchema().model,
+        DataStatus: new DataStatusSchema().model
       }
     connect(process.env.DB_CONNECT!,{useNewUrlParser: true}!);//secure access tokens etc todo
     this._db = connection;

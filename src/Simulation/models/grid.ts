@@ -4,9 +4,9 @@ import { DB } from '../DB-Connector/db-connector';
 import ConsumerHandler from '../handlers/ConsumerHandler';
 import ProsumerHandler from '../handlers/ProsumerHandler';
 import ManagerHandler from '../handlers/ManagerHandler';
-import Manager from "./manager";
 import DefaultNode from "./defaultnode";
 import { IComponent } from './node';
+import DataMonitor from "../handlers/DataMonitor";
 
 export default class Grid {
     private _nodes: Node[][]
@@ -45,7 +45,6 @@ export default class Grid {
         // * a manager on a node can only set the price, production of prosumers sells only as the cheapest
         // * all Nodes must supply demand, if a grid does not have supply then a future implementation will add region sharing of energy.
         // TODO fix simulation so that it can extract pricing information on how much a consumer, prosumer is costing, aswell as data for manager on how much money they are earning
-        // TODO add datamonitors
 
         const consumers = ConsumerHandler.instance.getConsumers() as IComponent[];
         const prosumers = Array.from(ProsumerHandler.Instance.getAll().values());
@@ -54,44 +53,61 @@ export default class Grid {
         const managers = ManagerHandler.Instance.getAll();
         const producers = (prosumers as IProducer[]).concat(managers as IProducer[]); //TODO fix prosumers becomes competitive aswell, fix after pricing for prosumer is added, also make strukure for producers
 
-        producers.sort((fst: IProducer, snd : IProducer) => fst.price - snd.price);
+        producers.sort((fst: IProducer, snd : IProducer) => fst.price - snd.price); // this will have make sure consumers take from cheapest source first in a FIFS manner
 
-        //TODO Datamonitor
+        //== DataMonitor ==
+        const  monitor =  DataMonitor.instance;
         //knapsack to opt
         //rough algorithm to improve, complexity O(P * D), P nr of producers (which is asymtopically small), D nr of demanders (Large number)
+        // so by convention as inteded by design the overall complexity O(nlog(n)) of n nodes
         let demander = consumers.pop();
         let provider = producers.pop();
+
+        
         //inb4 hell of fixing
-        //no more demand? done, no more supply? done
+        //no more demand? done. no more supply? done.
+        //TODO test that this writes back to its refernce
+        //TODO rework to a knapsack problem
         while(demander && provider){
             let supply = provider!.output - provider!.demand;
+            monitor.log(` a ${provider.asset} supplied it self!`)
             //demander has demand, provider exist and there is supply
             while(demander && provider && supply > 0){
                 let take = supply - demander.demand;
+
                 if(supply! < 0){
                     supply = 0
                     take = demander.demand + supply
+                    monitor.log(` a ${provider.asset} partially supplied ${take} to a customer`)
                     demander.demand -= take;
 
                 }else{
                     demander.demand = 0;
                     supply -= demander.demand;
+                    monitor.log(` a ${provider.asset} fully supplied ${take} to a customer`)
                     demander = consumers.pop();
                 }   
                 provider.output -= take;
+                monitor.log(` a ${provider.asset} has ${provider.output} left`)
+
             }
             provider = producers.pop();
             
         }
+        let rsupply = 0;
+        let rdemand = 0;
 
-
+        producers.forEach(p => rsupply += p.output);
+        consumers.forEach(c => rdemand += c.demand);
+        
+        return [rsupply, rdemand];
         
 
     }
 
 
     public tick(){
-        this._nodes.forEach(col => col.forEach((v:Node) => v.tick(Date.now())));
+        this._nodes.forEach(col => col.map((v:Node) => v.tick(Date.now())));
     }
 
     public get nodes(){

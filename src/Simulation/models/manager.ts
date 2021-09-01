@@ -39,7 +39,7 @@ export default class Manager extends DefaultNode implements IProducer, IComponen
 
             if(this.timeToMonitor < time){
                 this.timeToMonitor = time + 10000;
-                DataMonitor.instance.status(this as IComponent);
+                DataMonitor.instance.status(this);
             }
         }
 

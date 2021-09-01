@@ -1,19 +1,23 @@
 import * as fs from 'fs'
 import { Weather, IWeather } from '../weather'
 import { IComponent } from '../models/node';
+import { DB } from '../DB-Connector/db-connector';
 
 interface DataStatus {
     date: number
     output: number
     demand: number
     netPower: number
-    weather: IWeather
+    id: string
+    // weather: IWeather
 }
 
 export default class DataMonitor {
-    private static _maxMapSize: number = 80000 // 1 day in ms
+
+    private static _maxSize: number = 80000 
     private static _timeToClear: number = 86400000 // 1 day in ms
     private static _instance: DataMonitor | null = null
+    private static _subSambpleSize: number = 100
     private file: string
     private _logDate: number | null
     private _status: Map<string, DataStatus[]>;
@@ -38,14 +42,20 @@ export default class DataMonitor {
     }
 
     private _handleEntryData(entry: DataStatus[]) {
-        // TODO Make data analysis models in mongodb
-        // TODO post subsample of entries.
+        for(let i = 0; i < DataMonitor._subSambpleSize; i++) {
+            const item = (entry[(i*(entry.length/DataMonitor._subSambpleSize))%entry.length]);
+            this.document(item);
+        }
     }
 
+
     private _mapOverflow() {
-        if (this._status.size > DataMonitor._maxMapSize) {
-            this._status.forEach((entry) => this._handleEntryData(entry))
-        }
+        this._status.forEach((entry, key) => {
+            if(entry.length > DataMonitor._maxSize){
+                this._handleEntryData(entry)
+                this._status.set(key, []);
+            }  
+        })
     }
 
     private _dayElapsed() {
@@ -78,14 +88,15 @@ export default class DataMonitor {
         const date = Date.now()
         const output = caller.output;
         const demand = caller.demand;
-        const weather = Weather.Instance.toJson();
+        // const weather = Weather.Instance.toJson();
 
         const obj = {
             date,
             output,
             demand,
             netPower: output - demand,
-            weather
+            id: caller.id
+            // weather
         }
         
         const item = this._status.get(caller.id)
@@ -95,5 +106,19 @@ export default class DataMonitor {
             this._status.set(caller.id, [obj])
         }
         return obj;
+    }
+    public async document(item: DataStatus) {
+        try {
+            await DB.Models.DataStatus!.create(item);
+        } catch (error) {
+            console.log(error)
+        }
+           
+    }
+
+    public async get(id: string): Promise<DataStatus[] | undefined> {
+        const items : DataStatus[] | undefined = this._status.get(id);
+        const old : DataStatus[] | undefined = await DB.Models.DataStatus.find({id: id});
+        return items && old ? items.concat(old): old ? old : items? items : undefined;
     }
 }

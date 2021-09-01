@@ -2,8 +2,8 @@ import * as fs from 'fs'
 
 
 export interface IFile{
-    name: string;
-    data?: Buffer;
+    id: string;
+    data: Buffer;
 }
 
 export default class FileHander{
@@ -22,25 +22,34 @@ export default class FileHander{
     public insert( file : IFile){
         this.files.push(file);
         setTimeout(this.delete, 3600000, file);
+
+        fs.writeFileSync('./assets/'+file.id+'/profile.png',file.data);
+        
     }
     
-    public delete( file : IFile){
-        this.files = this.files.filter(f => !(file.name === f.name));
+    public delete( id : string){
+        this.files = this.files.filter(f => (f.id !== id));
     }
 
-    public getFile( name : string) : Buffer{
-        const entry = this.files.filter(f => f.name === name)[0];
+    public getFile( id : string) : Buffer{
+        const entry = this.files.filter(f => f.id === id)[0];
         if(entry.data){
             return entry.data;
         }
-        const data = fs.readFileSync('./assets/'+name+'.png');
+        try {
+            const data = fs.readFileSync('./assets/'+id+'/profile.png');
 
-        if(entry){
-            this.files[this.files.indexOf(entry)].data = data;
-        }else{
-            this.insert({name: name, data: data});
+            if(entry){
+                this.files[this.files.indexOf(entry)].data = data;
+            }else{
+                this.insert({id: id, data: data});
+            }
+            return data;
+        } catch (error) {
+            console.log(error);
+            return fs.readFileSync('./assets/default.png');
         }
-        return data;
+
 
         
     }
