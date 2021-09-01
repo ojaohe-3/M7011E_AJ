@@ -6,7 +6,8 @@ export interface IDataStatus extends Document
     output: number
     demand: number
     netPower: number
-    id: string
+    id: string,
+    cost: number
 }
 
 
@@ -23,6 +24,7 @@ export class DataStatusSchema {
             output: {type: Number, required : true},
             netPower: {type: Number, required : true},
             id: {type: String, required : true},
+            cost: {type: Number, required : true},
         });
         this._model = model<IDataStatus>('DataStatus', DataStatus)
     }

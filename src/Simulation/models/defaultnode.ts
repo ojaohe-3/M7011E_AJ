@@ -8,11 +8,13 @@ export default class DefaultNode implements IComponent{
     asset: string;
     id: string;
     timeToMonitor: number;
+    cost: number;
     supply: () => number;
 
     constructor(){
         this.output = 0;
         this.demand = 0;
+        this.cost = 0;
         this.tick = (time: number) => {};
         this.asset = "empty";
         this.id = "Null"

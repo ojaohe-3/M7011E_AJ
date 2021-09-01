@@ -9,6 +9,7 @@ interface DataStatus {
     demand: number
     netPower: number
     id: string
+    cost: number
     // weather: IWeather
 }
 
@@ -95,7 +96,8 @@ export default class DataMonitor {
             output,
             demand,
             netPower: output - demand,
-            id: caller.id
+            id: caller.id,
+            cost: caller.cost
             // weather
         }
         

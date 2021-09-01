@@ -75,16 +75,18 @@ export default class Grid {
             while(demander && provider && supply > 0){
                 let take = supply - demander.demand;
 
-                if(supply! < 0){
+                if(take! < 0){
                     supply = 0
-                    take = demander.demand + supply
+                    take = demander.demand + take
                     monitor.log(` a ${provider.asset} partially supplied ${take} to a customer`)
                     demander.demand -= take;
+                    demander.cost += take * provider!.price;
 
                 }else{
                     demander.demand = 0;
                     supply -= demander.demand;
                     monitor.log(` a ${provider.asset} fully supplied ${take} to a customer`)
+                    demander.cost += take * provider!.price;
                     demander = consumers.pop();
                 }   
                 provider.output -= take;
@@ -99,6 +101,7 @@ export default class Grid {
 
         producers.forEach(p => rsupply += p.output);
         consumers.forEach(c => rdemand += c.demand);
+        monitor.log(`Grit Updated left over: ${rsupply} supply, ${rdemand} demand`);
         
         return [rsupply, rdemand];
         
