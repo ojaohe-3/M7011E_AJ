@@ -188,9 +188,9 @@ export default {
     
     
 
-      this.elecPrice = market.price.toFixed(2);
+      this.elecPrice = manager.price.toFixed(2);
       this.production = manager.current.toFixed(2);
-      this.elecDemand = market.stats.totalDemand.toFixed(2);
+      // this.elecDemand = market.stats.totalDemand.toFixed(2); TODO
       this.maxProduction = manager.maxProduction;
       this.income = this.production * this.elecPrice;
       this.income = this.income.toFixed(2);
