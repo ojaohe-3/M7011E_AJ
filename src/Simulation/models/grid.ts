@@ -39,19 +39,27 @@ export default class Grid {
         this._nodes[y][x] = value;
     }
 
-    public balance() {
+    /**
+     * @deprecated
+     * @returns 
+     */
+    public balance() : [number, number] {
+
+
+
+
         // The rules: 
         // * a node takes only from the cheapest source if it is available
         // * a manager on a node can only set the price, production of prosumers sells only as the cheapest
         // * all Nodes must supply demand, if a grid does not have supply then a future implementation will add region sharing of energy.
         // TODO fix simulation so that it can extract pricing information on how much a consumer, prosumer is costing, aswell as data for manager on how much money they are earning
 
-        const consumers = ConsumerHandler.instance.getConsumers() as IComponent[];
+        const consumers : IComponent[] = ConsumerHandler.instance.getConsumers();
         const prosumers = Array.from(ProsumerHandler.Instance.getAll().values());
-        consumers.concat(prosumers as IComponent[]);
+        consumers.concat(prosumers);
 
         const managers = ManagerHandler.Instance.getAll();
-        const producers = (prosumers as IProducer[]).concat(managers as IProducer[]); //TODO fix prosumers becomes competitive aswell, fix after pricing for prosumer is added, also make strukure for producers
+        const producers : IProducer[] = (prosumers).concat(managers); //TODO fix prosumers becomes competitive aswell, fix after pricing for prosumer is added, also make strukure for producers
 
         producers.sort((fst: IProducer, snd : IProducer) => fst.price - snd.price); // this will have make sure consumers take from cheapest source first in a FIFS manner
 
@@ -64,10 +72,7 @@ export default class Grid {
         let provider = producers.pop();
 
         
-        //inb4 hell of fixing
-        //no more demand? done. no more supply? done.
-        //TODO test that this writes back to its refernce
-        //TODO rework to a knapsack problem
+        //TODO Network implementation
         while(demander && provider){
             let supply = provider!.output - provider!.demand;
             monitor.log(` a ${provider.asset} supplied it self!`)

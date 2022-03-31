@@ -1,6 +1,6 @@
 
 
-import express = require("express");
+import { Router } from "express";
 import { Types } from "mongoose";
 import Authenticate from "../authentication/authenticator";
 import { DB } from "../DB-Connector/db-connector";
@@ -10,7 +10,7 @@ import Manager from "../models/manager";
 require('dotenv').config();
 
 
-const app = express.Router();
+const app = Router();
 app.get('/',(req, res)=>{
     res.json( {body: ManagerHandler.Instance.getAll()}); 
 });

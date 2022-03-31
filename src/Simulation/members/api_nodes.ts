@@ -1,12 +1,12 @@
-import { Simulator } from '../handlers/Simulation';
-import express = require("express");
 import { IComponent } from '../models/node';
 import Authenticate from '../authentication/authenticator';
 import { assert } from 'console';
+import { Router } from 'express';
+import Simulator from '../handlers/simulation';
 
 
 require('dotenv').config();
-const app = express.Router();
+const app = Router();
 
 app.get('/', (_, res) => {
     res.json(Simulator.instance.getAll());

@@ -1,5 +1,5 @@
 import { DB } from "../DB-Connector/db-connector";
-import { Consumer } from "../models/consumer";
+import Consumer  from "../models/consumer";
 
 export default class ConsumerHandler{
 

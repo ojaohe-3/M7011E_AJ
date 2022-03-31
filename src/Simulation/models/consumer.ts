@@ -6,15 +6,25 @@ import { assert } from "console";
 import DefaultNode from "./defaultnode";
 import DataMonitor from "../handlers/DataMonitor";
 
-export class Consumer extends DefaultNode {
-  timefn: number[];
+
+/**
+ * Defines A tuble T of N size 
+ * e.g. 
+ *      let a : Tuple<string,2> = ['a', 'b']
+ *      let b : Tuple<string,2> = ['a'] // error 
+ */
+export type TimeArray = Tuple<number, 24>;
+type Tuple<T, N extends number> = N extends N ? number extends N ? T[] : _TupleOf<T, N, []> : never;
+type _TupleOf<T, N extends number, R extends unknown[]> = R['length'] extends N ? R : _TupleOf<T, N, [T, ...R]>;
+
+export default class Consumer extends DefaultNode {
+  timefn: TimeArray;
   consumption: (temp: number) => number;
   profile: number;
-  
-  constructor(id: string, timefn: number[], demand?: number, profile?: number) {
+
+  constructor(id: string, timefn: TimeArray, demand?: number, profile?: number) {
     super();
     this.id = id;
-    assert(timefn.length == 24);
     this.timefn = timefn;
     this.output = 0;
     this.asset = "consumer";
@@ -68,7 +78,7 @@ export class Consumer extends DefaultNode {
     }
   }
 
-  static generateTimeFn(): number[] {
+  static generateTimeFn(): TimeArray {
     const random = Math.random();
     return [
       0.02 * random,
@@ -95,6 +105,6 @@ export class Consumer extends DefaultNode {
       0.76 * random,
       0.311 * random,
       0.121 * random,
-    ]; // profile for each hour of the day
+    ] as Tuple<number, 24>; // profile for each hour of the day
   }
 }

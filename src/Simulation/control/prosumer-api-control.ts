@@ -1,11 +1,11 @@
-import express = require("express");
 import * as dotenv from "dotenv";
 import ProsumerHandler from "../handlers/ProsumerHandler";
 import Authenticate from "../authentication/authenticator";
+import { Router } from "express";
 
 dotenv.config({ path: "./.env" });
 
-const app = express.Router();
+const app = Router();
 
 app.get('/:id', Authenticate("prosumers", 3), async (req, res) => {
     try {
@@ -57,4 +57,4 @@ app.get('/:id/disable', Authenticate("prosumers", 3), (req, res) => {
         })
     }
 });
-module.exports = app;
+export default app;

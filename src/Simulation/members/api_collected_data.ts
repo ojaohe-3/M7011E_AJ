@@ -1,8 +1,7 @@
-import express = require("express");
+import { Router } from "express";
 import DataMonitor from "../handlers/DataMonitor";
-import { Simulator } from "../handlers/Simulation";
 
-const app = express.Router();
+const app = Router();
 
 //TODO
 // get all datapoints from the simulation

@@ -1,11 +1,13 @@
 import Grid from '../models/grid';
+import Network from '../models/network';
 import Node, { INode } from '../models/node';
 import { IComponent } from '../models/node';
 
-export class Simulator {
+export default class Simulator {
 
     private static _instance?: Simulator;
     private _grid: Grid;
+
     public static get instance() {
         return this._instance ? this._instance : new Simulator();
     }
@@ -18,7 +20,8 @@ export class Simulator {
 
     public process() : void{
         this._grid.tick();
-        this._grid.balance();
+        Network.instance().tick();
+        // this._grid.balance();
 
     }
 

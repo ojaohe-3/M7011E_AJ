@@ -1,13 +1,14 @@
-import express = require("express");
-import { Consumer } from "../models/consumer";
+import Consumer, { TimeArray } from "../models/consumer";
 import ConsumerHandler from "../handlers/ConsumerHandler";
 import Authenticate from "../authentication/authenticator";
-const app = express.Router();
+import { Router } from "express";
+
+const app = Router();
 const handler = ConsumerHandler.instance;
 
 interface userFormat{
 	id : string, 
-	timefn : number[], 
+	timefn : TimeArray, 
 	demand? : number, 
 	profile?: number
 }

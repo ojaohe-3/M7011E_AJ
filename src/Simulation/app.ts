@@ -2,7 +2,7 @@ import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 
 
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
 dotenv.config();
 
 declare interface ResponseError extends Error {
@@ -64,13 +64,13 @@ app.use((err: ResponseError, req: Request, res: Response, next: NextFunction) =>
   })
 
 
-const consumer = require('./members/api_consumer');
-const prosumer = require('./members/api_prosumer');
-const manager = require('./members/api_manager');
-const simdata = require('./members/api_collected_data');
-const nodes = require('./members/api_nodes');
-const manager_control = require('./control/manager-api-control');
-const prosumer_control = require('./control/prosumer-api-control');
+import consumer from './members/api_consumer';
+import prosumer from './members/api_prosumer';
+import manager from './members/api_manager';
+import simdata from './members/api_collected_data';
+import nodes from './members/api_nodes';
+import manager_control from './control/manager-api-control';
+import prosumer_control from './control/prosumer-api-control';
 
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);

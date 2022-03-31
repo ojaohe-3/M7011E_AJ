@@ -1,9 +1,9 @@
 
-import express = require("express");
+import { Router } from "express";
 import Authenticate from "../authentication/authenticator";
 import ManagerHandler from "../handlers/ManagerHandler";
 require('dotenv').config();
-const app = express.Router();
+const app = Router();
 
 interface format{
     ratio? : number,
@@ -35,4 +35,4 @@ app.get('/:id',  Authenticate('managers', 3), (req, res)=>{
         res.status(404).json({message: "member not found"});
 });
 
-module.exports = app;
+export default app;

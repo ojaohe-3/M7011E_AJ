@@ -1,13 +1,13 @@
-import express = require("express");
 import * as dotenv from "dotenv";
 import ProsumerHandler from "../handlers/ProsumerHandler";
 import { Procumer , IProcumer} from "../models/procumer";
 import Authenticate from '../authentication/authenticator';
 import Battery from '../models/battery';
 import Turbine from '../models/turbine';
+import { Router } from "express";
 dotenv.config({ path: "./.env" });
 
-const app = express.Router();
+const app = Router();
 const handler = ProsumerHandler.Instance;
 
 app.get("/", (req, res) => {
@@ -66,4 +66,4 @@ app.put("/:id", Authenticate("prosumers", 5),async (req, res) => {
 	}
 });
 
-module.exports = app;
+export default app;
