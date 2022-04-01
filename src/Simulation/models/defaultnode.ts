@@ -1,5 +1,5 @@
 import { IComponent } from "./node";
-
+export type Asset = "empty" | ""
 export default class DefaultNode implements IComponent{
     tick: (time:number) => void;
     static readonly monitorFreq = 0.1;

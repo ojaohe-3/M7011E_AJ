@@ -15,7 +15,7 @@ export default class Grid {
     id: string
 
     constructor(width?: number, height?: number, id?: string) {
-        this.id = id ? id: Types.ObjectId().toHexString();
+        this.id = id ? id : Types.ObjectId().toHexString();
         this._nodes = [];
         this.width = width ? width : 64;
         this.height = height ? height : 64;
@@ -41,9 +41,8 @@ export default class Grid {
 
     /**
      * @deprecated
-     * @returns 
      */
-    public balance() : [number, number] {
+    public balance(): [number, number] {
 
 
 
@@ -54,52 +53,52 @@ export default class Grid {
         // * all Nodes must supply demand, if a grid does not have supply then a future implementation will add region sharing of energy.
         // TODO fix simulation so that it can extract pricing information on how much a consumer, prosumer is costing, aswell as data for manager on how much money they are earning
 
-        const consumers : IComponent[] = ConsumerHandler.instance.getConsumers();
+        const consumers: IComponent[] = ConsumerHandler.instance.getConsumers();
         const prosumers = Array.from(ProsumerHandler.Instance.getAll().values());
         consumers.concat(prosumers);
 
         const managers = ManagerHandler.Instance.getAll();
-        const producers : IProducer[] = (prosumers).concat(managers); //TODO fix prosumers becomes competitive aswell, fix after pricing for prosumer is added, also make strukure for producers
+        const producers: IProducer[] = (prosumers).concat(managers); //TODO fix prosumers becomes competitive aswell, fix after pricing for prosumer is added, also make strukure for producers
 
-        producers.sort((fst: IProducer, snd : IProducer) => fst.price - snd.price); // this will have make sure consumers take from cheapest source first in a FIFS manner
+        producers.sort((fst: IProducer, snd: IProducer) => fst.price - snd.price); // this will have make sure consumers take from cheapest source first in a FIFS manner
 
         //== DataMonitor ==
-        const  monitor =  DataMonitor.instance;
+        const monitor = DataMonitor.instance;
         //knapsack to opt
         //rough algorithm to improve, complexity O(P * D), P nr of producers (which is asymtopically small), D nr of demanders (Large number)
         // so by convention as inteded by design the overall complexity O(nlog(n)) of n nodes
         let demander = consumers.pop();
         let provider = producers.pop();
 
-        
+
         //TODO Network implementation
-        while(demander && provider){
+        while (demander && provider) {
             let supply = provider!.output - provider!.demand;
             monitor.log(` a ${provider.asset} supplied it self!`)
             //demander has demand, provider exist and there is supply
-            while(demander && provider && supply > 0){
+            while (demander && provider && supply > 0) {
                 let take = supply - demander.demand;
 
-                if(take! < 0){
+                if (take! < 0) {
                     supply = 0
                     take = demander.demand + take
                     monitor.log(` a ${provider.asset} partially supplied ${take} to a customer`)
                     demander.demand -= take;
                     demander.cost += take * provider!.price;
 
-                }else{
+                } else {
                     demander.demand = 0;
                     supply -= demander.demand;
                     monitor.log(` a ${provider.asset} fully supplied ${take} to a customer`)
                     demander.cost += take * provider!.price;
                     demander = consumers.pop();
-                }   
+                }
                 provider.output -= take;
                 monitor.log(` a ${provider.asset} has ${provider.output} left`)
 
             }
             provider = producers.pop();
-            
+
         }
         let rsupply = 0;
         let rdemand = 0;
@@ -107,29 +106,29 @@ export default class Grid {
         producers.forEach(p => rsupply += p.output);
         consumers.forEach(c => rdemand += c.demand);
         monitor.log(`Grit Updated left over: ${rsupply} supply, ${rdemand} demand`);
-        
+
         return [rsupply, rdemand];
-        
+
 
     }
 
 
-    public tick(){
-        this._nodes.forEach(col => col.map((v:Node) => v.tick(Date.now())));
+    public tick() {
+        this._nodes.forEach(col => col.map((v: Node) => v.tick(Date.now())));
     }
 
-    public get nodes(){
+    public get nodes() {
         return this._nodes;
     }
 
-    public async document(){
+    public async document() {
         const body = {
             width: this.width,
             height: this.height,
             _id: this.id
         }
         try {
-            DB.Models.Grid.findByIdAndUpdate(this.id, body , {upsert : true}).exec();
+            DB.Models.Grid.findByIdAndUpdate(this.id, body, { upsert: true }).exec();
         } catch (error) {
             console.log(error);
         }

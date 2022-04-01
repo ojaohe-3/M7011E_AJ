@@ -1,6 +1,6 @@
 
 
- import { Schema,  model, Document, Model, Number } from 'mongoose';
+ import { Schema,  model, Document, Model, Number} from 'mongoose';
 
 declare interface IManager extends Document{
     current: number,
@@ -8,6 +8,7 @@ declare interface IManager extends Document{
     status: Boolean,
     ratio: number,
     name: String,
+    price: number
 }
 export interface ManagerModel extends Model<IManager>{};
 

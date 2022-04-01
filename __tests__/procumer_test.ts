@@ -1,7 +1,7 @@
 import { Battery } from "../src/Procumer/Battery";
 import { Procumer } from "../src/Procumer/procumer";
 import { Turbine } from "../src/Procumer/Turbine";
-
+// REDO
 test('procumer_test',()=>{
     let procumer = new Procumer([new Battery(1000, 51, 51)], [new Turbine(2000)]);
     procumer.input_ratio = 1;

@@ -5,6 +5,7 @@ import { ConsumerModel, ConsumerSchema } from './consumer';
 import { DataStatusModel, DataStatusSchema } from './data_status';
 import { GridModel, GridSchema } from './grid';
 import { ManagerModel, ManagerSchema } from './manager';
+import { NetworkModel, NetworkSchema } from './network';
 import { NodeModel, NodeSchema } from './node';
 import { ProsumerModel, ProsumerSchema } from './prosumer';
 export declare interface IModels {
@@ -14,6 +15,7 @@ export declare interface IModels {
   Node: NodeModel,
   Grid: GridModel,
   DataStatus: DataStatusModel,
+  Network: NetworkModel,
 }
 export class DB{
   
@@ -36,7 +38,8 @@ export class DB{
         Manager: new ManagerSchema().model,
         Node: new NodeSchema().model,
         Grid: new GridSchema().model,
-        DataStatus: new DataStatusSchema().model
+        DataStatus: new DataStatusSchema().model,
+        Network: new NetworkSchema().model,
       }
     connect(process.env.DB_CONNECT!,{useNewUrlParser: true}!);//secure access tokens etc todo
     this._db = connection;

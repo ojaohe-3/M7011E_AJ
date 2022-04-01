@@ -1,7 +1,7 @@
 import Grid from '../models/grid';
-import Network from '../models/network';
 import Node, { INode } from '../models/node';
 import { IComponent } from '../models/node';
+import NetworkHandler from './NetworkHandler';
 
 export default class Simulator {
 
@@ -20,7 +20,7 @@ export default class Simulator {
 
     public process() : void{
         this._grid.tick();
-        Network.instance().tick();
+        NetworkHandler.instance.tick();
         // this._grid.balance();
 
     }
