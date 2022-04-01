@@ -32,7 +32,7 @@ app.use(express.urlencoded({
   extended: false
 }))
 
-let logger = (req, res, next) => {
+let logger = (req: Request, res : Response, next) => {
     console.log(`at ${
         (new Date()).toString()
     }: ${
@@ -63,7 +63,6 @@ app.use((err: ResponseError, req: Request, res: Response, next: NextFunction) =>
     res.send("Error Occured!\nPlease try again later");
   })
 
-
 import consumer from './members/api_consumer';
 import prosumer from './members/api_prosumer';
 import manager from './members/api_manager';
@@ -71,6 +70,7 @@ import simdata from './members/api_collected_data';
 import nodes from './members/api_nodes';
 import manager_control from './control/manager-api-control';
 import prosumer_control from './control/prosumer-api-control';
+
 
 app.use('/api/members/consumers', consumer);
 app.use('/api/members/prosumers', prosumer);

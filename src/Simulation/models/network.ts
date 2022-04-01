@@ -1,9 +1,9 @@
 import { IComponent, IProducer } from "./node";
 
 export interface ITicket {
-    target: string
+    target: string // IComponent id
     price: number
-    source: string
+    source: string // IProducer id
     amount: number
 }
 export interface INetwork {
@@ -12,9 +12,9 @@ export interface INetwork {
     total_demand: number
     total_supply: number
     netpower: number
-    // connected: INetwork
+    // connected: INetwork this is a proposed solution for enabeling network to be past a simulation node to other in the cluster.
     tickets: ITicket[]
-    name: string
+    // name: string
     updatedAt: Date
 }
 
@@ -23,7 +23,7 @@ export default class Network {
 
 
     private _network: INetwork;
-
+    private _time: number = Date.now();
 
     constructor(network?: INetwork) {
         if (network) {
@@ -36,7 +36,7 @@ export default class Network {
                 total_supply: 0,
                 netpower: 0,
                 tickets: [],
-                name: process.env.NAME as string | 'undefined',
+                // name: process.env.NAME as string | 'undefined',
                 updatedAt: new Date()
             }
             this.document();
@@ -55,9 +55,22 @@ export default class Network {
         this._network = value;
     }
 
-    process({ suppliers, consumers, total_demand, total_supply, netpower, name, updatedAt }: INetwork) {
+
+
+    /**
+     * Tick takes the networks producers and consumers connected to it and resolves the cost for each consumer
+     * and gives information what state each agent is inside the network
+     * @param time 
+     * @returns 
+     */
+    public tick(time: number) {
+        if (time - this._time < UPDATE_EVERY_MS){
+            return;
+        }
+        this._time = time;
+
+        let { suppliers, consumers, total_demand, total_supply, netpower, updatedAt }: INetwork = this._network;
         updatedAt = new Date();
-        const updateTargets = (msg) => console.log("placeholder", msg);
         suppliers.sort((a, b) => a.price - b.price);
 
         suppliers.forEach(s => {
@@ -70,47 +83,56 @@ export default class Network {
         const demanders = [...consumers] // copy
         const tickets: ITicket[] = [];
 
-        let tdemand = total_demand;
-        let tsupply = total_supply;
-
         let consumer = demanders.pop();
         let producer = producers.pop();
 
 
         while (consumer && producer) {
             let supply: number = producer.output - producer.demand;
+            // tickets infere where the energy was tacken from, it can be from multiple sources
+            tickets.push({
+                target: producer.id,
+                price: 0,
+                source: producer.id,
+                amount: supply > 0 ? producer.demand : producer.output
+            });
             //demander has demand, producer exist and there is supply
-            while (consumer && producer && supply > 0) {
+            while (consumer !== undefined && producer !== undefined && supply > 0) {
                 let take: number = supply - consumer.demand;
 
                 if (take < 0) {
                     supply = 0
                     take = consumer.demand + take
-                    tickets.push({
-                        target: consumer.id,
-                        price: take * producer.price,
-                        source: producer.id,
-                        amount: take
-                    });
-                    consumer.cost += take * producer!.price;
+                    consumer.cost += take * producer.price;
 
                 } else {
-                    consumer.demand = 0;
                     supply -= consumer.demand;
-                    consumer.cost += take * producer!.price;
+                    consumer.cost += take * producer.price;
                     consumer = consumers.pop();
                 }
-                producer.output -= take;
+
+                tickets.push({
+                    target: consumer!.id,
+                    price: take * producer.price,
+                    source: producer.id,
+                    amount: take
+                });
 
             }
             producer = producers.pop();
 
         }
-        let rsupply = 0;
-        let rdemand = 0;
-
-        producers.forEach(p => rsupply += p.output);
-        consumers.forEach(c => rdemand += c.demand);
+        netpower = total_supply - total_demand;
+        this.network = {
+            suppliers,
+            consumers,
+            total_demand,
+            total_supply,
+            tickets,
+            updatedAt,
+            netpower,
+        };
+        this.document();
     }
 
-})
+}

@@ -1,11 +1,10 @@
-import { IComponent } from "./node";
-export type Asset = "empty" | ""
+import { IComponent, Asset } from "./node";
 export default class DefaultNode implements IComponent{
     tick: (time:number) => void;
     static readonly monitorFreq = 0.1;
     output: number;
     demand: number;
-    asset: string;
+    asset: Asset;
     id: string;
     timeToMonitor: number;
     cost: number;

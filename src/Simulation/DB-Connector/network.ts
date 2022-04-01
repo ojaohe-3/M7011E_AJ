@@ -18,7 +18,7 @@ export declare interface INetwork extends Document {
     total_supply: number
     netpower: number
     tickets: ITicket[]
-    name: string
+    // name: string
     updatedAt: Date
 }
 export interface NetworkModel extends Model<INetwork> { };
@@ -56,7 +56,7 @@ export class NetworkSchema {
             total_supply: { type: Number, required: true },
             total_demand: { type: Number, required: true },
             netpower: { type: Number, required: true },
-            name: { type: String, required: true, unique: true },
+            // name: { type: String, required: true, unique: true },
             updatedAt: { type: Date, required: true },
             suppliers: [suppliers],
             consumers: [consumers],

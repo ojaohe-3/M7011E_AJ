@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 import { Weather } from "../weather";
 import { IBattery as IBatteryDocument, ITurbine as ITurbineDocument } from '../DB-Connector/prosumer';
 import { DB } from "../DB-Connector/db-connector";
-import { IComponent, IProducer } from './node';
+import { IComponent, IProducer, Asset } from './node';
 import Consumer from "./consumer";
 import DataMonitor from "../handlers/DataMonitor";
 
@@ -23,7 +23,6 @@ export class Procumer extends Consumer implements IComponent, IProcumer, IProduc
     turbines: Turbine[];
     input_ratio: number
     output_ratio: number;
-    asset: string;
     currentCapacity: () => number;
     tick: (time: number) => void;
     timeout: number;

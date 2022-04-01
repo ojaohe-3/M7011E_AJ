@@ -17,6 +17,6 @@ export default class NetworkHandler{
         return  Array.from(this._networks.values());
     }
     public tick() {
-        this._networks.forEach((v) => v.tick())
+        this._networks.forEach((v) => v.tick(Date.now()))
     }
 }
