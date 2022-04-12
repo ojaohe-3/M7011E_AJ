@@ -1,20 +1,69 @@
-import e = require("express");
-import express = require("express");
-const axios = require('axios');
-require('dotenv').config();
-import cors = require("cors");
+import cors from "cors";
+import express, { Application, NextFunction, Request, Response } from "express";
 
 
+import dotenv from "dotenv";
+import Axios from "axios";
+dotenv.config();
+let number_updates = 0;
+declare interface ResponseError extends Error {
+  status?: number
+}
 
-const app: express.Application = express();
+const app : Application = express();
 
-let logger = (req, res, next) =>{
-    console.log(`at ${(new Date()).toString()}: ${req.protocol}://${req.get("host")}${req.originalUrl}: ${req.method} request`)
-    next();
-}; 
-app.use(logger);
+const options: cors.CorsOptions = {
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With', 
+    'Content-Type',
+    'Accept',
+    'X-Access-Token',
+  ],
+  methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+  origin: process.env.API_URL || 'localhost',
+  preflightContinue: false,
+}
+
+app.use(cors(options));
+
+
 app.use(express.json());
-app.use(cors());
+app.use(express.urlencoded({
+  extended: false
+}))
+
+let logger = (req: Request, res : Response, next) => {
+    console.log(`at ${
+        (new Date()).toString()
+    }: ${
+        req.protocol
+    }://${
+        req.get("host")
+    }${
+        req.originalUrl
+    }: ${
+        req.method
+    } request`)
+    next();
+};
+// todo authentication middleware
+app.use(logger);
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header("Access-Control-Allow-Origin", "*") //TODO
+  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+  res.set('Content-Type', 'application/json')
+  next()
+})
+
+app.use((err: ResponseError, req: Request, res: Response, next: NextFunction) => {
+    console.log(err);
+    res.status(err.status || 500);
+    res.send("Error Occured!\nPlease try again later");
+  })
+
 declare interface IWeatherReport {
     coord: {
         lon: number,
@@ -60,7 +109,7 @@ declare interface IWeatherReport {
 }
 
 
-interface cached {
+interface Cached {
     lat: number,
     lon: number,
     temp: number,
@@ -69,7 +118,7 @@ interface cached {
 }
 let temp = 0;
 let speed = 0;
-let cach: Array<cached> = [];
+let cach: Array<Cached> = [];
 console.log(`default : lat: ${
     process.env.LAT
 }, lon: ${
@@ -79,9 +128,12 @@ console.log(`default : lat: ${
 
 let PORT = process.env.PORT || 5000;
 
-app.get("/", cors(), async (req, res) => { 
-    const lat: number = + req.query.lat;
-    const lon: number = + req.query.lon;
+app.get("/", async (req, res) => { 
+    
+    const lat: number = + req.query.lat || +process.env.LAT;
+    const lon: number = + req.query.lon || +process.env.LON;
+    requests += 1;
+    activiy();
     if (lat && lon) {
         const entry = cach.filter(e => e.lat === lat && e.lon === lon);
         if (entry.some(e => (Date.now() - e.last_updated < 36000000))) {
@@ -93,16 +145,34 @@ app.get("/", cors(), async (req, res) => {
     }else
         res.send("no location specified")
 });
+
+app.get("/monitor", (req, res) =>{
+    res.json({
+        number_updates,
+        cach_size: cach.length,
+        requests,
+        activit_per_hour
+    })
+})
+
 app.listen(PORT, function () {
     console.log(`App is listening on port ${PORT}`);
 });
 
+setInterval(activiy, 10 * 60 * 1000);
+let activit_per_hour = 0;
+let requests = 0;
+let last_activiy = Date.now();
+function activiy(){
+    let hours = (Date.now() - last_activiy) / (3600*1000) // get Hours
+    activit_per_hour = requests / hours;
+}
+
 async function getWeather(lat: number, lon: number) {
     try {
-    const res = await axios({
-        url:`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.WAPI}`,
-        method:"GET"
-    });
+    console.log("update fetch")
+    number_updates++;
+    const res = await Axios.get(`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.WAPI}`);
     const data = res.data;
     temp = data.main.temp;
     speed = data.wind.speed;

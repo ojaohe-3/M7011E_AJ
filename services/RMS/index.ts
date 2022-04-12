@@ -106,7 +106,7 @@ interface UserData {
 
 async function verify(token: string): Promise<UserData | null> {
     try {
-        const data = await (await axios.get(process.env.AUTH_ENDPOINT + '/api/validate', { headers: { 'authorization': 'Bearer ' + token } })).data; // what did i do here???
+        const data = (await axios.get(process.env.AUTH_ENDPOINT + '/api/validate', { headers: { 'authorization': 'Bearer ' + token } })).data; // what did i do here???
         return data.body.data;
 
 

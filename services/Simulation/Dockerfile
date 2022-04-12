@@ -5,5 +5,5 @@ WORKDIR /app
 COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install --production 
 COPY . .
-RUN npm run tsc
-CMD ["node", "./build/index.js"]
+RUN npm run build
+RUN npm run start

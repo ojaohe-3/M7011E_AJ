@@ -2,16 +2,16 @@ import { Schema, model, Document, Model, Types, ObjectId } from "mongoose";
 
 declare interface IPrivilage {
   level: Number;
-  access?: String;
-  id: String;
+  access?: string;
+  id: string;
 }
 
-declare interface IUser extends Document {
+export declare interface IUser extends Document {
   _id: ObjectId;
-  username: String;
-  password: String;
+  username: string;
+  password: string;
   type: string;
-  main?: String;
+  main?: string;
   managers?: Array<IPrivilage>;
   prosumers?: Array<IPrivilage>;
   admin: boolean;
@@ -30,7 +30,7 @@ export class UserSchema {
     });
 
     const userSchema = new Schema({
-      _id: { required: true, unique: true, index: true, auto: true },
+      // _id: { required: true, unique: true, index: true, auto: true },
       username: { type: String, unique: true, required: true },
       password: { type: String, unique: false, required: true },
       main: { type: String, unique: false, required: false },

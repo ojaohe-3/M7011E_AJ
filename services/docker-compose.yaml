@@ -1,40 +1,65 @@
 version: "3"
-services:
-  simulator:
-    build: 
-      context: ./Simulation
-    ports: 
-      - "5000:5000"
-    env_file: sim.env
 
+services:
+  authenticator:
+    # build:
+    #   context: ./Auth
+    image: authenticator
+    ports:
+      - "6000:5000"
+    env_file: auth.env
+    networks:
+      - database
+      - services
+    depends_on:
+      - mongodb
 
   weather:
-    build: ./Weather-Module
-    ports: 
+    # build: ./Weather-Module
+    image: weather
+    ports:
       - "2555:2555"
     env_file: w.env
+    networks:
+      - services
 
-
-  market:
-    build: ./Market
-    ports: 
-      - "5001:5000"
-    env_file: mar.env
-
-  prosumer:
-    build: ./Procumer
-    ports: 
-      - "5002:5000"
-    env_file: pro.env
-
-  manager:
-    build: ./Manager
-    ports: 
-      - "5003:5000"
-    env_file: man.env
-  
-  front-end:
-    build: ./vue_interfaces
+  mongodb:
+    image: docker.io/bitnami/mongodb:5.0
     ports:
-      - "8080:8080"
+      - "27017:27017"
+    volumes:
+      - 'mongodb_data:/bitnami/mongodb'
+    networks:
+      - database
+
+  rabbitmq:
+    image: docker.io/bitnami/rabbitmq:3.9
+    ports:
+      - '4369:4369'
+      - '5551:5551'
+      - '5552:5552'
+      - '5672:5672'
+      - '25672:25672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_SECURE_PASSWORD=yes
+    volumes:
+      - 'rabbitmq_data:/bitnami/rabbitmq/mnesia'
+    networks:
+      - rabbit
+
+volumes:
+  rabbitmq_data:
+    driver: local
+
+  mongodb_data:
+    driver: local
+
+networks:
+  services:
+    driver: bridge
+  database:
+    driver: bridge
+  rabbit:
+    driver: bridge
     

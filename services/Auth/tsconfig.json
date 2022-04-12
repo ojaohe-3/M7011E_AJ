@@ -1,21 +1,20 @@
-
 {
-  "compilerOptions": {
-      "target": "es5",
-      "module": "commonjs",
-      "declaration": false,
-      "noImplicitAny": false,
-      "removeComments": true,
-      "noLib": false,
-      "outDir": "./build",
-      "skipLibCheck": true,
-      "esModuleInterop": true
-  },
-  "include": [
-      "**/*"
-  ],
-  "exclude": [
-      "node_modules",
-      "**/*.spec.ts"
-  ]
-}
+    "compilerOptions": {
+        "target": "ES2017",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "outDir": "./build",
+        "esModuleInterop": true
+    },
+    "include": [
+        "**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
+  }
+  

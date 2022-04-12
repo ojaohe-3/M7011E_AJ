@@ -78,7 +78,8 @@
       "strict": true,
       "removeComments": true,
       "noLib": false,
-      "outDir": "./build"
+      "outDir": "./build",
+      "esModuleInterop": true
   },
   "include": [
       "**/*"

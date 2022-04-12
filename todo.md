@@ -1,11 +1,18 @@
 # TODO
 ### Network object
 - ~~Add network db object model~~
-- ~~Add handler for network~~
+- ~~Add handler for network~~.
+- Setup Rabbitmq.
+- Setup MongoDB again.
+
+- Setup and test authenticator.
 - Network service, inform services via rabbitmq
+- WeatherService as rabbitmq publisher
 - Each object protains to its network object
 - API sucbscription to rabbitmq.
 - Change simulation loop and publish result.
+- Test all in local Deployment
+- Python docker spawner to make a test case.
 - Define websockets for front-end and service controll channels.
 - api for grid and network.
 - api for data managment and define database model for data gatherd
