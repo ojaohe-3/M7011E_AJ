@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { IComponent, Asset } from "./node";
 export default class DefaultNode implements IComponent{
     tick: (time:number) => void;
@@ -9,6 +10,7 @@ export default class DefaultNode implements IComponent{
     timeToMonitor: number;
     cost: number;
     supply: () => number;
+    network: string;
 
     constructor(){
         this.output = 0;
@@ -16,7 +18,8 @@ export default class DefaultNode implements IComponent{
         this.cost = 0;
         this.tick = (time: number) => {};
         this.asset = "empty";
-        this.id = "Null"
+        this.id = randomUUID();
+        this.network = "";
         this.timeToMonitor = Date.now() + 10000;
         this.supply = () => this.output - this.demand
     }

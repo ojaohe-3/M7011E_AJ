@@ -1,16 +1,16 @@
-import { Schema,  model, Document, Model, Number, Types} from 'mongoose';
+import { Schema, model, Document, Model, Number, Types } from 'mongoose';
 
-export interface IComponent extends Document
-{
+export interface IComponent extends Document {
+    network: string;
     type: string;
-    output: number;    
+    output: number;
     demand: number;
     asset: string;
     id: string;
 
 }
 
-export interface INode extends Document{
+export interface INode extends Document {
     x: number;
     y: number;
     child: IComponent;
@@ -18,25 +18,26 @@ export interface INode extends Document{
 }
 
 
-export interface NodeModel extends Model<INode>{};
+export interface NodeModel extends Model<INode> { };
 
 export class NodeSchema {
 
     private _model: Model<INode>;
 
-    constructor(){
+    constructor() {
         const child = new Schema({
-           type: {type: String, required : true},
-           output: {type: Number, required : true},
-           demand: {type: Number, required : true},
-           asset: {type: String, required : true},
-           id: {type: String, required : true}  // note that this is not the _id field
+            network: { type: String, required: true },
+            type: { type: String, required: true },
+            output: { type: Number, required: true },
+            demand: { type: Number, required: true },
+            asset: { type: String, required: true },
+            id: { type: String, required: true }  // note that this is not the _id field
         });
         const NodeSchema = new Schema({
-            x: {type: Number, required : true},
-            y: {type: Number, required : true},
+            x: { type: Number, required: true },
+            y: { type: Number, required: true },
             child: child,
-            gid: {type: Types.ObjectId, required: true}
+            gid: { type: Types.ObjectId, required: true }
         });
         this._model = model<INode>('Node', NodeSchema)
     }

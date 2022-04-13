@@ -4,6 +4,7 @@ import DefaultNode from "./defaultnode";
 
 export type Asset = "empty" | "consumer" | "windturbine" | "powerplant"
 export interface IComponent {
+    network: string
     tick: (time: number) => void;
     output: number;
     demand: number;
