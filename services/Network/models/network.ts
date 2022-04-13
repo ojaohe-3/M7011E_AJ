@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { Types } from "mongoose";
 import { DB } from "../DB-Connector/db-connector";
+import RabbitHandler from "../handler/RabbitHandler";
 import { Source, Consumer } from "./node";
 
 export interface ITicket {
@@ -16,7 +17,8 @@ export interface INetwork {
     name: string
     updatedAt: Date
 }
-
+const env = process.env.MAX_TICKETS_BACKLOG
+const MAX_LENGHT_TICKETS_BACKLOG: number = env ? +env : 10_000
 
 export default class Network implements INetwork {
 
@@ -50,6 +52,8 @@ export default class Network implements INetwork {
             this.updatedAt = new Date()
             this.document();
         }
+        RabbitHandler.instance.createRPCChannel(this.name);
+        RabbitHandler.instance.on("clear", this.clear_tickets);
     }
     //#region getters and setters
 
@@ -67,7 +71,7 @@ export default class Network implements INetwork {
         sources.forEach(s => this._suppliers.set(s.id, s))
     }
     public addConsumers(...consumers: Consumer[]) {
-        consumers.forEach(c => this._consumers.set(c.id,c))
+        consumers.forEach(c => this._consumers.set(c.id, c))
     }
 
     public removeSupplier(s: Source) {
@@ -107,7 +111,7 @@ export default class Network implements INetwork {
         producers.push(...this._remainder_sources)
         this._remainder_sources = [];
 
-        
+
         let total_demand = 0;
         let total_supply = 0;
         // accumulated supply and demand
@@ -143,12 +147,10 @@ export default class Network implements INetwork {
                 if (take < 0) {
                     supply = 0
                     take = consumer.demand + take
-                    consumer.cost += take * producer.price;
 
                 } else {
                     // otherwise supply demander with all.
                     supply -= consumer.demand;
-                    consumer.cost += take * producer.price;
                     consumer = demanders.pop();
                 }
 
@@ -164,10 +166,10 @@ export default class Network implements INetwork {
 
         }
 
-        // If we have left over add them over
-        if(consumer){
+        // If we have left over add them over to remainder to be reused next tick
+        if (consumer) {
             this._remainder_consumers.push(consumer, ...demanders)
-        }else if(producer){
+        } else if (producer) {
             this._remainder_sources.push(producer, ...producers)
         }
 
@@ -175,18 +177,18 @@ export default class Network implements INetwork {
 
         this.updatedAt = new Date();
         this.tickets.push(...tickets);
+        // Defined 
+        if (this.tickets.length >= MAX_LENGHT_TICKETS_BACKLOG) {
+            RabbitHandler.instance.sendData("datamonitor", this.tickets);
+            this.clear_tickets();
+        }
         this.document();
         return tickets;
     }
-    public async clear_tickets(){
+    public async clear_tickets() {
         this.tickets = [];
         await this.document();
     }
 
-    public toJson(){
-        return {
-            tickets: this.tickets,
-            name: this.name,
-        }  
-    }
+
 }

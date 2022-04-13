@@ -40,7 +40,7 @@ function isPrivilaged(key: string, user: UserData, id?: string, lvl?: number): b
 
 async function verify(token: string): Promise<UserData | null> {
     try {
-        const data = await (await axios.get(process.env.AUTH_ENDPOINT + '/api/validate', { headers: { 'authorization': 'Bearer ' + token } })).data; 
+        const data = await (await axios.get(process.env.AUTH_ENDPOINT + '/api/validate', { headers: { 'authorization': 'Bearer ' + token } })).data; // what did i do here???
         assert(data.status)
         return data.body.data;
 

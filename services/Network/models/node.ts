@@ -2,7 +2,7 @@
 export interface Node {
     output: number;
     demand: number;
-    cost: number;
+    // cost?: number;
     id: string;
 
 }

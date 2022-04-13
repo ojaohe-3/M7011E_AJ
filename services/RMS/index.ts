@@ -1,6 +1,7 @@
 import axios from "axios";
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
+import { createServer } from "https";
 import FileHander, { IFile } from "./FileHandler";
 
 const handler = FileHander.instance;
@@ -115,3 +116,13 @@ async function verify(token: string): Promise<UserData | null> {
         return null;
     }
 }
+
+const fs = require('fs');
+const credentials = {
+    key: fs.readFileSync('net.key'),
+    cert: fs.readFileSync('net.crt'),
+};
+
+const server = createServer(credentials, app)
+const PORT =  process.env.PORT || 5000;
+server.listen(PORT);

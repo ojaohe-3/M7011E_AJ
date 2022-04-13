@@ -1,7 +1,7 @@
 import client, { Connection, Channel } from 'amqplib';
 import WorkHandler, { Handler } from './workHandler';
 // import { buffer } from 'stream/consumers';
-export type EventKeys = "receive_rpc" | "data_gatherd" //TODO
+export type EventKeys = "receive_rpc" | "data_gatherd" | "clear" //TODO
 export type KeyTypes = "source" | "consumer"
 
 
@@ -10,15 +10,18 @@ export type RabbitWorkHandler = WorkHandler<Arguments>
 
 
 export interface Arguments{
-    content: ReceiveFormat
+    target: string
+    content: ReceiveFormat[]
     channel: Channel
     correlationID: any
+    replyTo: any
 }
 export interface ReceiveFormat {
-    type: KeyTypes,
-    amount: number,
-    id: string,
-    price: number
+    type: KeyTypes
+    amount: number
+    id: string
+    price?: number
+    additional?: number
 }
 export default class RabbitHandler {
     private static _instance: RabbitHandler;
@@ -65,20 +68,25 @@ export default class RabbitHandler {
     }
 
 
-    // public async sendData(channel: string, data: any): Promise<void>{
-    //     try {
-    //         const json = JSON.stringify(data);
-    //         if(!this._channels.has(channel)){
-    //             await this.createChannel(channel);
-    //         }
-    //         const c = this._channels.get(channel);
-    //         c?.publish(channel, '', Buffer.from(json));
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
+    public async sendData(channel: string, data: any): Promise<void>{
+        try {
+            const json = JSON.stringify(data);
+            if(!this._channels.has(channel)){
+                await this.createChannel(channel);
+            }
+            const c = this._channels.get(channel);
+            c?.sendToQueue(channel, Buffer.from(json));
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    public async createChannel(name: string){
+        const c = await this._connector.createChannel()
+        c.assertQueue(name, { durable: false });
+        this._channels.set(name, c);
+    }
 
-    public async createChannel(name: string): Promise<client.Channel | undefined> {
+    public async createRPCChannel(name: string): Promise<client.Channel | undefined> {
         if (this._connected === false){
             console.log("Not Connected!")
             return undefined;
@@ -86,15 +94,18 @@ export default class RabbitHandler {
         try {
             const c = await this._connector.createChannel()
             c.assertQueue(name, { durable: false });
+            c.prefetch(1);
             this._channels.set(name, c);
             c.consume(name, (msg) => {
                 if (msg === null) {
                     console.log('received null!')
                     return;
                 }
-                const json: ReceiveFormat = JSON.parse(msg?.content.toString());
+                const json: ReceiveFormat[] = JSON.parse(msg?.content.toString());
                 const cid = msg!.properties.correlationId;
-                this._workhandler.run("receive_rpc", { content: json, channel: c, correlationID: cid})
+                const replyTo = msg!.properties.replyTo;
+                
+                this._workhandler.run("receive_rpc" , { target: name, content: json, channel: c, correlationID: cid, replyTo: replyTo})
                 c.ack(msg);
             })
             return c;

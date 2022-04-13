@@ -6,7 +6,7 @@ services:
     #   context: ./Auth
     image: authenticator
     ports:
-      - "6000:5000"
+      - "5000:5000"
     env_file: auth.env
     networks:
       - database
