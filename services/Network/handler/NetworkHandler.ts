@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { DB } from "../DB-Connector/db-connector";
 import Network, { INetwork } from "../models/network"
 import { Consumer, Source } from "../models/node";
-import RabbitHandler from "./RabbitHandler";
+import RabbitHandler from "./RabbitSeverHandler";
 
 export default class NetworkHandler {
 
@@ -12,10 +12,11 @@ export default class NetworkHandler {
         return this._instance ? this._instance : new NetworkHandler();
     }
     private _networks: Map<string, Network>;
-    private
 
     constructor() {
         this._networks = new Map<string, Network>();
+        this.fetchAll();
+
         RabbitHandler.instance.on("receive_rpc", (msg) => {
             if (msg) {
                 const { channel, content, correlationID, replyTo, target } = msg;
@@ -48,7 +49,7 @@ export default class NetworkHandler {
 
         })
 
-        RabbitHandler.instance.createChannel("datamonitor");
+        // RabbitHandler.instance.createChannel("datamonitor");
     }
 
 
@@ -67,6 +68,7 @@ export default class NetworkHandler {
                 }
                 const network = new Network(_net);
                 this._networks.set(m.name, network);
+                // console.log(this._networks) 
             });
         } catch (error) {
             console.log(error);
@@ -80,9 +82,11 @@ export default class NetworkHandler {
             let id = data.id || Types.ObjectId.createFromTime(Date.now()).toHexString();
             const net = new Network({id, name: data.name!, tickets: data.tickets || [], updatedAt: data.updatedAt || new Date()});
             this._networks.set(net.id, net)
-
+            net.document();
         }else{
-
+            const net = new Network();
+            this._networks.set(net.id, net);
+            net.document();
         }
     }
 

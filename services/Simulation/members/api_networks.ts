@@ -1,5 +1,4 @@
 import { Router } from "express";
-import NetworkHandler from "../handlers/NetworkHandler";
 import Network from "../models/network";
 
 const net = NetworkHandler.instance;

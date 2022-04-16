@@ -7,7 +7,7 @@ import Simulator from '../handlers/simulation';
 
 require('dotenv').config();
 const app = Router();
-
+// const sim = Simulator.instance;
 app.get('/', (_, res) => {
     res.json(Simulator.instance.getAll());
 })

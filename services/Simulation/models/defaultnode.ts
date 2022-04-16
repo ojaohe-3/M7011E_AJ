@@ -18,7 +18,7 @@ export default class DefaultNode implements IComponent{
         this.cost = 0;
         this.tick = (time: number) => {};
         this.asset = "empty";
-        this.id = randomUUID();
+        this.id = "Null";
         this.network = "";
         this.timeToMonitor = Date.now() + 10000;
         this.supply = () => this.output - this.demand

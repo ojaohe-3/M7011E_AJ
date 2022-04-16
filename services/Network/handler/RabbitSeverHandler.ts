@@ -1,5 +1,5 @@
-import client, { Connection, Channel } from 'amqplib';
-import WorkHandler, { Handler } from './workHandler';
+import client, { Connection, Channel, credentials } from 'amqplib';
+import WorkHandler, { Handler } from './WorkHandler';
 // import { buffer } from 'stream/consumers';
 export type EventKeys = "receive_rpc" | "data_gatherd" | "clear" //TODO
 export type KeyTypes = "source" | "consumer"
@@ -57,18 +57,28 @@ export default class RabbitHandler {
 
     private async connect() {
         try {
-            this._connector = await client.connect(process.env.RABBITMQ_CONNECTION_STRING || 'amqp://localhost:5672');
+            const opt = {
+                credentials: credentials.plain(process.env.RABBITMQ_USER || "user", process.env.RABBITMQ_PASS || "password")
+            }
+            console.log("connecting to",process.env.RABBITMQ_CONNECTION_STRING|| 'amqp://localhost:5672')
+            this._connector = await client.connect(process.env.RABBITMQ_CONNECTION_STRING || 'amqp://localhost:5672', opt);
             this._connected = true;
-
+            console.log("rabbitmq connected!")
 
         } catch (error) {
             console.log(error);
             setTimeout(this.connect, 10000); // try to reconnect after 10s
+            this._connected = false;
+        
+
         }
     }
 
 
     public async sendData(channel: string, data: any): Promise<void>{
+        if(!this._connected){
+            return;
+        }
         try {
             const json = JSON.stringify(data);
             if(!this._channels.has(channel)){
@@ -81,9 +91,18 @@ export default class RabbitHandler {
         }
     }
     public async createChannel(name: string){
-        const c = await this._connector.createChannel()
-        c.assertQueue(name, { durable: false });
-        this._channels.set(name, c);
+        if(!this._connected){
+            setTimeout(this.createChannel, 1000, name);
+        }
+        try {
+            console.log("creating channel")
+            const c = await this._connector.createChannel()
+            console.log("created channel", c)
+            c.assertQueue(name, { durable: false });
+            this._channels.set(name, c);
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     public async createRPCChannel(name: string): Promise<client.Channel | undefined> {

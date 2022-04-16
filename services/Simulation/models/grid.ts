@@ -14,9 +14,11 @@ export default class Grid {
         this._nodes = [];
         this.width = width ? width : 64;
         this.height = height ? height : 64;
+
         for (let y = 0; y < this.height; y++) {
+            this._nodes.push([])
             for (let x = 0; x < this.width; x++) {
-                this._nodes[y][x] = new Node(this.id, x, y, new DefaultNode());
+                this._nodes[y].push(new Node(this.id, x, y, new DefaultNode()));
             }
         }
     }
@@ -35,6 +37,7 @@ export default class Grid {
     }
 
     public tick() {
+        console.log(this._nodes)
         this._nodes.forEach(col => col.map((v: Node) => v.tick(Date.now())));
     }
 

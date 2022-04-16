@@ -29,7 +29,6 @@ export default class Node implements INode {
     x: number;
     y: number;
     gid: string;
-
     child: IComponent;
     tick = (time: number) => this.child.tick(time);
 
@@ -53,7 +52,7 @@ export default class Node implements INode {
     }
 
     public isDefault(): boolean {
-        return this.child.id === "Null";
+        return this.child.id === "Null"; // This is a hack, TODO: check class type to consistantly get the right type under polymophism
     }
 
     public async document() {

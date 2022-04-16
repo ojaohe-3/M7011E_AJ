@@ -4,9 +4,10 @@
   "description": "School project in distributed dynamic websites",
   "main": "./build/index.js",
   "scripts": {
-    "tsc": "tsc",
-    "dev_all": "npx tsc -w",
-    "start": "npx tsc"
+    "start": "NODE_ENV=production node ./build/index.js",
+    "dev": "NODE_ENV=development nodemon ./index.ts",
+    "build": "tsc",
+    "lint": "eslint --ext .ts --fix ."
   },
   "repository": {
     "type": "git",

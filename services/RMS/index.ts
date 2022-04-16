@@ -119,10 +119,11 @@ async function verify(token: string): Promise<UserData | null> {
 
 const fs = require('fs');
 const credentials = {
-    key: fs.readFileSync('net.key'),
-    cert: fs.readFileSync('net.crt'),
+    key: fs.readFileSync('rms.key'),
+    cert: fs.readFileSync('rms.crt'),
 };
 
 const server = createServer(credentials, app)
 const PORT =  process.env.PORT || 5000;
+console.log("creating server on",PORT)
 server.listen(PORT);

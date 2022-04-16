@@ -14,7 +14,7 @@ export interface IProcumer {
     turbines: Array<ITurbine>;
     id: string;
 }
-export class Procumer extends Consumer implements IComponent, IProcumer, IProducer {
+export class Procumer extends Consumer implements IProcumer, IProducer {
     price: number;
     totalProduction: number;
     totalCapacity: number;

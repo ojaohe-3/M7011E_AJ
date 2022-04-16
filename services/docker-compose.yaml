@@ -1,21 +1,7 @@
 version: "3"
 
 services:
-  authenticator:
-    # build:
-    #   context: ./Auth
-    image: authenticator
-    ports:
-      - "5000:5000"
-    env_file: auth.env
-    networks:
-      - database
-      - services
-    depends_on:
-      - mongodb
-
   weather:
-    # build: ./Weather-Module
     image: weather
     ports:
       - "2555:2555"
@@ -47,12 +33,70 @@ services:
       - 'rabbitmq_data:/bitnami/rabbitmq/mnesia'
     networks:
       - rabbit
+  
+  authenticator:
+    image: authenticator
+    ports:
+      - "5025:5025"
+    env_file: auth.env
+    networks:
+      - database
+      - services
+    depends_on:
+      - mongodb
+
+  networks:
+    image: network
+    env_file:
+      - net.env
+    ports:
+    - "5050:5050"
+    networks:
+      - database
+      - services
+      - rabbit
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - authenticator
+
+  simulator:
+    image: simulator
+    ports:
+      - "5001:5001"
+    env_file: auth.env
+    networks:
+      - database
+      - rabbit
+      - services
+    depends_on:
+      - mongodb
+      - weather
+      - networks
+      - rabbitmq
+      - authenticator
+    
+  image_service:
+    image: 'rms'
+    ports:
+      - "2525:2525"
+    env_file:
+      - rms.env
+    networks:
+      - services
+    volumes:
+      - rms_data
+    depends_on:
+      - authenticator
 
 volumes:
   rabbitmq_data:
     driver: local
 
   mongodb_data:
+    driver: local
+
+  rms_data:
     driver: local
 
 networks:

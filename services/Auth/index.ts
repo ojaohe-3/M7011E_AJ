@@ -1,3 +1,4 @@
+import { assert } from "console";
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import { createServer } from "https";
@@ -87,11 +88,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 
 app.get("/api/validate", async (req, res) => {
-    const token = req.headers.authorization.split(' ')[1];
-    console.log(token);
+    const token = req.headers.authorization.split(' ')[1]; 
+    // const token = req.body
+
 
     try {
-        jwt.verify(token, process.env.JWT_SECRET)
+        jwt.verify(token,process.env.JWT_SECRET)
+
         const data = jwt.decode(token)
         res.json({ message: "Valid Token!", status: 1, body: data }) //todo enforce TLS 
     } catch (error) {
@@ -182,7 +185,7 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
-const PORT = + process.env.PORT | 5000;
+const PORT =  process.env.PORT || 5000;
 // app.listen(PORT, () => {
 //     console.log(`lisening on ${PORT}`);
 
@@ -196,8 +199,6 @@ const credentials = {
 };
 
 const server = createServer(credentials, app)
+console.log("creating server on",PORT)
 server.listen(PORT);
 DB.Instance;
-function sign_jwt(user: UserData) {
- 
-}

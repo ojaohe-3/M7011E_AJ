@@ -20,11 +20,13 @@ export declare interface IModels {
 export class DB{
   
   private static instance?: DB;
-  private static get Instance() : DB{
+
+  public static get Instance() : DB{
     if(!this.instance)
       this.instance = new DB();
     return this.instance;
   }
+
   private _db: Connection; 
   private _models: IModels;
 

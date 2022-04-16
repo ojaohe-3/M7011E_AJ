@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { Types } from "mongoose";
 import { DB } from "../DB-Connector/db-connector";
-import RabbitHandler from "../handler/RabbitHandler";
+import RabbitHandler from "../handler/RabbitSeverHandler";
 import { Source, Consumer } from "./node";
 
 export interface ITicket {
@@ -12,7 +12,6 @@ export interface ITicket {
 }
 export interface INetwork {
     id: string
-    // connected: INetwork this is a proposed solution for enabeling network to be past a simulation node to other in the cluster.
     tickets: ITicket[]
     name: string
     updatedAt: Date

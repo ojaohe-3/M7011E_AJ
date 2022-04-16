@@ -12,5 +12,6 @@ const credentials = {
 
 const server = createServer(credentials, app)
 const PORT =  process.env.PORT || 5000;
+console.log("creating server on",PORT)
 server.listen(PORT);
 

@@ -1,4 +1,4 @@
-import client, { Connection, Channel } from 'amqplib';
+import client, { Connection, Channel, credentials } from 'amqplib';
 import { randomUUID } from 'crypto';
 import WorkHandler, { Handler } from './WorkHandler';
 // import { buffer } from 'stream/consumers';
@@ -62,9 +62,13 @@ export default class RabbitHandler {
 
     private async connect() {
         try {
-            this._connector = await client.connect(process.env.RABBITMQ_CONNECTION_STRING || 'amqp://localhost:5672');
+            const opt = {
+                credentials: credentials.plain(process.env.RABBITMQ_USER || "user", process.env.RABBITMQ_PASS || "password")
+            }
+            console.log("connecting to",process.env.RABBITMQ_CONNECTION_STRING|| 'amqp://localhost')
+            this._connector = await client.connect(process.env.RABBITMQ_CONNECTION_STRING || 'amqp://localhost', opt);
             this._connected = true;
-
+            console.log("rabbitmq connected!")
 
         } catch (error) {
             console.log(error);

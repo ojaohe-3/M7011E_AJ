@@ -7,11 +7,6 @@ export interface ITicket extends Document {
     target: string
 }
 export declare interface INetwork extends Document {
-    _id: Types.ObjectId
-    // suppliers: string[]
-    // consumers: string[]
-    // total_demand: number
-    // total_supply: number
     tickets: ITicket[]
     updatedAt: Date
     name: string
@@ -19,7 +14,7 @@ export declare interface INetwork extends Document {
 export interface NetworkModel extends Model<INetwork> { };
 
 export class NetworkSchema {
-
+ 
     private _model: Model<INetwork>;
 
     constructor() {
@@ -32,16 +27,13 @@ export class NetworkSchema {
 
 
         const networkSchema = new Schema({
-            _id: { type: Types.ObjectId, requrired: true, unique: true},
-            // total_supply: { type: Number, required: true },
-            // total_demand: { type: Number, required: true },
+            // _id: { type: Types.ObjectId, requrired: true, unique: true},
+
             name: { type: String, required: true, unique: true },
             updatedAt: { type: Date, required: true },
-            // suppliers: [String],
-            // consumers: [String],
             tickets: [tickets]
         });
-        this._model = model<INetwork>('Consumer', networkSchema)
+        this._model = model<INetwork>('Network', networkSchema)
     }
 
     public get model(): Model<INetwork> {
