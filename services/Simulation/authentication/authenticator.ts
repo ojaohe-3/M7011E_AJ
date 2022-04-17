@@ -1,6 +1,7 @@
 import assert = require("assert");
 import axios from "axios";
 import UserData from "./userdata";
+import https from 'https';
 
 export default function Authenticate(key: string, lvl?: number) {
     return async function (req, res, next) { // todo TLS protocols
@@ -38,15 +39,21 @@ function isPrivilaged(key: string, user: UserData, id?: string, lvl?: number): b
     return false;
 }
 
-async function verify(token: string): Promise<UserData | null> {
+async function verify(token: string): Promise<UserData | undefined> {
     try {
-        const data = await (await axios.get(process.env.AUTH_ENDPOINT + '/api/validate', { headers: { 'authorization': 'Bearer ' + token } })).data; 
+        const fs = require('fs');
+        const httpsAgent = new https.Agent({
+            cert: fs.readFileSync("./sim.crt"),
+            key: fs.readFileSync("./sim.key"),
+            rejectUnauthorized: false // NOTE: this will disable client verification
+        })
+        const data = (await axios.get(process.env.AUTH_ENDPOINT + '/api/validate', { headers: { 'authorization': 'Bearer ' + token }, httpsAgent })).data;
         assert(data.status)
         return data.body.data;
 
 
     } catch (error) {
         console.log(error);
-        return null;
+        return undefined;
     }
 }

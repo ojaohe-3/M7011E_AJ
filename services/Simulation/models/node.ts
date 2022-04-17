@@ -8,7 +8,6 @@ export interface IComponent {
     tick: (time: number) => void;
     output: number;
     demand: number;
-    cost: number;
     asset: Asset;
     id: string;
 
