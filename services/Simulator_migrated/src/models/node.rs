@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::time::{Duration, Instant};
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Asset {
     EMPTY,
@@ -9,69 +8,82 @@ pub enum Asset {
     Windturbine,
     Powerplant,
 }
-
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct SimulationNode<'a> {
-    network: &'a str,
-    output: f64,
-    demand: f64,
-    asset: Asset,
-    id: &'a str,
-    last: Instant,
-}
-pub trait Component {
-    fn tick(&mut self, time: Instant) -> bool;
-    fn new(node: SimulationNode) -> Self;
+pub enum CellType {
+    Empty,
+    Conusmer,
+    Prosumer,
+    Manager,
 }
 
-type NodeGrid = Vec<Vec<Option<dyn Component>>>;
-pub struct Grid<'a> {
+pub trait Component<T> {
+    fn new(obj : T) -> Self;
+    fn tick(&mut self, elapsed: f64);
+    fn get_asset(&self) -> Asset;
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Cell {
+    x: usize,
+    y: usize,
+    id: String,
+    cell_type: CellType,
+}
+
+impl Cell {
+    pub fn new(x: usize, y: usize, id: String, cell_type: CellType) -> Self {
+        Self {
+            x,
+            y,
+            id,
+            cell_type,
+        }
+    }
+}
+
+pub type NodeGrid = Vec<Vec<Cell>>;
+pub struct Grid {
     width: usize,
     height: usize,
-    id: &'a str,
+    id: String,
     nodes: NodeGrid,
 }
 
-impl Grid<'_> {
-    fn new(width: usize, height: usize) -> Grid<'static>{
+impl Grid {
+    pub fn new(width: usize, height: usize) -> Self {
         use uuid::Uuid;
-        let id = Uuid::new_v4().ToString();
-        let mut grid: NodeGrid = &Vec::new();
+        let id = &Uuid::new_v4().to_string();
+        let mut grid: NodeGrid = Vec::new();
 
         for j in 0..height {
             let mut row = Vec::new();
             for i in 0..width {
-                row.push(None);
+                row.push(Cell {
+                    x: i,
+                    y: j,
+                    id: "none".to_string(),
+                    cell_type: CellType::Empty,
+                });
             }
             grid.push(row);
         }
 
-        Grid {
+        Self {
             width,
             height,
-            id,
+            id: id.to_string(),
             nodes: grid,
         }
     }
-
-    fn getAt(&self, x: usize, y: usize) -> Result<dyn Component, ()> {
+    pub fn get_at(&self, x: usize, y: usize) -> Result<Cell, ()> {
         if x > self.width || y > self.height {
             return Err(());
         }
-        Ok(self.node[y][x])
+        Ok(self.nodes[y][x].clone())
     }
 
-    fn setAt<T>(&mut self, x: usize, y: usize, item: &dyn Component) {
-        self.nodes[y][x].child = Some(*item);
-    }
-
-    fn tick(&self) {
-        for row in self.nodes {
-            for item in row {
-                if let Some(child) = item.child {
-                    child.tick(Instant::now());
-                }
-            }
-        }
+    pub fn set_at(&mut self, x: usize, y: usize, item: Cell) {
+        self.nodes[y][x] = item;
     }
 }
+

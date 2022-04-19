@@ -1,22 +1,26 @@
+use chrono::{Utc, Timelike};
 use serde::{Deserialize, Serialize};
+use rand::Rng;
 
-use super::node::SimulationNode;
+use super::node::{Asset, Component};
 
 type TimeFn = [f64; 24];
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct Consumer<'a> {
+pub struct Consumer {
     timefn: TimeFn,
     profile: f64,
-    node: SimulationNode<'a>,
+    asset: Asset,
+    demand: f64
 }
 
-impl<'a> Consumer<'a> {
-    pub fn new(timefn: TimeFn, profile: Option<f64>, node: SimulationNode<'a>) -> Self {
+impl Consumer{
+    pub fn new(timefn: TimeFn, profile: Option<f64>, asset: Option<Asset>) -> Self {
         if let Some(p) = profile {
             Self {
                 timefn,
                 profile: p,
-                node,
+                asset: if let Some(a) = asset { a } else { Asset::Customer1 },
+                demand : 0.,
             }
         } else {
             let mut rng = rand::thread_rng();
@@ -31,48 +35,61 @@ impl<'a> Consumer<'a> {
             Self {
                 timefn,
                 profile: size * 0.027 + lamba * 0.5,
-                node,
+                asset: if let Some(a) = asset { a } else { Asset::Customer1 },
+                demand : 0.,
             }
         }
     }
-        fn consumption(&self, temp: f32){
+    pub fn consumption(&self, temp: f64) -> f64 {
         let mut rng = rand::thread_rng();
         let now = Utc::now();
-        let hour = now.hour24();
-
-        self.profile * (0.002 * (294.15 - temp).powf(2) + self.timefn[hour])
+        let hour = now.hour();
+        
+        self.profile * (0.002 * (294.15 - temp).powf(2.) + self.timefn[hour as usize])
+    }
+    pub fn GenerateTimeFn() -> TimeFn {
+        let mut rng = rand::thread_rng();
+        let random: f64 = rng.gen();
+        return [
+            0.02 * random,
+            0.0114 * random,
+            0.011 * random,
+            0.05 * random,
+            0.2 * random,
+            0.35 * random,
+            0.6 * random,
+            0.8 * random,
+            0.65 * random,
+            0.64 * random,
+            0.56 * random,
+            0.58 * random,
+            0.74 * random,
+            0.56 * random,
+            0.3 * random,
+            0.2 * random,
+            0.812 * random,
+            0.911 * random,
+            0.922 * random,
+            0.926 * random,
+            0.845 * random,
+            0.76 * random,
+            0.311 * random,
+            0.121 * random,
+        ];
     }
 }
 
+impl Component<Consumer> for Consumer {
+    fn tick(&mut self, elapsed: f64){
+        // TODO weather dependant demand
+        
+    }
 
+    fn get_asset(&self) -> Asset {
+        self.asset
+    }
 
-pub fn GenerateTimeFn() -> TimeFn {
-    use rand::Rng;
-    let random: f64 = rng.gen();
-    return (
-        0.02 * random,
-        0.0114 * random,
-        0.011 * random,
-        0.05 * random,
-        0.2 * random,
-        0.35 * random,
-        0.6 * random,
-        0.8 * random,
-        0.65 * random,
-        0.64 * random,
-        0.56 * random,
-        0.58 * random,
-        0.74 * random,
-        0.56 * random,
-        0.3 * random,
-        0.2 * random,
-        0.812 * random,
-        0.911 * random,
-        0.922 * random,
-        0.926 * random,
-        0.845 * random,
-        0.76 * random,
-        0.311 * random,
-        0.121 * random,
-    );
+    fn new(obj : Consumer) -> Self {
+        obj
+    }
 }
