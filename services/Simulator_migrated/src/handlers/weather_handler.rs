@@ -26,8 +26,8 @@ pub fn weather_singleton() -> &'static WHReader {
     }
 }
 pub struct WeatherReport{
-    temp: f64, // temp in kevlin
-    wind_speed: f64  // windspeed in knots
+    pub temp: f64, // temp in kevlin
+    pub wind_speed: f64  // windspeed in knots
 }
 pub struct WeatherHandler{
     pub cache: Option<WeatherReport>,
@@ -43,13 +43,13 @@ impl WeatherHandler {
     pub fn process(&mut self){
         if self.last_fetch.elapsed() >= WeatherHandler::FREQ_OF_REQUEST{
             self.last_fetch = Instant::now();
-            WeatherHandler::fetch_report(self);
         }
     }
-    pub async fn fetch_report(weatherHandler: &mut WeatherHandler) -> Result<WeatherReport,()>{
+    pub async fn fetch_report() -> Result<WeatherReport,()>{
 
         // fetch weather from api
 
+        
         return Ok(WeatherReport{
             temp: 273.15, wind_speed: 0.
         })

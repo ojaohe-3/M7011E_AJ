@@ -1,6 +1,8 @@
-use chrono::{Utc, Timelike};
-use serde::{Deserialize, Serialize};
+use chrono::{Timelike, Utc};
 use rand::Rng;
+use serde::{Deserialize, Serialize};
+
+use crate::handlers::weather_handler::{weather_singleton, WeatherHandler};
 
 use super::node::{Asset, Component};
 
@@ -10,17 +12,21 @@ pub struct Consumer {
     timefn: TimeFn,
     profile: f64,
     asset: Asset,
-    demand: f64
+    demand: f64,
 }
 
-impl Consumer{
+impl Consumer {
     pub fn new(timefn: TimeFn, profile: Option<f64>, asset: Option<Asset>) -> Self {
         if let Some(p) = profile {
             Self {
                 timefn,
                 profile: p,
-                asset: if let Some(a) = asset { a } else { Asset::Customer1 },
-                demand : 0.,
+                asset: if let Some(a) = asset {
+                    a
+                } else {
+                    Asset::Customer1
+                },
+                demand: 0.,
             }
         } else {
             let mut rng = rand::thread_rng();
@@ -35,21 +41,24 @@ impl Consumer{
             Self {
                 timefn,
                 profile: size * 0.027 + lamba * 0.5,
-                asset: if let Some(a) = asset { a } else { Asset::Customer1 },
-                demand : 0.,
+                asset: if let Some(a) = asset {
+                    a
+                } else {
+                    Asset::Customer1
+                },
+                demand: 0.,
             }
         }
     }
     pub fn consumption(&self, temp: f64) -> f64 {
-        let mut rng = rand::thread_rng();
         let now = Utc::now();
         let hour = now.hour();
-        
+
         self.profile * (0.002 * (294.15 - temp).powf(2.) + self.timefn[hour as usize])
     }
     pub fn GenerateTimeFn() -> TimeFn {
         let mut rng = rand::thread_rng();
-        let random: f64 = rng.gen();
+        let random: f64 = rng.gen::<f64>()*10.;
         return [
             0.02 * random,
             0.0114 * random,
@@ -80,16 +89,43 @@ impl Consumer{
 }
 
 impl Component<Consumer> for Consumer {
-    fn tick(&mut self, elapsed: f64){
+    fn tick(&mut self, elapsed: f64) {
         // TODO weather dependant demand
-        
+        let s = weather_singleton();
+        let temp_report = if let Some(report) = &s.inner.lock().unwrap().cache {
+            Some(report.temp)
+        } else {
+            None
+        };
+        if let Some(temp) = temp_report {
+            self.demand = self.consumption(temp)*elapsed;
+        }
     }
 
     fn get_asset(&self) -> Asset {
         self.asset
     }
 
-    fn new(obj : Consumer) -> Self {
+    fn new(obj: Consumer) -> Self {
         obj
     }
+}
+
+#[tokio::test]
+async fn test_demand() {
+    let cm: &mut Consumer = &mut Component::new(Consumer::new(Consumer::GenerateTimeFn(), None, None));
+    cm.tick(1.);
+    assert_eq!(cm.demand, 0.);
+
+    let join = tokio::spawn(async { 
+        WeatherHandler::fetch_report().await.unwrap()
+    });
+    let report = match join.await{
+        Err(e) => panic!("{}", e),
+        Ok(v) => v
+    };
+    weather_singleton().inner.lock().unwrap().set_cache(report);
+
+    cm.tick(1.);
+    assert_ne!(cm.demand, 0.);
 }

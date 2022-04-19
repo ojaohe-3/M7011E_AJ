@@ -1,10 +1,11 @@
-
 use std::borrow::BorrowMut;
 
-use chrono::{Utc, DateTime};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::node::{Component, Asset};
+use crate::handlers::weather_handler::{weather_singleton, WeatherReport};
+
+use super::node::{Asset, Component};
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Turbine {
     max_production: f64,
@@ -12,20 +13,18 @@ pub struct Turbine {
 
 impl Turbine {
     pub fn new(max_production: f64) -> Self {
-        Self {
-            max_production,
-        }
+        Self { max_production }
     }
-    pub fn profile(&self, wind_speed: f64) -> f64{
+    pub fn profile(&self, wind_speed: f64) -> f64 {
         let mut ratio = 0.0;
-        if wind_speed > 3. && wind_speed < 24.6{
-            if wind_speed >= 12.{
+        if wind_speed > 3. && wind_speed < 24.6 {
+            if wind_speed >= 12. {
                 ratio = 1.0;
-            }else{
-                ratio = 1./12. * wind_speed;
+            } else {
+                ratio = 1. / 12. * wind_speed;
             }
         }
-        return self.max_production*ratio;
+        return self.max_production * ratio;
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize, Copy, PartialEq)]
@@ -46,20 +45,19 @@ impl Battery {
         }
     }
 
-    pub fn input(&mut self, ratio: f64) -> f64{
+    pub fn input(&mut self, ratio: f64) -> f64 {
         let mut give = ratio * self.max_charge;
         give = give.clamp(0., self.capacity - self.current);
         self.current += give;
         give
     }
-    
-    pub fn output(&mut self, ratio: f64) -> f64{
+
+    pub fn output(&mut self, ratio: f64) -> f64 {
         let mut take = self.max_output * ratio;
         take = take.clamp(0., self.current);
         self.current -= take;
         take
     }
-
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 
@@ -82,7 +80,7 @@ impl Prosumer {
         turbine: Vec<Turbine>,
         input_ratio: f64,
         output_ratio: f64,
-        id: String
+        id: String,
     ) -> Self {
         Self {
             status,
@@ -96,7 +94,7 @@ impl Prosumer {
             total_stored: 0.,
         }
     }
-    pub fn set_status(&mut self, status: bool){
+    pub fn set_status(&mut self, status: bool) {
         self.status = status;
     }
 
@@ -108,19 +106,36 @@ impl Prosumer {
 
 impl Component<Prosumer> for Prosumer {
     fn tick(&mut self, elapsed: f64) {
-        if self.timeout > 0.{
+        if self.timeout > 0. {
             self.status = false;
             self.timeout -= elapsed;
         }
-        
-        if self.status{ 
-            // TODO weather dependant turbine
-            let bs: &mut Vec<Battery> = &mut self.batteries;
-            for b in bs{
-                let net =  b.output(self.output_ratio) - b.input(self.input_ratio);
-                self.total_production += net;
-            }; // TODO Check if battery gets changed
+
+        let s = weather_singleton();
+        let report = &s.inner.lock().unwrap().cache;
+        let wind_speed = match report {
+            Some(v) => v.wind_speed,
+            None => 0.,
+        };
+
+        if self.status {
+            self.total_production = self
+                .turbine
+                .iter()
+                .map(|t| t.profile(wind_speed) * elapsed)
+                .sum();
         }
+        let bs: &mut Vec<Battery> = &mut self.batteries;
+        for b in bs {
+            let inp =  b.input(self.input_ratio);
+            let out = b.output(self.output_ratio);
+            let net = out - inp;
+            self.total_production += net;
+            if(self.total_production < 0.){
+                b.current -= inp;
+                self.total_production = 0.;
+            }
+        } // TODO Check if battery gets changed
         self.total_stored = self.batteries.iter().map(|b| b.current).sum();
     }
 
@@ -128,7 +143,55 @@ impl Component<Prosumer> for Prosumer {
         Asset::Windturbine
     }
 
-    fn new(obj : Prosumer) -> Self {
+    fn new(obj: Prosumer) -> Self {
         obj
     }
+}
+
+#[test]
+fn test_prosumer_no_output() {
+    let p: &mut Prosumer = &mut Component::new(Prosumer::new(
+        true,
+        vec![Battery::new(1000., 0., 100., 100.)],
+        vec![Turbine::new(1000.)],
+        1.,
+        0.,
+        "1".to_string(),
+    ));
+    let s = weather_singleton();
+    s.inner.lock().unwrap().set_cache(WeatherReport {
+        temp: 300.,
+        wind_speed: 0.,
+    });
+    assert_eq!(p.total_production, 0.);
+    assert_eq!(p.total_stored, 0.);
+
+    s.inner.lock().unwrap().set_cache(WeatherReport {
+        temp: 300.,
+        wind_speed: 11.,
+    });
+    p.tick(1.);
+    assert!(p.total_production < p.turbine[0].max_production);
+    assert!(p.total_stored > 0.);
+    s.inner.lock().unwrap().set_cache(WeatherReport {
+        temp: 300.,
+        wind_speed: 14.,
+    });
+    p.tick(1.);
+    assert_eq!(p.total_production, p.turbine[0].max_production - p.batteries[0].max_charge);
+    assert!(p.total_stored > 0.);
+    s.inner.lock().unwrap().set_cache(WeatherReport {
+        temp: 300.,
+        wind_speed: 25.,
+    });
+    p.tick(1.);
+    assert_eq!(p.total_production, 0.);
+    assert!(p.total_stored > 0.);
+    s.inner.lock().unwrap().set_cache(WeatherReport {
+        temp: 300.,
+        wind_speed: 2.,
+    });
+    p.tick(1.);
+    assert_eq!(p.total_production, 0.);
+    assert!(p.total_stored > 0.);
 }

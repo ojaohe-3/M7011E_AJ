@@ -1,18 +1,7 @@
-// export interface Privilage {
-//     level: Number,
-//     access?: string,
-//     id: string
-// }
-// export default interface UserData {
-//     username: string,
-//     main?: string,
-//     managers?: Array < Privilage >,
-//     prosumers?: Array < Privilage >,
-//     consumers?: Array < string >,
-//     admin: boolean,
-//     last_login?: Date
-// }
+use serde::{Serialize, Deserialize};
 
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Privilage{
     level: u32,
     access: Option<String>,
@@ -22,7 +11,7 @@ pub struct Privilage{
 impl Privilage {
     pub fn new(level: u32, access: Option<String>, id: String) -> Self { Self { level, access, id } }
 }
-
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct  UserData{
     username: String,
     main: Option<String>,
