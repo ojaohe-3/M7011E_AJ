@@ -1,11 +1,12 @@
 use std::borrow::BorrowMut;
 
 use chrono::{DateTime, Utc};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 use crate::handlers::weather_handler::{weather_singleton, WeatherReport};
 
-use super::node::{Asset, Component};
+use super::{node::{Asset, Component}, consumer::Consumer};
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Turbine {
     max_production: f64,
@@ -71,6 +72,7 @@ pub struct Prosumer {
     pub timeout: f64,
     pub total_production: f64,
     pub total_stored: f64,
+    pub demand: f64,
 }
 
 impl Prosumer {
@@ -81,6 +83,7 @@ impl Prosumer {
         input_ratio: f64,
         output_ratio: f64,
         id: String,
+        demand: f64,
     ) -> Self {
         Self {
             status,
@@ -92,6 +95,7 @@ impl Prosumer {
             timeout: 0.,
             total_production: 0.,
             total_stored: 0.,
+            demand
         }
     }
     pub fn set_status(&mut self, status: bool) {
@@ -106,6 +110,8 @@ impl Prosumer {
 
 impl Component<Prosumer> for Prosumer {
     fn tick(&mut self, elapsed: f64) {
+        let mut rng =  rand::thread_rng();
+        self.demand = rng.gen_range(1.0..10.);
         if self.timeout > 0. {
             self.status = false;
             self.timeout -= elapsed;
@@ -157,7 +163,8 @@ fn test_prosumer_no_output() {
         1.,
         0.,
         "1".to_string(),
-    ));
+        0.
+    ));        
     let s = weather_singleton();
     s.inner.lock().unwrap().set_cache(WeatherReport {
         temp: 300.,

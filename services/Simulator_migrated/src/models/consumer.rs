@@ -9,10 +9,10 @@ use super::node::{Asset, Component};
 type TimeFn = [f64; 24];
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Consumer {
-    timefn: TimeFn,
-    profile: f64,
-    asset: Asset,
-    demand: f64,
+    pub timefn: TimeFn,
+    pub profile: f64,
+    pub asset: Asset,
+    pub demand: f64,
 }
 
 impl Consumer {
@@ -56,7 +56,7 @@ impl Consumer {
 
         self.profile * (0.002 * (294.15 - temp).powf(2.) + self.timefn[hour as usize])
     }
-    pub fn GenerateTimeFn() -> TimeFn {
+    pub fn generate_time_fn() -> TimeFn {
         let mut rng = rand::thread_rng();
         let random: f64 = rng.gen::<f64>()*10.;
         return [
@@ -113,7 +113,7 @@ impl Component<Consumer> for Consumer {
 
 #[tokio::test]
 async fn test_demand() {
-    let cm: &mut Consumer = &mut Component::new(Consumer::new(Consumer::GenerateTimeFn(), None, None));
+    let cm: &mut Consumer = &mut Component::new(Consumer::new(Consumer::generate_time_fn(), None, None));
     cm.tick(1.);
     assert_eq!(cm.demand, 0.);
 

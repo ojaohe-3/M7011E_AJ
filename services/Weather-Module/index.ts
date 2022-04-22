@@ -143,7 +143,7 @@ app.get("/", async (req, res) => {
         }
 
     }else
-        res.send("no location specified")
+        res.status(403).send("no location specified")
 });
 
 app.get("/monitor", (req, res) =>{

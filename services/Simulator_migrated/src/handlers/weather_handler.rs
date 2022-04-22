@@ -3,6 +3,7 @@ use std::sync::{Mutex, Once};
 use std::time::Instant;
 use std::{mem::MaybeUninit};
 
+use serde::{Serialize, Deserialize};
 use time::Duration;
 
 
@@ -25,6 +26,7 @@ pub fn weather_singleton() -> &'static WHReader {
         SINGLETON.assume_init_ref()
     }
 }
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct WeatherReport{
     pub temp: f64, // temp in kevlin
     pub wind_speed: f64  // windspeed in knots
@@ -32,6 +34,7 @@ pub struct WeatherReport{
 pub struct WeatherHandler{
     pub cache: Option<WeatherReport>,
     last_fetch: Instant,
+
 }
 
 impl WeatherHandler {
@@ -49,7 +52,7 @@ impl WeatherHandler {
 
         // fetch weather from api
 
-        
+        // let res = reqwest::get()
         return Ok(WeatherReport{
             temp: 273.15, wind_speed: 0.
         })
