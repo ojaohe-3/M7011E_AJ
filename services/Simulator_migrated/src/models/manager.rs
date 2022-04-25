@@ -6,19 +6,25 @@ use std::{
     time::{Duration, Instant},
 };
 
+
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manager {
-    pub id: String,
-    pub max_production: f64,
-    pub current: f64,
-    pub ratio: f64,
-    pub price: f64,
-    pub status: bool,
-    pub last: f64,
+    pub id: String, // hash 128bit
+    pub max_production: f64, // in kw
+    pub current: f64, // [0, 1] range  
+    pub ratio: f64, // [0, 1] range  
+    pub price: f64, // price in kr
+    pub status: bool, // active or not
+    #[serde(skip_serializing)]
+    pub last: f64, // seconds as f64
+    #[serde(skip_serializing)]
+    pub acc: f64, // accumilated acceleration
 }
 
 impl Manager {
-    const STEP_PER_SECOND: f64 = 5.;
+    // const MAX_VELOCITY: f64 = 1.;
+    const ACCELERATION: f64 = 5e-5; // the constant acceleration, it goes without saying that this converges towards a velocity of infinity unless clamped
 
     pub fn new(id:String, max_production: f64, current: f64, ratio: f64, price: f64, status: bool) -> Self {
         Self {
@@ -29,6 +35,7 @@ impl Manager {
             price,
             status,
             last: 0.,
+            acc: 0.,
         }
     }
 
@@ -43,15 +50,23 @@ impl Manager {
 }
 
 impl Component<Manager> for Manager {
-    fn tick(&mut self, elapsed: f64){
+    fn tick(&mut self, dt: f64){
+        self.acc += Manager::ACCELERATION / dt;
+        // if self.last > 1.{
+        //     self.acc = 0.;
+        //     self.last = 0.;
+        //     println!("second passed!")
+        // }
+
         let mut cur = self.current;
         if self.status {
-            cur += Manager::STEP_PER_SECOND * elapsed;
+            cur += self.acc/self.max_production;//(self.acc + Manager::STEP_PER_SECOND) * dt/2. + Manager::ACCELERATION * dt.powf(2.)/2.;
         } else {
-            cur -= Manager::STEP_PER_SECOND * elapsed;
+            cur -= self.acc/self.max_production;//(self.acc + Manager::STEP_PER_SECOND) * dt/2. + Manager::ACCELERATION * dt.powf(2.)/2.;
         }
         cur = cur.clamp(0., self.ratio); // TODO make ratio the goal rather than status
         self.set_current(cur);
+        self.last += dt;
         
     }
 

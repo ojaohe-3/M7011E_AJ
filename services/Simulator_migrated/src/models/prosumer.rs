@@ -110,8 +110,11 @@ impl Prosumer {
 
 impl Component<Prosumer> for Prosumer {
     fn tick(&mut self, elapsed: f64) {
+        //TODO: make into profile that makes sense
         let mut rng =  rand::thread_rng();
         self.demand = rng.gen_range(1.0..10.);
+
+
         if self.timeout > 0. {
             self.status = false;
             self.timeout -= elapsed;
@@ -128,13 +131,13 @@ impl Component<Prosumer> for Prosumer {
             self.total_production = self
                 .turbine
                 .iter()
-                .map(|t| t.profile(wind_speed) * elapsed)
+                .map(|t| t.profile(wind_speed))
                 .sum();
         }
         let bs: &mut Vec<Battery> = &mut self.batteries;
         for b in bs {
-            let inp =  b.input(self.input_ratio);
-            let out = b.output(self.output_ratio);
+            let inp =  b.input(self.input_ratio*elapsed);
+            let out = b.output(self.output_ratio*elapsed);
             let net = out - inp;
             self.total_production += net;
             if(self.total_production < 0.){

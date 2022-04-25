@@ -1,11 +1,10 @@
-
+use std::mem::MaybeUninit;
 use std::sync::{Mutex, Once};
 use std::time::Instant;
-use std::{mem::MaybeUninit};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use time::Duration;
-
+use tokio::io::AsyncReadExt;
 
 pub struct WHReader {
     pub inner: Mutex<WeatherHandler>,
@@ -27,35 +26,61 @@ pub fn weather_singleton() -> &'static WHReader {
     }
 }
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub struct WeatherReport{
-    pub temp: f64, // temp in kevlin
-    pub wind_speed: f64  // windspeed in knots
+pub struct WeatherReport {
+    pub temp: f64,       // temp in kevlin
+    pub wind_speed: f64, // windspeed in knots
 }
-pub struct WeatherHandler{
+
+#[derive(Debug)]
+pub struct WeatherHandler {
     pub cache: Option<WeatherReport>,
     last_fetch: Instant,
+}
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 
+struct WeatherResponse{
+    lat: f64,
+    lon: f64,
+    temp: f64,
+    speed: f64,
+    last_updated: f64
 }
 
 impl WeatherHandler {
     const FREQ_OF_REQUEST: Duration = Duration::new(500, 0);
-    pub fn new() -> Self { Self { cache: None,
-    last_fetch: Instant::now()
-} }
+    pub fn new() -> Self {
+        Self {
+            cache: None,
+            last_fetch: Instant::now(),
+        }
+    }
 
-    pub fn process(&mut self){
-        if self.last_fetch.elapsed() >= WeatherHandler::FREQ_OF_REQUEST{
+    pub fn process(&mut self) {
+        if self.last_fetch.elapsed() >= WeatherHandler::FREQ_OF_REQUEST {
             self.last_fetch = Instant::now();
         }
     }
-    pub async fn fetch_report() -> Result<WeatherReport,()>{
-
+    pub async fn fetch_report() -> Result<WeatherReport, ()> {
+        //TODO: Fix the many possible errors and and handeling for that
         // fetch weather from api
+        let client = reqwest::Client::new();
 
+        let cert ={
+            let mut buf = &mut Vec::new();
+            tokio::fs::File::open("cert.pem")
+                .await
+                .unwrap()
+                .read_to_end(buf).await.unwrap();
+    
+             reqwest::Certificate::from_pem(buf).unwrap()
+        };
+        let resp = client.get("https://localhost:2551").query(&[("lat", 65.584160), ("lon", 22.154751)]).send().await.unwrap();
+        let data = resp.json::<WeatherResponse>().await.unwrap();
         // let res = reqwest::get()
-        return Ok(WeatherReport{
-            temp: 273.15, wind_speed: 0.
-        })
+        return Ok(WeatherReport {
+            temp: data.temp,
+            wind_speed: data.speed,
+        });
     }
 
     /// Set the weather handler's last fetch.

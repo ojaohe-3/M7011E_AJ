@@ -1,5 +1,7 @@
 use std::io::ErrorKind;
 
+use futures_util::Future;
+use futures_util::future::PollFn;
 use rand::prelude::IteratorRandom;
 use rand::thread_rng;
 use serde::{Deserialize, Serialize};
@@ -80,7 +82,7 @@ pub struct WeatherReportStore {
     time_stamp: f64,
 }
 
-#[derive()]
+#[derive(Debug)]
 pub struct DataHandler {
     pub prosumer_reports: Vec<ProsumerReport>,
     pub manager_reports: Vec<ManagerReport>,
@@ -90,7 +92,7 @@ pub struct DataHandler {
 }
 
 impl DataHandler {
-    const MAX_DATA_ENTRIES: usize = 1_000;
+    const MAX_DATA_ENTRIES: usize = 2_000;
     pub fn new() -> Self {
         Self {
             prosumer_reports: Vec::new(),
@@ -115,32 +117,32 @@ impl DataHandler {
     }
 
     pub async fn flush(&mut self) -> std::io::Result<()> {
-        if (self.manager_reports.len() > 100) {
+        if self.manager_reports.len() > 100 {
             let mut f = File::create("./dat/managers_data.bin").await?;
-            f.write_all(&bincode::serialize(&self.sample_managers_data()).unwrap());
+            f.write_all(&bincode::serialize(&self.sample_managers_data()).unwrap()).await?;
             self.manager_reports.clear();
-            f.flush().await;
+            f.flush().await?;
         }
 
-        if (self.prosumer_reports.len() > 100) {
+        if self.prosumer_reports.len() > 100 {
             let mut f = File::create("./dat/prosumers_data.bin").await?;
-            f.write_all(&bincode::serialize(&self.sample_prosumers_data()).unwrap());
+            f.write_all(&bincode::serialize(&self.sample_prosumers_data()).unwrap()).await?;
             self.prosumer_reports.clear();
-            f.flush().await;
+            f.flush().await?;
         }
 
-        if (self.consumer_reports.len() > 100) {
+        if self.consumer_reports.len() > 100 {
             let mut f = File::create("./dat/consumers_data.bin").await?;
-            f.write_all(&bincode::serialize(&self.sample_consumers_data()).unwrap());
+            f.write_all(&bincode::serialize(&self.sample_consumers_data()).unwrap()).await?;
             self.consumer_reports.clear();
-            f.flush().await;
+            f.flush().await?;
         }
 
         if (self.weather_reports.len() > 100) {
             let mut f = File::create("./dat/weather_data.bin").await?;
-            f.write_all(&bincode::serialize(&self.weather_reports).unwrap());
+            f.write_all(&bincode::serialize(&self.weather_reports).unwrap()).await?;
             self.weather_reports.clear();
-            f.flush().await;
+            f.flush().await?;
         }
 
         Ok(())
@@ -210,20 +212,20 @@ impl DataHandler {
         }
     }
 
-    pub async fn log_prosumer(&mut self, report: ProsumerReport) {
+    pub fn log_prosumer(&mut self, report: ProsumerReport){
         self.prosumer_reports.push(report);
-        self.check_status().await;
+        // self.check_status()
     }
-    pub async fn log_manager(&mut self, report: ManagerReport) {
+    pub fn log_manager(&mut self, report: ManagerReport) {
         self.manager_reports.push(report);
-        self.check_status().await;
+        // self.check_status()
     }
-    pub async fn log_consumer(&mut self, report: ConsumerReport) {
+    pub fn log_consumer(&mut self, report: ConsumerReport) {
         self.consumer_reports.push(report);
-        self.check_status().await;
+        // self.check_status()
     }
-    pub async fn log_weather(&mut self, report: WeatherReportStore) {
+    pub fn log_weather(&mut self, report: WeatherReportStore) {
         self.weather_reports.push(report);
-        self.check_status().await;
+        // self.check_status()
     }
 }

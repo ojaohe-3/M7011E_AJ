@@ -42,6 +42,8 @@ impl Cell {
 }
 
 pub type NodeGrid = Vec<Vec<Cell>>;
+#[derive(Debug, Clone, Serialize, Deserialize)]
+
 pub struct Grid {
     width: usize,
     height: usize,

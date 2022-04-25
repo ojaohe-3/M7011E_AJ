@@ -7,16 +7,17 @@ use crate::handlers::weather_handler::{weather_singleton, WeatherHandler};
 use super::node::{Asset, Component};
 
 type TimeFn = [f64; 24];
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Consumer {
     pub timefn: TimeFn,
     pub profile: f64,
     pub asset: Asset,
     pub demand: f64,
+    pub id: String,
 }
 
 impl Consumer {
-    pub fn new(timefn: TimeFn, profile: Option<f64>, asset: Option<Asset>) -> Self {
+    pub fn new(timefn: TimeFn, profile: Option<f64>, asset: Option<Asset>, id: Option<String>) -> Self {
         if let Some(p) = profile {
             Self {
                 timefn,
@@ -27,6 +28,7 @@ impl Consumer {
                     Asset::Customer1
                 },
                 demand: 0.,
+                id: if Some(id) { id } else { uuid::Uuid::new_v4().to_string() }
             }
         } else {
             let mut rng = rand::thread_rng();
@@ -47,6 +49,8 @@ impl Consumer {
                     Asset::Customer1
                 },
                 demand: 0.,
+                id: if Some(id) { id } else { uuid::Uuid::new_v4().to_string() }
+
             }
         }
     }
@@ -98,7 +102,7 @@ impl Component<Consumer> for Consumer {
             None
         };
         if let Some(temp) = temp_report {
-            self.demand = self.consumption(temp)*elapsed;
+            self.demand = self.consumption(temp);
         }
     }
 
@@ -113,7 +117,7 @@ impl Component<Consumer> for Consumer {
 
 #[tokio::test]
 async fn test_demand() {
-    let cm: &mut Consumer = &mut Component::new(Consumer::new(Consumer::generate_time_fn(), None, None));
+    let cm: &mut Consumer = &mut Component::new(Consumer::new(Consumer::generate_time_fn(), None, None, None));
     cm.tick(1.);
     assert_eq!(cm.demand, 0.);
 
