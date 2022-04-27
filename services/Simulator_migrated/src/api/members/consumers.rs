@@ -11,7 +11,7 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct MemberInfo {
+pub struct MemberInfo {
     id: Option<String>,
     profile: Option<f64>,
     timefn: Option<[f64; 24]>,
@@ -21,7 +21,7 @@ struct MemberInfo {
 #[get("/")]
 pub async fn get_all() -> Json<Vec<Consumer>> {
     let sim = simulation_singleton();
-    let consumers = sim.inner.lock().unwrap().consumers.to_vec();
+    let consumers = sim.inner.lock().await.consumers.to_vec();
     Json(consumers)
 }
 
@@ -31,12 +31,12 @@ pub async fn generate_member(
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let sim = simulation_singleton();
     let consumer = body.into_inner();
-    if let Some(id) = consumer.id {
-        if sim.inner.lock().unwrap().get_consumer(&id).is_some() {
+    if let Some(id) = &consumer.id {
+        if sim.inner.lock().await.get_consumer(id).is_some() {
             return Err(WebRequestError::MemberAlreadyExist);
         }
     }
-    sim.inner.lock().unwrap().add_consumer(Consumer::new(
+    sim.inner.lock().await.add_consumer(Consumer::new(
         if let Some(tf) = consumer.timefn {
             tf
         } else {
@@ -53,7 +53,7 @@ pub async fn generate_member(
 #[get("/{id}")]
 pub async fn get_member(id: Path<String>) -> Result<Json<Consumer>, WebRequestError> {
     let sim = simulation_singleton();
-    let consumer = sim.inner.lock().unwrap().get_consumer(&id).cloned();
+    let consumer = sim.inner.lock().await.get_consumer(&id).cloned();
     match consumer {
         Some(m) => return Ok(Json(m)),
         None => return Err(WebRequestError::MemberNotFound),
@@ -70,7 +70,7 @@ pub async fn update_member(
     let response = sim
         .inner
         .lock()
-        .unwrap()
+        .await
         .get_consumer_mut(&id)
         .and_then(|m| {
             if let Some(p) = member.profile {
@@ -96,6 +96,6 @@ pub fn construct_service() -> actix_web::Scope {
     web::scope("/consumers")
         .service(get_all)
         .service(update_member)
-        // .service(get_member)
+        .service(get_member)
         .service(generate_member)
 }

@@ -17,7 +17,12 @@ pub struct Consumer {
 }
 
 impl Consumer {
-    pub fn new(timefn: TimeFn, profile: Option<f64>, asset: Option<Asset>, id: Option<String>) -> Self {
+    pub fn new(
+        timefn: TimeFn,
+        profile: Option<f64>,
+        asset: Option<Asset>,
+        id: Option<String>,
+    ) -> Self {
         if let Some(p) = profile {
             Self {
                 timefn,
@@ -28,7 +33,11 @@ impl Consumer {
                     Asset::Customer1
                 },
                 demand: 0.,
-                id: if Some(id) { id } else { uuid::Uuid::new_v4().to_string() }
+                id: if let Some(i) = id {
+                    i
+                } else {
+                    uuid::Uuid::new_v4().to_string()
+                },
             }
         } else {
             let mut rng = rand::thread_rng();
@@ -49,8 +58,11 @@ impl Consumer {
                     Asset::Customer1
                 },
                 demand: 0.,
-                id: if Some(id) { id } else { uuid::Uuid::new_v4().to_string() }
-
+                id: if let Some(id) = id {
+                    id
+                } else {
+                    uuid::Uuid::new_v4().to_string()
+                },
             }
         }
     }
@@ -62,7 +74,7 @@ impl Consumer {
     }
     pub fn generate_time_fn() -> TimeFn {
         let mut rng = rand::thread_rng();
-        let random: f64 = rng.gen::<f64>()*10.;
+        let random: f64 = rng.gen::<f64>() * 10.;
         return [
             0.02 * random,
             0.0114 * random,
@@ -117,16 +129,19 @@ impl Component<Consumer> for Consumer {
 
 #[tokio::test]
 async fn test_demand() {
-    let cm: &mut Consumer = &mut Component::new(Consumer::new(Consumer::generate_time_fn(), None, None, None));
+    let cm: &mut Consumer = &mut Component::new(Consumer::new(
+        Consumer::generate_time_fn(),
+        None,
+        None,
+        None,
+    ));
     cm.tick(1.);
     assert_eq!(cm.demand, 0.);
 
-    let join = tokio::spawn(async { 
-        WeatherHandler::fetch_report().await.unwrap()
-    });
-    let report = match join.await{
+    let join = tokio::spawn(async { WeatherHandler::fetch_report().await.unwrap() });
+    let report = match join.await {
         Err(e) => panic!("{}", e),
-        Ok(v) => v
+        Ok(v) => v,
     };
     weather_singleton().inner.lock().unwrap().set_cache(report);
 

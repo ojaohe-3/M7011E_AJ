@@ -11,7 +11,7 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct MemberInfo {
+pub struct MemberInfo {
     id: Option<String>,
     max_production: f64, // in kw
     price: f64,          // price in kr
@@ -20,7 +20,7 @@ struct MemberInfo {
 #[get("/")]
 pub async fn get_all() -> Json<Vec<Manager>> {
     let sim = simulation_singleton();
-    let managers = sim.inner.lock().unwrap().managers.to_vec();
+    let managers = sim.inner.lock().await.managers.to_vec();
     Json(managers)
 }
 
@@ -31,10 +31,10 @@ pub async fn generate_member(
     let sim = simulation_singleton();
     let manager = body.into_inner();
     if let Some(id) = manager.id {
-        if sim.inner.lock().unwrap().get_manager(&id).is_some() {
+        if sim.inner.lock().await.get_manager(&id).is_some() {
             return Err(WebRequestError::MemberAlreadyExist);
         } else {
-            sim.inner.lock().unwrap().add_manager(Manager::new(
+            sim.inner.lock().await.add_manager(Manager::new(
                 id,
                 manager.max_production,
                 0.0,
@@ -45,7 +45,7 @@ pub async fn generate_member(
         }
     } else {
         let id = uuid::Uuid::new_v4().to_string();
-        sim.inner.lock().unwrap().add_manager(Manager::new(
+        sim.inner.lock().await.add_manager(Manager::new(
             id,
             manager.max_production,
             0.0,
@@ -60,7 +60,7 @@ pub async fn generate_member(
 #[get("/{id}")]
 pub async fn get_member(id: Path<String>) -> Result<Json<Manager>, WebRequestError> {
     let sim = simulation_singleton();
-    let manager = sim.inner.lock().unwrap().get_manager(&id).cloned();
+    let manager = sim.inner.lock().await.get_manager(&id).cloned();
     match manager {
         Some(m) => return Ok(Json(m)),
         None => return Err(WebRequestError::MemberNotFound),
@@ -74,16 +74,11 @@ pub async fn update_member(
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let sim = simulation_singleton();
     let member = body.into_inner();
-    let response = sim
-        .inner
-        .lock()
-        .unwrap()
-        .get_manager_mut(&id)
-        .and_then(|m| {
-            m.price = member.price;
-            m.max_production = member.max_production;
-            Some(ResponseFormat::new("Success!".to_string()))
-        });
+    let response = sim.inner.lock().await.get_manager_mut(&id).and_then(|m| {
+        m.price = member.price;
+        m.max_production = member.max_production;
+        Some(ResponseFormat::new("Success!".to_string()))
+    });
     match response {
         Some(res) => return Ok(Json(res)),
         None => return Err(WebRequestError::MemberNotFound),

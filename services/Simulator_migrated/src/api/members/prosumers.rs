@@ -13,7 +13,7 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct MemberInfo {
+pub struct MemberInfo {
     id: Option<String>,
     turbines: Vec<Turbine>,
     batteries: Vec<Battery>,
@@ -22,7 +22,7 @@ struct MemberInfo {
 #[get("/")]
 pub async fn get_all() -> Json<Vec<Prosumer>> {
     let sim = simulation_singleton();
-    let prosumers = sim.inner.lock().unwrap().prosumers.to_vec();
+    let prosumers = sim.inner.lock().await.prosumers.to_vec();
     Json(prosumers)
 }
 
@@ -33,10 +33,10 @@ pub async fn generate_member(
     let sim = simulation_singleton();
     let prosumer = body.into_inner();
     if let Some(id) = prosumer.id {
-        if sim.inner.lock().unwrap().get_prosumer(&id).is_some() {
+        if sim.inner.lock().await.get_prosumer(&id).is_some() {
             return Err(WebRequestError::MemberAlreadyExist);
         } else {
-            sim.inner.lock().unwrap().add_prosumer(Prosumer::new(
+            sim.inner.lock().await.add_prosumer(Prosumer::new(
                 true,
                 prosumer.batteries,
                 prosumer.turbines,
@@ -48,7 +48,7 @@ pub async fn generate_member(
         }
     } else {
         let id = uuid::Uuid::new_v4().to_string();
-        sim.inner.lock().unwrap().add_prosumer(Prosumer::new(
+        sim.inner.lock().await.add_prosumer(Prosumer::new(
             true,
             prosumer.batteries,
             prosumer.turbines,
@@ -64,7 +64,7 @@ pub async fn generate_member(
 #[get("/{id}")]
 pub async fn get_member(id: Path<String>) -> Result<Json<Prosumer>, WebRequestError> {
     let sim = simulation_singleton();
-    let prsoumer = sim.inner.lock().unwrap().get_prosumer(&id).cloned();
+    let prsoumer = sim.inner.lock().await.get_prosumer(&id).cloned();
     match prsoumer {
         Some(m) => return Ok(Json(m)),
         None => return Err(WebRequestError::MemberNotFound),
@@ -81,7 +81,7 @@ pub async fn update_member(
     let response = sim
         .inner
         .lock()
-        .unwrap()
+        .await
         .get_prosumer_mut(&id)
         .and_then(|m| Some(ResponseFormat::new("Success!".to_string())));
     match response {

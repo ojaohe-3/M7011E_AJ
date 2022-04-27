@@ -27,7 +27,7 @@ async fn get_ratio(path: Path<MemberInfo>) -> actix_web::Result<Json<MemberData>
     let response = sim
         .inner
         .lock()
-        .unwrap()
+        .await
         .get_prosumer_mut(&id)
         .and_then(|p| Some(MemberData { input_ratio: p.input_ratio, output_ratio: p.output_ratio }));
 
@@ -48,7 +48,7 @@ async fn set_ratio(
     let response = sim
         .inner
         .lock()
-        .unwrap()
+        .await
         .get_prosumer_mut(&id)
         .and_then(|p| {
             p.input_ratio = ratio.input_ratio;
@@ -73,7 +73,7 @@ async fn set_active(
     let response = sim
         .inner
         .lock()
-        .unwrap()
+        .await
         .get_prosumer_mut(&id)
         .and_then(|m| {
             m.status = status;

@@ -1,7 +1,9 @@
 use std::mem::MaybeUninit;
-use std::sync::{Mutex, Once};
+use std::sync::Once;
+// use std::sync::{Mutex, Once, Arc};
 use std::time::{Duration, Instant};
 
+use futures::lock::Mutex;
 use tokio::sync::broadcast::{channel, Sender};
 
 use crate::handlers::weather_handler::weather_singleton;
@@ -41,16 +43,16 @@ pub struct SimulationHandler {
     pub data_handler: DataHandler,
     pub weather_handler: WeatherHandler,
     pub consumers: Vec<Consumer>,
-    pub tx: Sender<u32>,
+    // pub tx: Sender<u32>,
     pub total_time: Instant, // rx: Receiver<u32>,
 }
 
 impl SimulationHandler {
-    const SIZE: usize = 64; //dotenv
-    const LOOP_FREQUENCY: f64 = 100.; //Hz
+    pub const SIZE: usize = 64; //dotenv
+    pub const LOOP_FREQUENCY: f64 = 10.; //Hz
 
     pub fn new() -> Self {
-        let (tx, _) = channel(100);
+        // let (tx, _) = channel(100);
         let grid = Grid::new(SimulationHandler::SIZE, SimulationHandler::SIZE);
 
         let data_handler = DataHandler::new();
@@ -62,7 +64,7 @@ impl SimulationHandler {
             data_handler,
             weather_handler,
             consumers: Vec::new(),
-            tx,
+            // tx,
             total_time: Instant::now(), // rx,
         }
     }
@@ -116,7 +118,7 @@ impl SimulationHandler {
         self.prosumers.push(prosumer);
     }
 
-    pub fn add_consumer(&mut self, consumer: Consuemr) {
+    pub fn add_consumer(&mut self, consumer: Consumer) {
         self.consumers.push(consumer);
     }
 
@@ -135,16 +137,16 @@ impl SimulationHandler {
     }
 
     pub fn get_consumer(&self, id: &String) -> Option<&Consumer> {
-        self.consumers.iter().find(|c| (*c).i.eq(id))
+        self.consumers.iter().find(|c| (*c).id.eq(id))
     }
 
     pub fn get_consumer_mut(&mut self, id: &String) -> Option<&mut Consumer> {
         self.consumers.iter_mut().find(|p| (*p).id.eq(id))
     }
 
-    pub fn subscribe(&self) -> tokio::sync::broadcast::Receiver<u32> {
-        self.tx.subscribe()
-    }
+    // pub fn subscribe(&self) -> tokio::sync::broadcast::Receiver<u32> {
+    //     self.tx.subscribe()
+    // }
 }
 
 #[tokio::test]
@@ -152,14 +154,14 @@ async fn test_simulation_mutability() {
     let sim = simulation_singleton();
     let instant = Instant::now();
 
-    assert_eq!(sim.inner.lock().unwrap().prosumers.len(), 0);
-    assert_eq!(sim.inner.lock().unwrap().managers.len(), 0);
+    assert_eq!(sim.inner.lock().await.prosumers.len(), 0);
+    assert_eq!(sim.inner.lock().await.managers.len(), 0);
 
     sim.inner
         .lock()
-        .unwrap()
+        .await
         .add_manager(Manager::new("1".to_string(), 1000.0, 0., 0.5, 1., true));
-    sim.inner.lock().unwrap().add_prosumer(Prosumer::new(
+    sim.inner.lock().await.add_prosumer(Prosumer::new(
         true,
         vec![Battery::new(1000., 0., 100., 100.)],
         vec![Turbine::new(2000.)],
@@ -169,34 +171,34 @@ async fn test_simulation_mutability() {
         0.,
     ));
 
-    assert_eq!(sim.inner.lock().unwrap().prosumers.len(), 1);
-    assert_eq!(sim.inner.lock().unwrap().managers.len(), 1);
+    assert_eq!(sim.inner.lock().await.prosumers.len(), 1);
+    assert_eq!(sim.inner.lock().await.managers.len(), 1);
 
     let m_c = sim
         .inner
         .lock()
-        .unwrap()
+        .await
         .get_manager(&("1".to_string()))
         .unwrap()
         .current;
     // let p_c = pro.inner.lock().unwrap().get_prosumer("1").unwrap().current
 
-    sim.inner.lock().unwrap().process(instant).await;
+    sim.inner.lock().await.process(instant).await;
     assert_ne!(
         m_c,
         sim.inner
             .lock()
-            .unwrap()
+            .await
             .get_manager(&("1".to_string()))
             .unwrap()
             .current
     );
 
-    assert!(sim.inner.lock().unwrap().data_handler.manager_reports.len() > 0);
+    assert!(sim.inner.lock().await.data_handler.manager_reports.len() > 0);
     assert!(
         sim.inner
             .lock()
-            .unwrap()
+            .await
             .data_handler
             .prosumer_reports
             .len()
@@ -205,7 +207,7 @@ async fn test_simulation_mutability() {
     assert!(
         sim.inner
             .lock()
-            .unwrap()
+            .await
             .data_handler
             .consumer_reports
             .len()
@@ -219,9 +221,9 @@ async fn test_loop() {
 
     sim.inner
         .lock()
-        .unwrap()
+        .await
         .add_manager(Manager::new("1".to_string(), 1000.0, 0., 1., 1., true));
-    sim.inner.lock().unwrap().add_prosumer(Prosumer::new(
+    sim.inner.lock().await.add_prosumer(Prosumer::new(
         true,
         vec![Battery::new(1000., 0., 100., 100.)],
         vec![Turbine::new(2000.)],
@@ -241,14 +243,14 @@ async fn test_loop() {
             1. / SimulationHandler::LOOP_FREQUENCY,
         ))
         .await;
-        sim.inner.lock().unwrap().process(time).await;
+        sim.inner.lock().await.process(time).await;
         println!(
             "[{}]{}:ouput: {}",
             i,
             time.elapsed().as_secs_f64(),
-            sim.inner.lock().unwrap().managers[0].output()
+            sim.inner.lock().await.managers[0].output()
         );
-        let p = &sim.inner.lock().unwrap().prosumers[0];
+        let p = &sim.inner.lock().await.prosumers[0];
         println!(
             "[{}]{}:produced: {} stored: {}",
             i,

@@ -1,13 +1,13 @@
 use std::{
     env, fmt,
-    time::{Duration, Instant},
+    time::{Duration, Instant}, sync::{Arc, Mutex},
 };
 
-use actix_web::{middleware::Logger, App, HttpResponse, HttpServer};
+use actix_web::{middleware::Logger, App, HttpResponse, HttpServer, web};
 use dotenv::dotenv;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod, SslAcceptorBuilder};
 
-use crate::handlers::simulation_handler::simulation_singleton;
+use crate::handlers::simulation_handler::{simulation_singleton, SimulationHandler};
 
 mod api;
 mod app;
@@ -15,6 +15,12 @@ mod db;
 mod handlers;
 mod middleware;
 mod models;
+
+
+#[derive(Debug, Clone)]
+struct AppData{
+    sim: Arc<Mutex<SimulationHandler>>
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -33,42 +39,56 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
     builder.set_certificate_chain_file("cert.pem").unwrap();
     let port = format!("127.0.0.1:{}", envs.PORT);
-    // tokio::spawn(simulation_loop()).await;
-    println!("Starting server on port {}", envs.PORT);
+
+
     // TODO: Serve Rabbitmq
     // TODO: Serve Mongodb connector
     // TODO: Generate members object from db
-    // TODO: declare thread for simulation
-    // TODO: Generate API
+    
 
-
-    HttpServer::new(move || {
+    let mut sim = Arc::new(Mutex::new(SimulationHandler::new()));
+    
+    println!("Starting server on {}", port);
+    let server = HttpServer::new(move || {
         let api = api::control::manager_controller::construct_service();
         let logger = Logger::default();
+        // let data = web::Data::new(AppData{
+        //     sim
+        // });
         App::new()
-            .wrap(logger)
-            .wrap(Logger::new("%a %{User-Agent}i"))
-            .service(api)
+        .wrap(logger)
+        .wrap(Logger::new("%a %{User-Agent}i"))
+        // .app_data(data)
+        .service(api)
     })
     .bind_openssl(port, builder)?
-    .run()
-    .await
+    .run();
+    
+    let simulation_loop = tokio::spawn(async move {
+        let env = envs.clone();
+        let mut time = Instant::now();
+        let mut interval = tokio::time::interval(Duration::from_secs_f64(1. / SimulationHandler::LOOP_FREQUENCY));
+        //TODO: read broadcasts
+        println!("Starting Simulation");
+        let sim = simulation_singleton();
+        loop {
+            interval.tick().await;
+            sim.inner.lock().await.process(time).await;
+            time = Instant::now();
+        }
+        // Ok(true);
+    });
+
+    tokio::select! {
+        _ = server => 0,
+        _ = simulation_loop => 0
+      };
+      return Ok(());
     // println!("{:?}", envs);
 }
 
 
-// async fn simulation_loop() -> std::io::Result<()>{
-//     let mut time = Instant::now();
-//     //TODO: read broadcasts
-//     let sim = simulation_singleton();
-//     println!("Starting Simulation");
 
-//     loop {
-//         tokio::time::sleep(Duration::from_secs_f64(1. / 100.)).await;
-//         sim.inner.lock().unwrap().process(time).await;
-//         time = Instant::now();
-//     }
-// }
 
 #[derive(Debug, Clone)]
 enum EnvKey {

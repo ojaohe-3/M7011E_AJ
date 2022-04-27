@@ -6,7 +6,7 @@ use rand::prelude::IteratorRandom;
 use rand::thread_rng;
 use serde::{Deserialize, Serialize};
 use time::Instant;
-use tokio::fs::File;
+use tokio::fs::{File, OpenOptions};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 use super::weather_handler::WeatherReport;
@@ -118,28 +118,28 @@ impl DataHandler {
 
     pub async fn flush(&mut self) -> std::io::Result<()> {
         if self.manager_reports.len() > 100 {
-            let mut f = File::create("./dat/managers_data.bin").await?;
+            let mut f = OpenOptions::new().write(true).create(true).append(true).open("./dat/managers_data.bin").await?;
             f.write_all(&bincode::serialize(&self.sample_managers_data()).unwrap()).await?;
             self.manager_reports.clear();
             f.flush().await?;
         }
 
         if self.prosumer_reports.len() > 100 {
-            let mut f = File::create("./dat/prosumers_data.bin").await?;
+            let mut f = OpenOptions::new().write(true).create(true).append(true).open("./dat/prosumers_data.bin").await?;
             f.write_all(&bincode::serialize(&self.sample_prosumers_data()).unwrap()).await?;
             self.prosumer_reports.clear();
             f.flush().await?;
         }
 
         if self.consumer_reports.len() > 100 {
-            let mut f = File::create("./dat/consumers_data.bin").await?;
+            let mut f = OpenOptions::new().write(true).create(true).append(true).open("./dat/consumers_data.bin").await?;
             f.write_all(&bincode::serialize(&self.sample_consumers_data()).unwrap()).await?;
             self.consumer_reports.clear();
             f.flush().await?;
         }
 
         if (self.weather_reports.len() > 100) {
-            let mut f = File::create("./dat/weather_data.bin").await?;
+            let mut f = OpenOptions::new().write(true).create(true).append(true).open("./dat/weather_data.bin").await?;
             f.write_all(&bincode::serialize(&self.weather_reports).unwrap()).await?;
             self.weather_reports.clear();
             f.flush().await?;
