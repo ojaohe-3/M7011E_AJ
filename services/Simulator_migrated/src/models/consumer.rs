@@ -6,7 +6,7 @@ use crate::handlers::weather_handler::{weather_singleton, WeatherHandler};
 
 use super::node::{Asset, Component};
 
-type TimeFn = [f64; 24];
+pub type TimeFn = [f64; 24];
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Consumer {
     pub timefn: TimeFn,
@@ -18,14 +18,18 @@ pub struct Consumer {
 
 impl Consumer {
     pub fn new(
-        timefn: TimeFn,
+        timefn: Option<TimeFn>,
         profile: Option<f64>,
         asset: Option<Asset>,
         id: Option<String>,
     ) -> Self {
         if let Some(p) = profile {
             Self {
-                timefn,
+                timefn: if let Some(tf) = timefn {
+                    tf
+                } else {
+                    Consumer::generate_time_fn()
+                },
                 profile: p,
                 asset: if let Some(a) = asset {
                     a
@@ -50,7 +54,11 @@ impl Consumer {
             let lamba = r - r / 2. + rd / 2. + 1.;
 
             Self {
-                timefn,
+                timefn: if let Some(tf) = timefn {
+                    tf
+                } else {
+                    Consumer::generate_time_fn()
+                },
                 profile: size * 0.027 + lamba * 0.5,
                 asset: if let Some(a) = asset {
                     a
@@ -130,7 +138,7 @@ impl Component<Consumer> for Consumer {
 #[tokio::test]
 async fn test_demand() {
     let cm: &mut Consumer = &mut Component::new(Consumer::new(
-        Consumer::generate_time_fn(),
+        None,
         None,
         None,
         None,

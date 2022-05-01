@@ -11,11 +11,11 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct MemberInfo {
-    id: Option<String>,
-    profile: Option<f64>,
-    timefn: Option<[f64; 24]>,
-    asset: Option<Asset>,
+pub struct CreateConsumerInfo {
+    pub id: Option<String>,
+    pub profile: Option<f64>,
+    pub timefn: Option<[f64; 24]>,
+    pub asset: Option<Asset>,
 }
 
 #[get("/")]
@@ -27,7 +27,7 @@ pub async fn get_all() -> Json<Vec<Consumer>> {
 
 #[post("/")]
 pub async fn generate_member(
-    body: Json<MemberInfo>,
+    body: Json<CreateConsumerInfo>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let sim = simulation_singleton();
     let consumer = body.into_inner();
@@ -37,11 +37,7 @@ pub async fn generate_member(
         }
     }
     sim.inner.lock().await.add_consumer(Consumer::new(
-        if let Some(tf) = consumer.timefn {
-            tf
-        } else {
-            Consumer::generate_time_fn()
-        },
+        consumer.timefn,
         consumer.profile,
         consumer.asset,
         consumer.id,
@@ -63,7 +59,7 @@ pub async fn get_member(id: Path<String>) -> Result<Json<Consumer>, WebRequestEr
 #[put("/{id}")]
 pub async fn update_member(
     id: Path<String>,
-    body: Json<MemberInfo>,
+    body: Json<CreateConsumerInfo>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let sim = simulation_singleton();
     let member = body.into_inner();

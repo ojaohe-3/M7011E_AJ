@@ -1,11 +1,13 @@
 use std::{
     env, fmt,
-    time::{Duration, Instant}, sync::{Arc, Mutex},
+    sync::{Arc, Mutex},
+    time::{Duration, Instant},
 };
 
-use actix_web::{middleware::Logger, App, HttpResponse, HttpServer, web};
+use actix_web::{middleware::Logger, web, App, HttpResponse, HttpServer};
 use dotenv::dotenv;
-use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod, SslAcceptorBuilder};
+use mongodb::{options::ClientOptions, Client, Database};
+use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
 
 use crate::handlers::simulation_handler::{simulation_singleton, SimulationHandler};
 
@@ -16,10 +18,10 @@ mod handlers;
 mod middleware;
 mod models;
 
-
-#[derive(Debug, Clone)]
-struct AppData{
-    sim: Arc<Mutex<SimulationHandler>>
+struct AppState {
+    pub db: Database,
+    pub client: Client,
+    // pub auth_client: AuthClient
 }
 
 #[actix_web::main]
@@ -30,44 +32,50 @@ async fn main() -> std::io::Result<()> {
         Ok(v) => v,
         Err(e) => panic!("{}", e),
     };
-    println!("env file loaded!");
     std::env::set_var("RUST_LOG", "debug");
     std::env::set_var("RUST_BACKTRACE", "1");
+    println!("env file loaded!");
+
+    let mut options = ClientOptions::parse(envs.DB_CONNECT).await.expect("Could not get database");
+
+    
+    let client = Client::with_options(options).expect("Failed to create client!");
+    let db = client.database("AJ");
+    
+    println!("mongodb connected!");
+
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
     builder
         .set_private_key_file("key.pem", SslFiletype::PEM)
         .unwrap();
     builder.set_certificate_chain_file("cert.pem").unwrap();
-    let port = format!("127.0.0.1:{}", envs.PORT);
-
 
     // TODO: Serve Rabbitmq
     // TODO: Serve Mongodb connector
     // TODO: Generate members object from db
-    
 
-    let mut sim = Arc::new(Mutex::new(SimulationHandler::new()));
-    
+    let port = format!("127.0.0.1:{}", envs.PORT);
     println!("Starting server on {}", port);
     let server = HttpServer::new(move || {
-        let api = api::control::manager_controller::construct_service();
+        let api = app::generate_api();
         let logger = Logger::default();
         // let data = web::Data::new(AppData{
         //     sim
         // });
         App::new()
-        .wrap(logger)
-        .wrap(Logger::new("%a %{User-Agent}i"))
-        // .app_data(data)
-        .service(api)
+            .wrap(logger)
+            .wrap(Logger::new("%a %{User-Agent}i"))
+            .service(api)
     })
     .bind_openssl(port, builder)?
     .run();
-    
+
     let simulation_loop = tokio::spawn(async move {
         let env = envs.clone();
         let mut time = Instant::now();
-        let mut interval = tokio::time::interval(Duration::from_secs_f64(1. / SimulationHandler::LOOP_FREQUENCY));
+        let mut interval = tokio::time::interval(Duration::from_secs_f64(
+            1. / SimulationHandler::LOOP_FREQUENCY,
+        ));
         //TODO: read broadcasts
         println!("Starting Simulation");
         let sim = simulation_singleton();
@@ -76,19 +84,14 @@ async fn main() -> std::io::Result<()> {
             sim.inner.lock().await.process(time).await;
             time = Instant::now();
         }
-        // Ok(true);
     });
 
     tokio::select! {
+        _ = simulation_loop => 0,
         _ = server => 0,
-        _ = simulation_loop => 0
-      };
-      return Ok(());
-    // println!("{:?}", envs);
+    };
+    return Ok(());
 }
-
-
-
 
 #[derive(Debug, Clone)]
 enum EnvKey {

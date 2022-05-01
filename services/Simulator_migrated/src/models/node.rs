@@ -24,17 +24,17 @@ pub trait Component<T> {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Cell {
-    x: usize,
-    y: usize,
+    // x: usize,
+    // y: usize,
     id: String,
     cell_type: CellType,
 }
 
 impl Cell {
-    pub fn new(x: usize, y: usize, id: String, cell_type: CellType) -> Self {
+    pub fn new(/*x: usize, y: usize,*/ id: String, cell_type: CellType) -> Self {
         Self {
-            x,
-            y,
+            // x,
+            // y,
             id,
             cell_type,
         }
@@ -45,10 +45,10 @@ pub type NodeGrid = Vec<Vec<Cell>>;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 
 pub struct Grid {
-    width: usize,
-    height: usize,
-    id: String,
-    nodes: NodeGrid,
+    pub width: usize,
+    pub height: usize,
+    pub id: String,
+    pub nodes: NodeGrid,
 }
 
 impl Grid {
@@ -61,8 +61,8 @@ impl Grid {
             let mut row = Vec::new();
             for i in 0..width {
                 row.push(Cell {
-                    x: i,
-                    y: j,
+                    // x: i,
+                    // y: j,
                     id: "none".to_string(),
                     cell_type: CellType::Empty,
                 });
@@ -86,6 +86,16 @@ impl Grid {
 
     pub fn set_at(&mut self, x: usize, y: usize, item: Cell) {
         self.nodes[y][x] = item;
+    }
+
+    pub fn get_all_id(&self, id: &String) -> Vec<Cell>{
+        let mut temp = Vec::new();
+        for col in &self.nodes{
+            for cell in col{
+                temp.push(cell);
+            }
+        }
+        temp.into_iter().cloned().collect()
     }
 }
 

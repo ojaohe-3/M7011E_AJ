@@ -11,10 +11,10 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct MemberInfo {
+pub struct CreateManagerInfo {
     id: Option<String>,
-    max_production: f64, // in kw
-    price: f64,          // price in kr
+    pub max_production: f64, // in kw
+    pub price: f64,          // price in kr
 }
 
 #[get("/")]
@@ -26,7 +26,7 @@ pub async fn get_all() -> Json<Vec<Manager>> {
 
 #[post("/")]
 pub async fn generate_member(
-    body: Json<MemberInfo>,
+    body: Json<CreateManagerInfo>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let sim = simulation_singleton();
     let manager = body.into_inner();
@@ -70,7 +70,7 @@ pub async fn get_member(id: Path<String>) -> Result<Json<Manager>, WebRequestErr
 #[put("/{id}")]
 pub async fn update_member(
     id: Path<String>,
-    body: Json<MemberInfo>,
+    body: Json<CreateManagerInfo>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let sim = simulation_singleton();
     let member = body.into_inner();
