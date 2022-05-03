@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
-    handlers::simulation_handler::simulation_singleton,
+    app::AppState,
     models::{consumer::Consumer, node::Asset},
 };
 
@@ -19,24 +19,23 @@ pub struct CreateConsumerInfo {
 }
 
 #[get("/")]
-pub async fn get_all() -> Json<Vec<Consumer>> {
-    let sim = simulation_singleton();
-    let consumers = sim.inner.lock().await.consumers.to_vec();
+pub async fn get_all(data: web::Data<AppState>) -> Json<Vec<Consumer>> {
+    let consumers = data.sim.lock().await.consumers.to_vec();
     Json(consumers)
 }
 
 #[post("/")]
 pub async fn generate_member(
     body: Json<CreateConsumerInfo>,
+    data: web::Data<AppState>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
-    let sim = simulation_singleton();
     let consumer = body.into_inner();
     if let Some(id) = &consumer.id {
-        if sim.inner.lock().await.get_consumer(id).is_some() {
+        if data.sim.lock().await.get_consumer(id).is_some() {
             return Err(WebRequestError::MemberAlreadyExist);
         }
     }
-    sim.inner.lock().await.add_consumer(Consumer::new(
+    data.sim.lock().await.add_consumer(Consumer::new(
         consumer.timefn,
         consumer.profile,
         consumer.asset,
@@ -47,9 +46,11 @@ pub async fn generate_member(
 }
 
 #[get("/{id}")]
-pub async fn get_member(id: Path<String>) -> Result<Json<Consumer>, WebRequestError> {
-    let sim = simulation_singleton();
-    let consumer = sim.inner.lock().await.get_consumer(&id).cloned();
+pub async fn get_member(
+    id: Path<String>,
+    data: web::Data<AppState>,
+) -> Result<Json<Consumer>, WebRequestError> {
+    let consumer = data.sim.lock().await.get_consumer(&id).cloned();
     match consumer {
         Some(m) => return Ok(Json(m)),
         None => return Err(WebRequestError::MemberNotFound),
@@ -60,26 +61,21 @@ pub async fn get_member(id: Path<String>) -> Result<Json<Consumer>, WebRequestEr
 pub async fn update_member(
     id: Path<String>,
     body: Json<CreateConsumerInfo>,
+    data:  web::Data<AppState>
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
-    let sim = simulation_singleton();
     let member = body.into_inner();
-    let response = sim
-        .inner
-        .lock()
-        .await
-        .get_consumer_mut(&id)
-        .and_then(|m| {
-            if let Some(p) = member.profile {
-                m.profile = p;
-            }
-            if let Some(a) = member.asset {
-                m.asset = a;
-            }
-            if let Some(tf) = member.timefn {
-                m.timefn = tf;
-            }
-            Some(ResponseFormat::new("Success!".to_string()))
-        });
+    let response = data.sim.lock().await.get_consumer_mut(&id).and_then(|m| {
+        if let Some(p) = member.profile {
+            m.profile = p;
+        }
+        if let Some(a) = member.asset {
+            m.asset = a;
+        }
+        if let Some(tf) = member.timefn {
+            m.timefn = tf;
+        }
+        Some(ResponseFormat::new("Success!".to_string()))
+    });
     match response {
         Some(res) => return Ok(Json(res)),
         None => return Err(WebRequestError::MemberNotFound),

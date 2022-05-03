@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
-    handlers::simulation_handler::simulation_singleton,
+    app::AppState,
     models::manager::{self, Manager},
 };
 
@@ -18,23 +18,22 @@ pub struct CreateManagerInfo {
 }
 
 #[get("/")]
-pub async fn get_all() -> Json<Vec<Manager>> {
-    let sim = simulation_singleton();
-    let managers = sim.inner.lock().await.managers.to_vec();
+pub async fn get_all(data: web::Data<AppState>) -> Json<Vec<Manager>> {
+    let managers = data.sim.lock().await.managers.to_vec();
     Json(managers)
 }
 
 #[post("/")]
 pub async fn generate_member(
     body: Json<CreateManagerInfo>,
+    data: web::Data<AppState>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
-    let sim = simulation_singleton();
     let manager = body.into_inner();
     if let Some(id) = manager.id {
-        if sim.inner.lock().await.get_manager(&id).is_some() {
+        if data.sim.lock().await.get_manager(&id).is_some() {
             return Err(WebRequestError::MemberAlreadyExist);
         } else {
-            sim.inner.lock().await.add_manager(Manager::new(
+            data.sim.lock().await.add_manager(Manager::new(
                 id,
                 manager.max_production,
                 0.0,
@@ -45,7 +44,7 @@ pub async fn generate_member(
         }
     } else {
         let id = uuid::Uuid::new_v4().to_string();
-        sim.inner.lock().await.add_manager(Manager::new(
+        data.sim.lock().await.add_manager(Manager::new(
             id,
             manager.max_production,
             0.0,
@@ -58,9 +57,11 @@ pub async fn generate_member(
 }
 
 #[get("/{id}")]
-pub async fn get_member(id: Path<String>) -> Result<Json<Manager>, WebRequestError> {
-    let sim = simulation_singleton();
-    let manager = sim.inner.lock().await.get_manager(&id).cloned();
+pub async fn get_member(
+    id: Path<String>,
+    data: web::Data<AppState>,
+) -> Result<Json<Manager>, WebRequestError> {
+    let manager = data.sim.lock().await.get_manager(&id).cloned();
     match manager {
         Some(m) => return Ok(Json(m)),
         None => return Err(WebRequestError::MemberNotFound),
@@ -71,10 +72,10 @@ pub async fn get_member(id: Path<String>) -> Result<Json<Manager>, WebRequestErr
 pub async fn update_member(
     id: Path<String>,
     body: Json<CreateManagerInfo>,
+    data: web::Data<AppState>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
-    let sim = simulation_singleton();
     let member = body.into_inner();
-    let response = sim.inner.lock().await.get_manager_mut(&id).and_then(|m| {
+    let response = data.sim.lock().await.get_manager_mut(&id).and_then(|m| {
         m.price = member.price;
         m.max_production = member.max_production;
         Some(ResponseFormat::new("Success!".to_string()))

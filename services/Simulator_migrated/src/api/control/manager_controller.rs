@@ -5,8 +5,7 @@ use actix_web::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    api::formats::{WebRequestError, ResponseFormat},
-    handlers::simulation_handler::simulation_singleton,
+    api::formats::{WebRequestError, ResponseFormat}, app::AppState,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -19,12 +18,10 @@ struct MemberData {
 }
 
 #[get("/{id}")]
-async fn get_ratio(path: Path<MemberInfo>) -> actix_web::Result<Json<MemberData>, WebRequestError> {
+async fn get_ratio(path: Path<MemberInfo>, data:  web::Data<AppState>) -> actix_web::Result<Json<MemberData>, WebRequestError> {
     let id = &path.id;
 
-    let sim = simulation_singleton();
-    let response = sim
-        .inner
+    let response = data.sim
         .lock()
         .await
         .get_manager(&id)
@@ -40,12 +37,11 @@ async fn get_ratio(path: Path<MemberInfo>) -> actix_web::Result<Json<MemberData>
 async fn set_ratio(
     path: Path<MemberInfo>,
     body: Json<MemberData>,
+    data:  web::Data<AppState>,
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let id = &path.id;
     let ratio = body.ratio;
-    let sim = simulation_singleton();
-    let response = sim
-        .inner
+    let response = data.sim
         .lock()
         .await
         .get_manager_mut(&id)
@@ -67,11 +63,11 @@ async fn set_ratio(
 #[post("/{id}/{status}")]
 async fn set_active(
     path: Path<(String, bool)>,
+    data:  web::Data<AppState>,
+
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let (id, status) = path.into_inner();
-    let sim = simulation_singleton();
-    let response = sim
-        .inner
+    let response = data.sim
         .lock()
         .await
         .get_manager_mut(&id)

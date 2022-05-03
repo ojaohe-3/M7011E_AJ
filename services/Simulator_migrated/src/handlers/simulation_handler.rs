@@ -19,21 +19,22 @@ pub struct SHReader {
     pub inner: Mutex<SimulationHandler>,
 }
 
-pub fn simulation_singleton() -> &'static SHReader {
-    static mut SINGLETON: MaybeUninit<SHReader> = MaybeUninit::uninit();
-    static ONCE: Once = Once::new();
+// //TODO: move to arc::mutex in shared app data
+// pub fn simulation_singleton() -> &'static SHReader {
+//     static mut SINGLETON: MaybeUninit<SHReader> = MaybeUninit::uninit();
+//     static ONCE: Once = Once::new();
 
-    unsafe {
-        ONCE.call_once(|| {
-            let singleton = SHReader {
-                inner: Mutex::new(SimulationHandler::new()),
-            };
-            SINGLETON.write(singleton);
-        });
+//     unsafe {
+//         ONCE.call_once(|| {
+//             let singleton = SHReader {
+//                 inner: Mutex::new(SimulationHandler::new()),
+//             };
+//             SINGLETON.write(singleton);
+//         });
 
-        SINGLETON.assume_init_ref()
-    }
-}
+//         SINGLETON.assume_init_ref()
+//     }
+// }
 
 #[derive(Debug)]
 pub struct SimulationHandler {
@@ -44,7 +45,8 @@ pub struct SimulationHandler {
     pub weather_handler: WeatherHandler,
     pub consumers: Vec<Consumer>,
     // pub tx: Sender<u32>,
-    pub total_time: Instant, // rx: Receiver<u32>,
+    // rx: Receiver<u32>,
+    pub total_time: Instant,
 }
 
 impl SimulationHandler {
@@ -150,18 +152,15 @@ impl SimulationHandler {
 }
 
 #[tokio::test]
-async fn test_simulation_mutability() {
-    let sim = simulation_singleton();
+async fn test_simulation() {
+    let mut sim = SimulationHandler::new();
     let instant = Instant::now();
 
-    assert_eq!(sim.inner.lock().await.prosumers.len(), 0);
-    assert_eq!(sim.inner.lock().await.managers.len(), 0);
+    assert_eq!(sim.prosumers.len(), 0);
+    assert_eq!(sim.managers.len(), 0);
 
-    sim.inner
-        .lock()
-        .await
-        .add_manager(Manager::new("1".to_string(), 1000.0, 0., 0.5, 1., true));
-    sim.inner.lock().await.add_prosumer(Prosumer::new(
+    sim.add_manager(Manager::new("1".to_string(), 1000.0, 0., 0.5, 1., true));
+    sim.add_prosumer(Prosumer::new(
         true,
         vec![Battery::new(1000., 0., 100., 100.)],
         vec![Turbine::new(2000.)],
@@ -171,59 +170,26 @@ async fn test_simulation_mutability() {
         0.,
     ));
 
-    assert_eq!(sim.inner.lock().await.prosumers.len(), 1);
-    assert_eq!(sim.inner.lock().await.managers.len(), 1);
+    assert_eq!(sim.prosumers.len(), 1);
+    assert_eq!(sim.managers.len(), 1);
 
-    let m_c = sim
-        .inner
-        .lock()
-        .await
-        .get_manager(&("1".to_string()))
-        .unwrap()
-        .current;
+    let m_c = sim.get_manager(&("1".to_string())).unwrap().current;
     // let p_c = pro.inner.lock().unwrap().get_prosumer("1").unwrap().current
 
-    sim.inner.lock().await.process(instant).await;
-    assert_ne!(
-        m_c,
-        sim.inner
-            .lock()
-            .await
-            .get_manager(&("1".to_string()))
-            .unwrap()
-            .current
-    );
+    sim.process(instant).await;
+    assert_ne!(m_c, sim.get_manager(&("1".to_string())).unwrap().current);
 
-    assert!(sim.inner.lock().await.data_handler.manager_reports.len() > 0);
-    assert!(
-        sim.inner
-            .lock()
-            .await
-            .data_handler
-            .prosumer_reports
-            .len()
-            > 0
-    );
-    assert!(
-        sim.inner
-            .lock()
-            .await
-            .data_handler
-            .consumer_reports
-            .len()
-            > 0
-    );
+    assert!(sim.data_handler.manager_reports.len() > 0);
+    assert!(sim.data_handler.prosumer_reports.len() > 0);
+    assert!(sim.data_handler.consumer_reports.len() > 0);
 }
 #[tokio::test]
 async fn test_loop() {
     let mut time = Instant::now();
-    let sim = simulation_singleton();
+    let mut sim = SimulationHandler::new();
 
-    sim.inner
-        .lock()
-        .await
-        .add_manager(Manager::new("1".to_string(), 1000.0, 0., 1., 1., true));
-    sim.inner.lock().await.add_prosumer(Prosumer::new(
+    sim.add_manager(Manager::new("1".to_string(), 1000.0, 0., 1., 1., true));
+    sim.add_prosumer(Prosumer::new(
         true,
         vec![Battery::new(1000., 0., 100., 100.)],
         vec![Turbine::new(2000.)],
@@ -232,7 +198,7 @@ async fn test_loop() {
         "1".to_string(),
         0.,
     ));
-    let ws = weather_singleton();
+    let ws = weather_singleton(); // FIXME: This should be removed and replaced as an inner
     ws.inner.lock().unwrap().set_cache(WeatherReport {
         temp: 273.,
         wind_speed: 12.8,
@@ -243,14 +209,14 @@ async fn test_loop() {
             1. / SimulationHandler::LOOP_FREQUENCY,
         ))
         .await;
-        sim.inner.lock().await.process(time).await;
+        sim.process(time).await;
         println!(
             "[{}]{}:ouput: {}",
             i,
             time.elapsed().as_secs_f64(),
-            sim.inner.lock().await.managers[0].output()
+            sim.managers[0].output()
         );
-        let p = &sim.inner.lock().await.prosumers[0];
+        let p = &sim.prosumers[0];
         println!(
             "[{}]{}:produced: {} stored: {}",
             i,

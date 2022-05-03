@@ -7,9 +7,9 @@ use actix_web::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::handlers::{
-    data_handler::{ConsumerReport, ManagerReport, ProsumerReport, WeatherReportStore},
-    simulation_handler::simulation_singleton,
+use crate::{
+    app::AppState,
+    handlers::data_handler::{ConsumerReport, ManagerReport, ProsumerReport, WeatherReportStore},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -19,11 +19,13 @@ pub struct MemberInfo {
 }
 
 #[get("/manager/{id}/{size}")]
-pub async fn get_manager_datapoints(path: Path<MemberInfo>) -> Json<Vec<ManagerReport>> {
-    let sim = simulation_singleton();
+pub async fn get_manager_datapoints(
+    path: Path<MemberInfo>,
+    data: web::Data<AppState>,
+) -> Json<Vec<ManagerReport>> {
     let info = path.into_inner();
-    let data = sim
-        .inner
+    let data = data
+        .sim
         .lock()
         .await
         .data_handler
@@ -32,11 +34,13 @@ pub async fn get_manager_datapoints(path: Path<MemberInfo>) -> Json<Vec<ManagerR
 }
 
 #[get("/prosumer/{id}/{size}")]
-pub async fn get_prosumer_datapoints(path: Path<MemberInfo>) -> Json<Vec<ProsumerReport>> {
-    let sim = simulation_singleton();
+pub async fn get_prosumer_datapoints(
+    path: Path<MemberInfo>,
+    data: web::Data<AppState>,
+) -> Json<Vec<ProsumerReport>> {
     let info = path.into_inner();
-    let data = sim
-        .inner
+    let data = data
+        .sim
         .lock()
         .await
         .data_handler
@@ -44,11 +48,13 @@ pub async fn get_prosumer_datapoints(path: Path<MemberInfo>) -> Json<Vec<Prosume
     Json(data)
 }
 #[get("/consumer/{size}")]
-pub async fn get_consumer_datapoints(path: Path<usize>) -> Json<Vec<ConsumerReport>> {
-    let sim = simulation_singleton();
+pub async fn get_consumer_datapoints(
+    path: Path<usize>,
+    data: web::Data<AppState>,
+) -> Json<Vec<ConsumerReport>> {
     let size = path.into_inner();
-    let data = sim
-        .inner
+    let data = data
+        .sim
         .lock()
         .await
         .data_handler
@@ -60,11 +66,13 @@ pub async fn get_consumer_datapoints(path: Path<usize>) -> Json<Vec<ConsumerRepo
 }
 
 #[get("/weather/{size}")]
-pub async fn get_weather_datapoints(path: Path<usize>) -> Json<Vec<WeatherReportStore>> {
-    let sim = simulation_singleton();
+pub async fn get_weather_datapoints(
+    path: Path<usize>,
+    data: web::Data<AppState>,
+) -> Json<Vec<WeatherReportStore>> {
     let size = path.into_inner();
-    let data = sim
-        .inner
+    let data = data
+        .sim
         .lock()
         .await
         .data_handler

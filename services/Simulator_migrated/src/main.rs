@@ -1,15 +1,16 @@
 use std::{
     env, fmt,
-    sync::{Arc, Mutex},
+    sync::Arc,
     time::{Duration, Instant},
 };
 
-use actix_web::{middleware::Logger, web, App, HttpResponse, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
-use mongodb::{options::ClientOptions, Client, Database};
-use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
+use futures::lock::Mutex;
+use mongodb::{bson::doc, options::ClientOptions, Client};
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
-use crate::handlers::simulation_handler::{simulation_singleton, SimulationHandler};
+use crate::{app::AppState, handlers::simulation_handler::SimulationHandler};
 
 mod api;
 mod app;
@@ -18,70 +19,80 @@ mod handlers;
 mod middleware;
 mod models;
 
-struct AppState {
-    pub db: Database,
-    pub client: Client,
-    // pub auth_client: AuthClient
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let instance = Instant::now();
+    // ==== Assert enviormental variables
     dotenv().ok();
 
     let envs = match assert_all_env_loaded() {
         Ok(v) => v,
         Err(e) => panic!("{}", e),
     };
-    std::env::set_var("RUST_LOG", "debug");
-    std::env::set_var("RUST_BACKTRACE", "1");
+    // std::env::set_var("RUST_LOG", "debug");
+    // std::env::set_var("RUST_BACKTRACE", "1");
     println!("env file loaded!");
 
-    let mut options = ClientOptions::parse(envs.DB_CONNECT).await.expect("Could not get database");
+    // ==== Connect and configure mongodb connector ====
+    let options = ClientOptions::parse(envs.DB_CONNECT)
+        .await
+        .expect("Could not get database");
 
-    
     let client = Client::with_options(options).expect("Failed to create client!");
     let db = client.database("AJ");
-    
+    let c = doc! { "ping": 1};
+    db.run_command(c, None)
+        .await
+        .expect("Could Not Connect to mongodb");
     println!("mongodb connected!");
 
+    // ==== Build TLS encryption for https ====
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
     builder
         .set_private_key_file("key.pem", SslFiletype::PEM)
         .unwrap();
     builder.set_certificate_chain_file("cert.pem").unwrap();
 
+    // ==== Build application Data ====
+    let sim = Arc::new(Mutex::new(SimulationHandler::new()));
+
     // TODO: Serve Rabbitmq
-    // TODO: Serve Mongodb connector
     // TODO: Generate members object from db
 
+    // let data = Arc::new(Mutex::new(AppState::new(db, client, sim.clone())));
+    let data = web::Data::new(AppState::new(db, client, sim.clone()));
     let port = format!("127.0.0.1:{}", envs.PORT);
-    println!("Starting server on {}", port);
+    println!(
+        "Starting server on {}, toke {}s",
+        port,
+        instance.elapsed().as_secs_f64()
+    );
+    // ==== Server serving the API ====
     let server = HttpServer::new(move || {
         let api = app::generate_api();
-        let logger = Logger::default();
         // let data = web::Data::new(AppData{
         //     sim
         // });
         App::new()
-            .wrap(logger)
-            .wrap(Logger::new("%a %{User-Agent}i"))
+            .app_data(data.clone())
+            .wrap(Logger::default())
+            // .wrap(Logger::new("%a %{User-Agent}i"))
             .service(api)
     })
     .bind_openssl(port, builder)?
     .run();
-
+    // ==== Simulation loop ====
     let simulation_loop = tokio::spawn(async move {
-        let env = envs.clone();
         let mut time = Instant::now();
         let mut interval = tokio::time::interval(Duration::from_secs_f64(
             1. / SimulationHandler::LOOP_FREQUENCY,
         ));
         //TODO: read broadcasts
         println!("Starting Simulation");
-        let sim = simulation_singleton();
+        // let sim = simulation_singleton();
         loop {
             interval.tick().await;
-            sim.inner.lock().await.process(time).await;
+            sim.lock().await.process(time).await;
             time = Instant::now();
         }
     });
