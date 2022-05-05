@@ -48,7 +48,7 @@ async fn set_ratio(
         .and_then(|m| {
             m.ratio = ratio;
             Some(ResponseFormat {
-                message: "Successed".to_string(),
+                message: "Success".to_string(),
                 code: 200,
             })
         });
@@ -74,7 +74,7 @@ async fn set_active(
         .and_then(|m| {
             m.status = status;
             Some(ResponseFormat {
-                message: "Successed".to_string(),
+                message: "Success".to_string(),
                 code: 200,
             })
         });

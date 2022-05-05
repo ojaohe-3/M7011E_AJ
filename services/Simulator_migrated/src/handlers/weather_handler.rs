@@ -47,7 +47,6 @@ struct WeatherResponse{
 }
 
 impl WeatherHandler {
-    const FREQ_OF_REQUEST: Duration = Duration::new(500, 0);
     pub fn new() -> Self {
         Self {
             cache: None,
@@ -55,11 +54,6 @@ impl WeatherHandler {
         }
     }
 
-    pub fn process(&mut self) {
-        if self.last_fetch.elapsed() >= WeatherHandler::FREQ_OF_REQUEST {
-            self.last_fetch = Instant::now();
-        }
-    }
     pub async fn fetch_report() -> Result<WeatherReport, ()> {
         //TODO: Fix the many possible errors and and handeling for that
         // fetch weather from api
@@ -74,6 +68,7 @@ impl WeatherHandler {
     
              reqwest::Certificate::from_pem(buf).unwrap()
         };
+        
         let resp = client.get("https://localhost:2551").query(&[("lat", 65.584160), ("lon", 22.154751)]).send().await.unwrap();
         let data = resp.json::<WeatherResponse>().await.unwrap();
         // let res = reqwest::get()

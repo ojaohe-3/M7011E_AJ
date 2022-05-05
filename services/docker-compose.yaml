@@ -75,17 +75,16 @@ services:
       - networks
       - rabbitmq
       - authenticator
-    
   image_service:
-    image: 'rms'
+    image: rms
     ports:
       - "2525:2525"
     env_file:
       - rms.env
     networks:
       - services
-    volumes:
-      - rms_data
+#    volumes:
+#      - rms_data
     depends_on:
       - authenticator
 
@@ -96,8 +95,8 @@ volumes:
   mongodb_data:
     driver: local
 
-  rms_data:
-    driver: local
+#  rms_data:
+#    driver: local
 
 networks:
   services:

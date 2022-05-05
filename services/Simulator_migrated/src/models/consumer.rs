@@ -2,9 +2,9 @@ use chrono::{Timelike, Utc};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use crate::handlers::weather_handler::{weather_singleton, WeatherHandler};
+use crate::handlers::weather_handler::{weather_singleton, WeatherHandler, WeatherReport};
 
-use super::node::{Asset, Component};
+use super::node::{Asset, Node};
 
 pub type TimeFn = [f64; 24];
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -14,6 +14,7 @@ pub struct Consumer {
     pub asset: Asset,
     pub demand: f64,
     pub id: String,
+    pub network: String,
 }
 
 impl Consumer {
@@ -22,6 +23,7 @@ impl Consumer {
         profile: Option<f64>,
         asset: Option<Asset>,
         id: Option<String>,
+        network: String,
     ) -> Self {
         if let Some(p) = profile {
             Self {
@@ -42,6 +44,7 @@ impl Consumer {
                 } else {
                     uuid::Uuid::new_v4().to_string()
                 },
+                network,
             }
         } else {
             let mut rng = rand::thread_rng();
@@ -71,6 +74,7 @@ impl Consumer {
                 } else {
                     uuid::Uuid::new_v4().to_string()
                 },
+                network,
             }
         }
     }
@@ -112,18 +116,9 @@ impl Consumer {
     }
 }
 
-impl Component<Consumer> for Consumer {
-    fn tick(&mut self, elapsed: f64) {
-        // TODO weather dependant demand
-        let s = weather_singleton();
-        let temp_report = if let Some(report) = &s.inner.lock().unwrap().cache {
-            Some(report.temp)
-        } else {
-            None
-        };
-        if let Some(temp) = temp_report {
-            self.demand = self.consumption(temp);
-        }
+impl Node<Consumer> for Consumer {
+    fn tick(&mut self, elapsed: f64, weather_report: WeatherReport) {
+        self.demand = self.consumption(weather_report.temp);
     }
 
     fn get_asset(&self) -> Asset {
@@ -137,22 +132,7 @@ impl Component<Consumer> for Consumer {
 
 #[tokio::test]
 async fn test_demand() {
-    let cm: &mut Consumer = &mut Component::new(Consumer::new(
-        None,
-        None,
-        None,
-        None,
-    ));
-    cm.tick(1.);
-    assert_eq!(cm.demand, 0.);
-
-    let join = tokio::spawn(async { WeatherHandler::fetch_report().await.unwrap() });
-    let report = match join.await {
-        Err(e) => panic!("{}", e),
-        Ok(v) => v,
-    };
-    weather_singleton().inner.lock().unwrap().set_cache(report);
-
-    cm.tick(1.);
-    assert_ne!(cm.demand, 0.);
+    let cm: &mut Consumer = &mut Node::new(Consumer::new(None, None, None, None, format!("")));
+    cm.tick(1., WeatherReport { temp: 26.0, wind_speed: 0. });
+    assert!(cm.demand > 0.);
 }

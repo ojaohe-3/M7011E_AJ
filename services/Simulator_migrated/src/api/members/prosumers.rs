@@ -15,6 +15,7 @@ pub struct CreateProsumerInfo {
     id: Option<String>,
     pub turbines: Vec<Turbine>,
     pub batteries: Vec<Battery>,
+    pub network: String,
 }
 
 #[get("/")]
@@ -41,6 +42,7 @@ pub async fn generate_member(
                 1.,
                 id,
                 0.,
+                format!("")
             ));
         }
     } else {
@@ -53,6 +55,7 @@ pub async fn generate_member(
             1.,
             id,
             0.,
+            prosumer.network
         ));
     }
     return Ok(Json(ResponseFormat::new(format!("Success!"))));

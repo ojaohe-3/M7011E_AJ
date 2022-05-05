@@ -1,27 +1,45 @@
-use serde::{Serialize, Deserialize};
-
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Privilage{
-    level: u32,
-    access: Option<String>,
-    id: String,
+pub struct Privilage {
+    pub level: u32,
+    pub access: Option<String>, // TODO: this is currently unused, but it is intended to point inherit other users access level for a specific item
+    pub id: String,
 }
 
 impl Privilage {
-    pub fn new(level: u32, access: Option<String>, id: String) -> Self { Self { level, access, id } }
+    pub fn new(level: u32, access: Option<String>, id: String) -> Self {
+        Self { level, access, id }
+    }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct  UserData{
-    username: String,
-    main: Option<String>,
-    managers: Option<Vec<Privilage>>,
-    prosumers: Option<Vec<Privilage>>,
-    consumers: Option<Vec<Privilage>>,
-    
+pub struct UserData {
+    pub id: String,
+    pub username: String,
+    pub main: Option<String>,
+    pub managers: Option<Vec<Privilage>>,
+    pub prosumers: Option<Vec<Privilage>>,
+    pub consumers: Option<Vec<Privilage>>,
+    pub admin: bool,
 }
 
 impl UserData {
-    pub fn new(username: String, main: Option<String>, managers: Option<Vec<Privilage>>, prosumers: Option<Vec<Privilage>>, consumers: Option<Vec<Privilage>>) -> Self { Self { username, main, managers, prosumers, consumers } }
+    pub fn new(
+        id: String,
+        username: String,
+        main: Option<String>,
+        managers: Option<Vec<Privilage>>,
+        prosumers: Option<Vec<Privilage>>,
+        consumers: Option<Vec<Privilage>>,
+    ) -> Self {
+        Self {
+            id,
+            username,
+            main,
+            managers,
+            prosumers,
+            consumers,
+            admin: false,
+        }
+    }
 }
-

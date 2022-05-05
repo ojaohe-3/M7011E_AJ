@@ -6,9 +6,11 @@ use std::{
 
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
+use env_logger::Env;
 use futures::lock::Mutex;
 use mongodb::{bson::doc, options::ClientOptions, Client};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
+
 
 use crate::{app::AppState, handlers::simulation_handler::SimulationHandler};
 
@@ -24,7 +26,6 @@ async fn main() -> std::io::Result<()> {
     let instance = Instant::now();
     // ==== Assert enviormental variables
     dotenv().ok();
-
     let envs = match assert_all_env_loaded() {
         Ok(v) => v,
         Err(e) => panic!("{}", e),
@@ -67,16 +68,14 @@ async fn main() -> std::io::Result<()> {
         port,
         instance.elapsed().as_secs_f64()
     );
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
     // ==== Server serving the API ====
     let server = HttpServer::new(move || {
         let api = app::generate_api();
-        // let data = web::Data::new(AppData{
-        //     sim
-        // });
         App::new()
             .app_data(data.clone())
             .wrap(Logger::default())
-            // .wrap(Logger::new("%a %{User-Agent}i"))
+            .wrap(Logger::new("%a %{User-Agent}i"))
             .service(api)
     })
     .bind_openssl(port, builder)?
@@ -92,6 +91,7 @@ async fn main() -> std::io::Result<()> {
         // let sim = simulation_singleton();
         loop {
             interval.tick().await;
+            sim.lock().await.process_inters().await;
             sim.lock().await.process(time).await;
             time = Instant::now();
         }
@@ -101,6 +101,7 @@ async fn main() -> std::io::Result<()> {
         _ = simulation_loop => 0,
         _ = server => 0,
     };
+
     return Ok(());
 }
 

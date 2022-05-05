@@ -1,10 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use super::node::{Asset, Component};
-use std::{
-    borrow::BorrowMut,
-    time::{Duration, Instant},
-};
+use crate::handlers::weather_handler::WeatherReport;
+
+use super::node::{Asset, Node};
 
 
 
@@ -16,6 +14,7 @@ pub struct Manager {
     pub ratio: f64, // [0, 1] range  
     pub price: f64, // price in kr
     pub status: bool, // active or not
+    pub network: String, // Network instant that is to be supplied
     #[serde(skip_serializing)]
     pub last: f64, // seconds as f64
     #[serde(skip_serializing)]
@@ -24,9 +23,8 @@ pub struct Manager {
 
 impl Manager {
     // const MAX_VELOCITY: f64 = 1.;
-    const ACCELERATION: f64 = 5e-5; // the constant acceleration, it goes without saying that this converges towards a velocity of infinity unless clamped
-
-    pub fn new(id:String, max_production: f64, current: f64, ratio: f64, price: f64, status: bool) -> Self {
+    const ACCELERATION: f64 = 5e-2; 
+    pub fn new(id:String, max_production: f64, current: f64, ratio: f64, price: f64, status: bool, network: String) -> Self {
         Self {
             id,
             max_production,
@@ -36,6 +34,7 @@ impl Manager {
             status,
             last: 0.,
             acc: 0.,
+            network
         }
     }
 
@@ -49,8 +48,8 @@ impl Manager {
     }
 }
 
-impl Component<Manager> for Manager {
-    fn tick(&mut self, dt: f64){
+impl Node<Manager> for Manager {
+    fn tick(&mut self, dt: f64, weather_report: WeatherReport){
         self.acc += Manager::ACCELERATION / dt;
         // if self.last > 1.{
         //     self.acc = 0.;
@@ -64,6 +63,7 @@ impl Component<Manager> for Manager {
         } else {
             cur -= self.acc/self.max_production;//(self.acc + Manager::STEP_PER_SECOND) * dt/2. + Manager::ACCELERATION * dt.powf(2.)/2.;
         }
+        cur *= dt;
         cur = cur.clamp(0., self.ratio); // TODO make ratio the goal rather than status
         self.set_current(cur);
         self.last += dt;
@@ -80,22 +80,21 @@ impl Component<Manager> for Manager {
 }
 #[test]
 fn test_manager() {
-    let m = Manager::new("".to_string(),1000., 0., 0., 0.05, true);
-    let manager: &mut Manager = &mut Component::new(m);
-
+    let m = Manager::new("".to_string(),1000., 0., 0., 0.05, true, format!(""));
+    let manager: &mut Manager = &mut Node::new(m);
+    let report = WeatherReport{ temp: 0., wind_speed: 0.};
     assert!(manager.status);
     assert_eq!(manager.output(), 0.);
-
-    manager.tick(1.);
-    manager.tick(1000.);
+    manager.tick(1000.,report);
     assert_eq!(manager.output(), 0.);
     manager.ratio = 1.;
-    manager.tick(1.);
+    manager.tick(0.1,report);
+    manager.tick(0.1,report);
     assert!(manager.output() > 0.);
-    manager.tick(1000.);
+    manager.tick(1000.,report);
     assert_eq!(manager.output(), manager.max_production);
     manager.status = false;
-    manager.tick(0.1);
+    manager.tick(0.1,report);
     assert!(manager.output() < manager.max_production);
 
 }

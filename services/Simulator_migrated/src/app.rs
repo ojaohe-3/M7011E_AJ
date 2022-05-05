@@ -5,8 +5,8 @@ use futures::lock::Mutex;
 use mongodb::{Client, Database};
 
 use crate::{
-    api::{control, datapoints, grid, members},
-    handlers::simulation_handler::SimulationHandler,
+    api::{control, datapoints, grid, members, formats::WebRequestError},
+    handlers::simulation_handler::SimulationHandler, models::user::{UserData, Privilage},
 };
 
 #[derive(Clone, Debug)]
@@ -39,3 +39,4 @@ pub fn generate_api() -> Scope {
         .service(datapoints::construct_service())
         .service(grid::construct_service())
 }
+

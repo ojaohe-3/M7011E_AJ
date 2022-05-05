@@ -15,6 +15,7 @@ pub struct CreateManagerInfo {
     id: Option<String>,
     pub max_production: f64, // in kw
     pub price: f64,          // price in kr
+    pub network: String
 }
 
 #[get("/")]
@@ -40,6 +41,7 @@ pub async fn generate_member(
                 0.,
                 manager.price,
                 false,
+                manager.network
             ));
         }
     } else {
@@ -51,6 +53,8 @@ pub async fn generate_member(
             0.,
             manager.price,
             false,
+            manager.network
+
         ));
     }
     return Ok(Json(ResponseFormat::new(format!("Success!"))));

@@ -7,8 +7,6 @@ export type KeyTypes = "source" | "consumer"
 
 export type RabbitWorker = Handler<Arguments>
 export type RabbitWorkHandler = WorkHandler<Arguments>
-
-
 export interface Arguments{
     target: string
     content: ReceiveFormat[]

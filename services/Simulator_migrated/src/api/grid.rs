@@ -72,6 +72,7 @@ pub async fn set_manager_at(
         0.,
         manager.price,
         false,
+        manager.network
     ));
 
     Ok(Json(ResponseFormat::new(format!(
@@ -92,13 +93,14 @@ pub async fn set_consumer_at(
     data.sim.lock().await.grid.set_at(
         info.x,
         info.y,
-        Cell::new(cell.id.to_string(), crate::models::node::CellType::Manager),
+        Cell::new(cell.id.to_string(), crate::models::node::CellType::Conusmer),
     );
     data.sim.lock().await.add_consumer(Consumer::new(
         consumer.timefn,
         consumer.profile,
         consumer.asset,
         consumer.id,
+        consumer.network
     ));
 
     Ok(Json(ResponseFormat::new(format!(
@@ -119,7 +121,7 @@ pub async fn set_prosumer_at(
     data.sim.lock().await.grid.set_at(
         info.x,
         info.y,
-        Cell::new(cell.id.to_string(), crate::models::node::CellType::Manager),
+        Cell::new(cell.id.to_string(), crate::models::node::CellType::Prosumer),
     );
     data.sim.lock().await.add_prosumer(Prosumer::new(
         true,
@@ -129,6 +131,7 @@ pub async fn set_prosumer_at(
         1.,
         cell.id,
         0.,
+        prosumer.network
     ));
 
     Ok(Json(ResponseFormat::new(format!(

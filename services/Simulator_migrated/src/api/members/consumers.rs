@@ -16,6 +16,7 @@ pub struct CreateConsumerInfo {
     pub profile: Option<f64>,
     pub timefn: Option<[f64; 24]>,
     pub asset: Option<Asset>,
+    pub network: String,
 }
 
 #[get("/")]
@@ -40,6 +41,7 @@ pub async fn generate_member(
         consumer.profile,
         consumer.asset,
         consumer.id,
+        consumer.network
     ));
 
     return Ok(Json(ResponseFormat::new(format!("Success!"))));

@@ -7,7 +7,7 @@ import { Source, Consumer } from "./node";
 export interface ITicket {
     target: string // IComponent id
     price: number
-    source: string // IProducer id
+    source: string // IProducer id who gave you power (takes the last one, i.e if you take from one source 99% first then 1% later 100% will be to the latter part for simplisity)
     amount: number
 }
 export interface INetwork {

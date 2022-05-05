@@ -9,7 +9,7 @@ use tokio::sync::broadcast::{channel, Sender};
 use crate::handlers::weather_handler::weather_singleton;
 use crate::models::consumer::Consumer;
 use crate::models::manager::Manager;
-use crate::models::node::{Component, Grid};
+use crate::models::node::{Node, Grid};
 use crate::models::prosumer::{Battery, Prosumer, Turbine};
 
 use super::data_handler::{ConsumerReport, DataHandler, ManagerReport, ProsumerReport};
@@ -47,12 +47,13 @@ pub struct SimulationHandler {
     // pub tx: Sender<u32>,
     // rx: Receiver<u32>,
     pub total_time: Instant,
+    pub last_inter: Instant,
 }
 
 impl SimulationHandler {
     pub const SIZE: usize = 64; //dotenv
     pub const LOOP_FREQUENCY: f64 = 10.; //Hz
-
+    pub const FETCH_REQUENCY: Duration = Duration::from_secs(1000);
     pub fn new() -> Self {
         // let (tx, _) = channel(100);
         let grid = Grid::new(SimulationHandler::SIZE, SimulationHandler::SIZE);
@@ -66,8 +67,9 @@ impl SimulationHandler {
             data_handler,
             weather_handler,
             consumers: Vec::new(),
-            // tx,
-            total_time: Instant::now(), // rx,
+            total_time: Instant::now(), 
+            last_inter: Instant::now()
+
         }
     }
 
@@ -78,32 +80,33 @@ impl SimulationHandler {
         //     Ok(it) => self.weather_handler.set_cache(it),
         //     Err(err) => println!("failed to fetch weather! {:?}", err),
         // };
+        if let Some(report) = self.weather_handler.cache {
+            self.consumers.iter_mut().for_each(|c| {
+                c.tick(instance.elapsed().as_secs_f64(), report);
+                total_demand += c.demand;
+            });
+            self.prosumers.iter_mut().for_each(|p| {
+                p.tick(instance.elapsed().as_secs_f64(), report);
+                total_demand += p.demand;
+                self.data_handler.log_prosumer(ProsumerReport::new(
+                    p.id.to_string(),
+                    p.total_production,
+                    p.total_stored,
+                    p.demand,
+                    self.total_time.elapsed().as_secs_f64(),
+                ));
 
-        self.consumers.iter_mut().for_each(|c| {
-            c.tick(instance.elapsed().as_secs_f64());
-            total_demand += c.demand;
-        });
-        self.prosumers.iter_mut().for_each(|p| {
-            p.tick(instance.elapsed().as_secs_f64());
-            total_demand += p.demand;
-            self.data_handler.log_prosumer(ProsumerReport::new(
-                p.id.to_string(),
-                p.total_production,
-                p.total_stored,
-                p.demand,
-                self.total_time.elapsed().as_secs_f64(),
-            ));
-        });
-
-        self.managers.iter_mut().for_each(|m| {
-            m.tick(instance.elapsed().as_secs_f64());
-            self.data_handler.log_manager(ManagerReport::new(
-                m.id.to_string(),
-                m.output(),
-                self.total_time.elapsed().as_secs_f64(),
-                m.ratio,
-            ));
-        });
+                self.managers.iter_mut().for_each(|m| {
+                    m.tick(instance.elapsed().as_secs_f64(), report);
+                    self.data_handler.log_manager(ManagerReport::new(
+                        m.id.to_string(),
+                        m.output(),
+                        self.total_time.elapsed().as_secs_f64(),
+                        m.ratio,
+                    ));
+                });
+            });
+        }
 
         self.data_handler.log_consumer(ConsumerReport::new(
             total_demand,
@@ -149,6 +152,20 @@ impl SimulationHandler {
     // pub fn subscribe(&self) -> tokio::sync::broadcast::Receiver<u32> {
     //     self.tx.subscribe()
     // }
+    pub async fn process_inters(&mut self){
+        if(self.last_inter.elapsed() > Duration::from_secs(1) || self.weather_handler.cache.is_none()){
+            let result = match WeatherHandler::fetch_report().await{
+                Ok(v) => v,
+                Err(_) => {
+                    println!("not able to fetch weather report defaulting to generic"); 
+                    WeatherReport{temp: 273.15, wind_speed: 4.}
+                },
+            };
+            self.weather_handler.cache = Some(result);
+            //TODO: Rabbit mq inform and fetch
+        }
+
+    }
 }
 
 #[tokio::test]
@@ -159,7 +176,15 @@ async fn test_simulation() {
     assert_eq!(sim.prosumers.len(), 0);
     assert_eq!(sim.managers.len(), 0);
 
-    sim.add_manager(Manager::new("1".to_string(), 1000.0, 0., 0.5, 1., true));
+    sim.add_manager(Manager::new(
+        "1".to_string(),
+        1000.0,
+        0.,
+        0.5,
+        1.,
+        true,
+        format!(""),
+    ));
     sim.add_prosumer(Prosumer::new(
         true,
         vec![Battery::new(1000., 0., 100., 100.)],
@@ -168,6 +193,7 @@ async fn test_simulation() {
         0.,
         "1".to_string(),
         0.,
+        format!(""),
     ));
 
     assert_eq!(sim.prosumers.len(), 1);
@@ -188,7 +214,15 @@ async fn test_loop() {
     let mut time = Instant::now();
     let mut sim = SimulationHandler::new();
 
-    sim.add_manager(Manager::new("1".to_string(), 1000.0, 0., 1., 1., true));
+    sim.add_manager(Manager::new(
+        "1".to_string(),
+        1000.0,
+        0.,
+        1.,
+        1.,
+        true,
+        format!(""),
+    ));
     sim.add_prosumer(Prosumer::new(
         true,
         vec![Battery::new(1000., 0., 100., 100.)],
@@ -197,6 +231,7 @@ async fn test_loop() {
         0.,
         "1".to_string(),
         0.,
+        format!(""),
     ));
     let ws = weather_singleton(); // FIXME: This should be removed and replaced as an inner
     ws.inner.lock().unwrap().set_cache(WeatherReport {

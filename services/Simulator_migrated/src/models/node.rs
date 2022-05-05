@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+
+use crate::handlers::weather_handler::WeatherReport;
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Asset {
     EMPTY,
@@ -16,10 +18,13 @@ pub enum CellType {
     Manager,
 }
 
-pub trait Component<T> {
+
+
+pub trait Node<T> {
     fn new(obj : T) -> Self;
-    fn tick(&mut self, elapsed: f64);
+    fn tick(&mut self, elapsed: f64, weather_report: WeatherReport);
     fn get_asset(&self) -> Asset;
+
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

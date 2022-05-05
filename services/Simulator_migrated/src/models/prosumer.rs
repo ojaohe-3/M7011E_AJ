@@ -6,7 +6,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::handlers::weather_handler::{weather_singleton, WeatherReport};
 
-use super::{node::{Asset, Component}, consumer::Consumer};
+use super::{
+    consumer::Consumer,
+    node::{Asset, Node},
+};
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Turbine {
     max_production: f64,
@@ -45,19 +48,22 @@ impl Battery {
             max_output,
         }
     }
-
-    pub fn input(&mut self, ratio: f64) -> f64 {
+    /// How much battery is willing to accept
+    pub fn input(&self, ratio: f64) -> f64 {
         let mut give = ratio * self.max_charge;
         give = give.clamp(0., self.capacity - self.current);
-        self.current += give;
+        // self.current += give;
         give
     }
-
-    pub fn output(&mut self, ratio: f64) -> f64 {
+    /// How much battery is willing to part with
+    pub fn output(&self, ratio: f64) -> f64 {
         let mut take = self.max_output * ratio;
         take = take.clamp(0., self.current);
-        self.current -= take;
+        // self.current -= take;
         take
+    }
+    pub fn modify(&mut self, give: f64){
+        self.current += give;
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -73,6 +79,7 @@ pub struct Prosumer {
     pub total_production: f64,
     pub total_stored: f64,
     pub demand: f64,
+    pub network: String,
 }
 
 impl Prosumer {
@@ -84,6 +91,7 @@ impl Prosumer {
         output_ratio: f64,
         id: String,
         demand: f64,
+        network: String,
     ) -> Self {
         Self {
             status,
@@ -95,7 +103,8 @@ impl Prosumer {
             timeout: 0.,
             total_production: 0.,
             total_stored: 0.,
-            demand
+            demand,
+            network,
         }
     }
     pub fn set_status(&mut self, status: bool) {
@@ -108,42 +117,32 @@ impl Prosumer {
     }
 }
 
-impl Component<Prosumer> for Prosumer {
-    fn tick(&mut self, elapsed: f64) {
+impl Node<Prosumer> for Prosumer {
+    fn tick(&mut self, elapsed: f64, weather_report: WeatherReport) {
         //TODO: make into profile that makes sense
-        let mut rng =  rand::thread_rng();
+        let mut rng = rand::thread_rng();
         self.demand = rng.gen_range(1.0..10.);
-
 
         if self.timeout > 0. {
             self.status = false;
             self.timeout -= elapsed;
         }
 
-        let s = weather_singleton();
-        let report = &s.inner.lock().unwrap().cache;
-        let wind_speed = match report {
-            Some(v) => v.wind_speed,
-            None => 0.,
-        };
+        let wind_speed = weather_report.wind_speed;
 
         if self.status {
-            self.total_production = self
-                .turbine
-                .iter()
-                .map(|t| t.profile(wind_speed))
-                .sum();
+            self.total_production = self.turbine.iter().map(|t| t.profile(wind_speed)).sum();
         }
         let bs: &mut Vec<Battery> = &mut self.batteries;
         for b in bs {
-            let inp =  b.input(self.input_ratio*elapsed);
-            let out = b.output(self.output_ratio*elapsed);
-            let net = out - inp;
-            self.total_production += net;
-            if(self.total_production < 0.){
+            let inp = b.input(self.input_ratio * elapsed).clamp(0., self.total_production);
+            let out = b.output(self.output_ratio * elapsed);
+            self.total_production += out - inp;
+            if self.total_production < 0. {
                 b.current -= inp;
                 self.total_production = 0.;
             }
+            b.modify(inp - out);
         } // TODO Check if battery gets changed
         self.total_stored = self.batteries.iter().map(|b| b.current).sum();
     }
@@ -159,49 +158,53 @@ impl Component<Prosumer> for Prosumer {
 
 #[test]
 fn test_prosumer_no_output() {
-    let p: &mut Prosumer = &mut Component::new(Prosumer::new(
+    let p: &mut Prosumer = &mut Node::new(Prosumer::new(
         true,
         vec![Battery::new(1000., 0., 100., 100.)],
         vec![Turbine::new(1000.)],
         1.,
         0.,
         "1".to_string(),
-        0.
-    ));        
-    let s = weather_singleton();
-    s.inner.lock().unwrap().set_cache(WeatherReport {
-        temp: 300.,
-        wind_speed: 0.,
-    });
-    assert_eq!(p.total_production, 0.);
-    assert_eq!(p.total_stored, 0.);
+        0.,
+        format!(""),
+    ));
 
-    s.inner.lock().unwrap().set_cache(WeatherReport {
+
+
+    p.tick(1.,WeatherReport {
         temp: 300.,
         wind_speed: 11.,
     });
-    p.tick(1.);
     assert!(p.total_production < p.turbine[0].max_production);
     assert!(p.total_stored > 0.);
-    s.inner.lock().unwrap().set_cache(WeatherReport {
+
+
+    let cur = p.total_stored;
+    p.output_ratio = 1.0;
+    p.tick(1.,WeatherReport {
         temp: 300.,
-        wind_speed: 14.,
+        wind_speed: 0.,
     });
-    p.tick(1.);
-    assert_eq!(p.total_production, p.turbine[0].max_production - p.batteries[0].max_charge);
-    assert!(p.total_stored > 0.);
-    s.inner.lock().unwrap().set_cache(WeatherReport {
+    
+    assert_eq!(
+        p.total_production,
+        p.batteries[0].max_output
+    );
+
+    assert!(p.total_stored < cur);
+    p.output_ratio = 0.;
+    
+    p.tick(1., WeatherReport {
         temp: 300.,
         wind_speed: 25.,
     });
-    p.tick(1.);
     assert_eq!(p.total_production, 0.);
-    assert!(p.total_stored > 0.);
-    s.inner.lock().unwrap().set_cache(WeatherReport {
+    assert_eq!(p.total_stored, 0.);
+    p.tick(1., WeatherReport {
         temp: 300.,
         wind_speed: 2.,
     });
-    p.tick(1.);
+
     assert_eq!(p.total_production, 0.);
     assert!(p.total_stored > 0.);
 }

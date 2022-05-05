@@ -128,10 +128,10 @@ console.log(`default : lat: ${
 
 let PORT = process.env.PORT || 5000;
 
-app.get("/", async (req, res) => { 
+app.get("/:lat/:lon", async (req, res) => { 
     
-    const lat: number = + req.query.lat || +process.env.LAT;
-    const lon: number = + req.query.lon || +process.env.LON;
+    const lat: number = + req.params.lat || +process.env.LAT;
+    const lon: number = + req.params.lon || +process.env.LON;
     requests += 1;
     activiy();
     if (lat && lon) {

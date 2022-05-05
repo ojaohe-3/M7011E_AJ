@@ -28,7 +28,7 @@ pub enum WebRequestError{
 
 impl Display for WebRequestError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{{ error: {:?} }}", self)
+        write!(f, "{{ \"error\": \"{:?}\" }}", self)
     }
 }
 
