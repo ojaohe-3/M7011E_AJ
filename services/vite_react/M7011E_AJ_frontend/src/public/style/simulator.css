@@ -1,0 +1,84 @@
+/* simulator block */
+
+#simulator {
+    display: block;
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #ecf0f1;
+    color: #34495e;
+    padding: 15px;
+}
+
+#legend {
+    float: left;
+}
+
+.colorDot {
+    height: 30px;
+    position: relative;
+    top: 10px;
+}
+
+#simulatorMap {
+    width: 80%;
+    height: auto;
+}
+
+#simulator .yellowLine {
+    width: 115%;
+    height: 8px;
+    background-color: #f1c40f;
+    float: left;
+    position: relative;
+    top: 7px;
+    right: 8%;
+    border-radius: 25px;
+}
+
+#simulator .blueLine {
+    width: 8px;
+    height: 650px;
+    background-color: #3498db;
+    float: left;
+    position: relative;
+    right: 20px;
+    bottom: 610px;
+    border-radius: 25px;
+}
+
+@media screen and (max-width: 1230px) {
+    #simulator .blueLine {
+        height: 540px;
+        bottom: 505px;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    #simulator .blueLine {
+        height: 490px;
+        bottom: 450px;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    #simulatorMap {
+        width: 95%;
+    }
+
+    .legendBlock {
+        display: inline;
+    }
+
+    #simulator .blueLine {
+        height: 480px;
+        bottom: 450px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #simulator .blueLine {
+        height: 400px;
+        bottom: 370px;
+    }
+}

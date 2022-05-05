@@ -11,9 +11,9 @@ const initialState: UserData = {
 
 export default function UserReducer(state = initialState, action: Action) {
     switch (action.type) {
-        case ActionTypes.UpdateOption:
+        case ActionTypes.UpdateUser:
             return action.payload;
-        case ActionTypes.ResetOption:
+        case ActionTypes.ResetUser:
             return initialState;
         default:
             // console.log("fallthough!:", action)

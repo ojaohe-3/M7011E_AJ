@@ -1,41 +1,29 @@
-import { Tasks } from "../../../models"
-import SRP_Options from "../../../models/Options"
-import SimulationData from "../../../models/SimulationData"
+import SimulationData from "../../../models/SimulationData";
+import UserData from "../../../models/userdata";
 
-export enum ActionTypes{
-    UpdateOption = "updateOption",
-    ResetOption = "resetOption",
-    UpdateTasks = "updateTasks",
-    ResetTasks = "resetTasks",
-    UpdateSimdata = "updateSimdata",
-    ResetSimdata= "resetSimdata",
+export enum ActionTypes {
+  UpdateUser = "updateUser",
+  ResetUser = "resetUser",
+  UpdateSimdata = "updateSimdata",
+  ResetSimdata = "resetSimdata",
 }
-export interface UpdateOption{
-    type: ActionTypes.UpdateOption,
-    payload: SRP_Options
+export interface UpdateUser {
+  type: ActionTypes.UpdateUser;
+  payload: UserData;
 }
-export interface ResetOption{
-    type: ActionTypes.ResetOption,
-    payload: undefined
+export interface ResetUser {
+  type: ActionTypes.ResetUser;
+  payload: undefined;
 }
 
-export interface UpdateTasks{
-    type: ActionTypes.UpdateTasks,
-    payload: Tasks
-}
-export interface ResetTasks{
-    type: ActionTypes.ResetTasks,
-    payload: undefined
+export interface UpdateSimdata {
+  type: ActionTypes.UpdateSimdata;
+  payload: SimulationData;
 }
 
-export interface UpdateSimdata{
-    type: ActionTypes.UpdateSimdata,
-    payload: SimulationData
+export interface ResetSimdata {
+  type: ActionTypes.ResetSimdata;
+  payload: undefined;
 }
 
-export interface ResetSimdata{
-    type: ActionTypes.ResetSimdata,
-    payload: undefined
-}
-
-export type Action =  UpdateOption | ResetOption | UpdateTasks | ResetTasks | UpdateSimdata | ResetSimdata
+export type Action = UpdateUser | ResetUser | UpdateSimdata | ResetSimdata;

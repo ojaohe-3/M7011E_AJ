@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import SimulationData from "../../../models/SimulationData";
 
 import { Action } from "../../actions/types";
 import { ActionTypes } from "../../actions/types";
 
 // Define the initial state using that type
 const initState: SimulationData = {
-    // res: [],
-    // bps:  null, 
-    // load_factor: 0,
+    width: 0,
+    height: 0,
+    nodes: []
 }
 
 
