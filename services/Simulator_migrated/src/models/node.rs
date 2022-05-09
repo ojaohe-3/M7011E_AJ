@@ -10,7 +10,7 @@ pub enum Asset {
     Windturbine,
     Powerplant,
 }
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum CellType {
     Empty,
     Conusmer,
@@ -27,12 +27,12 @@ pub trait Node<T> {
 
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Cell {
     // x: usize,
     // y: usize,
-    id: String,
-    cell_type: CellType,
+    pub id: String,
+    pub cell_type: CellType,
 }
 
 impl Cell {
@@ -97,7 +97,22 @@ impl Grid {
         let mut temp = Vec::new();
         for col in &self.nodes{
             for cell in col{
-                temp.push(cell);
+                if cell.id.eq(id)
+                {
+                    temp.push(cell);
+                }
+            }
+        }
+        temp.into_iter().cloned().collect()
+    }
+
+    pub fn get_all_type(&self, cell_type: CellType)-> Vec<Cell>{
+        let mut temp = Vec::new();
+        for col in &self.nodes{
+            for cell in col{
+                if cell.cell_type.eq(&cell_type){
+                    temp.push(cell);
+                }
             }
         }
         temp.into_iter().cloned().collect()

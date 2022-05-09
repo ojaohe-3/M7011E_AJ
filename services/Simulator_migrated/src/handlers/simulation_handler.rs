@@ -76,10 +76,6 @@ impl SimulationHandler {
     pub async fn process(&mut self, instance: Instant) {
         let mut total_demand = 0.;
 
-        // let report = match WeatherHandler::fetch_report().await {
-        //     Ok(it) => self.weather_handler.set_cache(it),
-        //     Err(err) => println!("failed to fetch weather! {:?}", err),
-        // };
         if let Some(report) = self.weather_handler.cache {
             self.consumers.iter_mut().for_each(|c| {
                 c.tick(instance.elapsed().as_secs_f64(), report);
@@ -149,22 +145,15 @@ impl SimulationHandler {
         self.consumers.iter_mut().find(|p| (*p).id.eq(id))
     }
 
-    // pub fn subscribe(&self) -> tokio::sync::broadcast::Receiver<u32> {
-    //     self.tx.subscribe()
-    // }
-    pub async fn process_inters(&mut self){
-        if(self.last_inter.elapsed() > Duration::from_secs(1) || self.weather_handler.cache.is_none()){
-            let result = match WeatherHandler::fetch_report().await{
-                Ok(v) => v,
-                Err(_) => {
-                    println!("not able to fetch weather report defaulting to generic"); 
-                    WeatherReport{temp: 273.15, wind_speed: 4.}
-                },
-            };
-            self.weather_handler.cache = Some(result);
-            //TODO: Rabbit mq inform and fetch
-        }
-
+    pub async fn fetch_weather(&mut self){
+        let result = match WeatherHandler::fetch_report().await{
+            Ok(v) => v,
+            Err(_) => {
+                println!("not able to fetch weather report defaulting to generic"); 
+                WeatherReport{temp: 273.15, wind_speed: 4.}
+            },
+        };
+        self.weather_handler.cache = Some(result);
     }
 }
 

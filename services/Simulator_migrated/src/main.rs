@@ -12,7 +12,7 @@ use mongodb::{bson::doc, options::ClientOptions, Client};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 
-use crate::{app::AppState, handlers::simulation_handler::SimulationHandler};
+use crate::{app::AppState, handlers::{simulation_handler::SimulationHandler, network_handler::NetworkHandler}};
 
 mod api;
 mod app;
@@ -41,11 +41,17 @@ async fn main() -> std::io::Result<()> {
 
     let client = Client::with_options(options).expect("Failed to create client!");
     let db = client.database("AJ");
-    let c = doc! { "ping": 1};
+    let c = doc! { "ping": "1"};
+
     db.run_command(c, None)
         .await
         .expect("Could Not Connect to mongodb");
     println!("mongodb connected!");
+
+    // ==== Fetch from db ====
+    if let Some(name) = envs.NAME{
+
+    }
 
     // ==== Build TLS encryption for https ====
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
@@ -58,6 +64,7 @@ async fn main() -> std::io::Result<()> {
     let sim = Arc::new(Mutex::new(SimulationHandler::new()));
 
     // TODO: Serve Rabbitmq
+    let mut rmq = Arc::new(Mutex::new(NetworkHandler::new()));
     // TODO: Generate members object from db
 
     // let data = Arc::new(Mutex::new(AppState::new(db, client, sim.clone())));
@@ -83,17 +90,27 @@ async fn main() -> std::io::Result<()> {
     // ==== Simulation loop ====
     let simulation_loop = tokio::spawn(async move {
         let mut time = Instant::now();
+        let mut long_time = Instant::now();
+        let duration = Duration::from_secs_f64(1.0);
         let mut interval = tokio::time::interval(Duration::from_secs_f64(
             1. / SimulationHandler::LOOP_FREQUENCY,
         ));
+        rmq.lock().await.connect().await.expect("Failed to connect rabbitmq");
         //TODO: read broadcasts
         println!("Starting Simulation");
         // let sim = simulation_singleton();
         loop {
             interval.tick().await;
-            sim.lock().await.process_inters().await;
             sim.lock().await.process(time).await;
             time = Instant::now();
+            if long_time.elapsed() > duration{
+                sim.lock().await.fetch_weather().await;
+                let cs = sim.lock().await.consumers.to_vec();
+                let ms = sim.lock().await.managers.to_vec();
+                let ps = sim.lock().await.prosumers.to_vec();
+                
+                long_time = Instant::now();
+            }
         }
     });
 
