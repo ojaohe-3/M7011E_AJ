@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::mem::MaybeUninit;
 use std::sync::Once;
 // use std::sync::{Mutex, Once, Arc};
@@ -13,6 +14,7 @@ use crate::models::node::{Node, Grid};
 use crate::models::prosumer::{Battery, Prosumer, Turbine};
 
 use super::data_handler::{ConsumerReport, DataHandler, ManagerReport, ProsumerReport};
+use super::network_handler::{SendFormat, KeyTypes};
 use super::weather_handler::{WeatherHandler, WeatherReport};
 
 pub struct SHReader {
@@ -155,6 +157,44 @@ impl SimulationHandler {
         };
         self.weather_handler.cache = Some(result);
     }
+
+    fn generate_sendform_consumers(&self) -> Vec<(String, SendFormat)>{
+        let mut res = Vec::new();
+        for c in self.consumers{
+           let format = SendFormat::new(KeyTypes::Consumer, c.demand, c.id, None, None);
+           res.push((c.network, format));
+        }
+        
+        res
+    }
+    fn generate_sendform_prosumers(&self) -> Vec<(String, SendFormat)>{
+        let mut res = Vec::new();
+        for p in self.prosumers{
+           let format = SendFormat::new(KeyTypes::Consumer, p.total_production, p.id, Some(0.05), Some(p.demand));
+           res.push((p.network, format));
+        }
+        
+        res
+    }
+    fn generate_sendform_managers(&self) -> Vec<(String, SendFormat)>{
+        let mut res = Vec::new();
+        for m in self.managers{
+           let format = SendFormat::new(KeyTypes::Consumer, m.output() , m.id, Some(m.price), None);
+           res.push((m.network, format));
+        }
+        
+        res
+    }
+    pub fn generate_sendforms(&self) -> Vec<(String, SendFormat)>{
+        let mut c = self.generate_sendform_consumers();
+        let p = self.generate_sendform_prosumers();
+        let m = self.generate_sendform_managers();
+
+        c.append(&mut p);
+        c.append(&mut m);
+        c
+    }
+
 }
 
 #[tokio::test]

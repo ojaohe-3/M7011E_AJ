@@ -21,7 +21,7 @@ impl AppDocument {
         let bson_item = bson::to_bson(&item)?;
         let document = bson_item.as_document().unwrap();
         let options = UpdateOptions::builder().upsert(true).build();
-        db.collection::<Grid>("grids")
+        db.collection::<Grid>("apps")
             .update_one(query, document.to_owned(), options)
             .await
     }
@@ -73,7 +73,7 @@ impl GridDocument {
 
         Ok(Some(result))
     }
-    pub async fn get_prosumerss(db: Database, gr: Grid)-> Result<Option<Vec<Prosumer>>, mongodb::error::Error>{
+    pub async fn get_prosumers(db: Database, gr: Grid)-> Result<Option<Vec<Prosumer>>, mongodb::error::Error>{
         let prosumer_cells = gr.get_all_type(CellType::Conusmer);
         let mut result = Vec::new();
         for cell in prosumer_cells{

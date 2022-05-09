@@ -69,11 +69,13 @@ impl SendFormat {
     }
 }
 
+#[derive(Debug)]
 pub struct NetworkHandler {
     tx: broadcast::Sender<ReciveFormat>,
     // rx: broadcast::Receiver<ReciveFormat>
     connection: Option<Connection>,
 }
+
 
 impl NetworkHandler {
     pub fn new() -> Self {

@@ -1,18 +1,24 @@
 use std::{
     env, fmt,
     sync::Arc,
-    time::{Duration, Instant},
+    time::{Duration, Instant}, collections::HashMap,
 };
 
 use actix_web::{middleware::Logger, web, App, HttpServer};
+use db::documents::ConsumerDocument;
 use dotenv::dotenv;
 use env_logger::Env;
-use futures::lock::Mutex;
-use mongodb::{bson::doc, options::ClientOptions, Client};
+use futures::{future::join_all, lock::Mutex, Future};
+use handlers::network_handler::{self, ReciveFormat};
+use mongodb::{bson::doc, options::ClientOptions, Client, Database};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
-
-use crate::{app::AppState, handlers::{simulation_handler::SimulationHandler, network_handler::NetworkHandler}};
+use crate::{
+    app::AppState,
+    db::documents::{ManagerDocument, ProsumerDocument},
+    handlers::{network_handler::{NetworkHandler, SendFormat}, simulation_handler::SimulationHandler},
+    models::{consumer::Consumer, manager::Manager, prosumer::Prosumer},
+};
 
 mod api;
 mod app;
@@ -20,7 +26,7 @@ mod db;
 mod handlers;
 mod middleware;
 mod models;
-
+type DocumentFuture<T> = dyn Future<Output = Result<Option<T>, mongodb::error::Error>>;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let instance = Instant::now();
@@ -49,9 +55,7 @@ async fn main() -> std::io::Result<()> {
     println!("mongodb connected!");
 
     // ==== Fetch from db ====
-    if let Some(name) = envs.NAME{
-
-    }
+    if let Some(name) = envs.NAME {}
 
     // ==== Build TLS encryption for https ====
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
@@ -68,7 +72,7 @@ async fn main() -> std::io::Result<()> {
     // TODO: Generate members object from db
 
     // let data = Arc::new(Mutex::new(AppState::new(db, client, sim.clone())));
-    let data = web::Data::new(AppState::new(db, client, sim.clone()));
+    let data = web::Data::new(AppState::new(db.clone(), client.clone(), sim.clone()));
     let port = format!("127.0.0.1:{}", envs.PORT);
     println!(
         "Starting server on {}, toke {}s",
@@ -95,21 +99,73 @@ async fn main() -> std::io::Result<()> {
         let mut interval = tokio::time::interval(Duration::from_secs_f64(
             1. / SimulationHandler::LOOP_FREQUENCY,
         ));
-        rmq.lock().await.connect().await.expect("Failed to connect rabbitmq");
-        //TODO: read broadcasts
-        println!("Starting Simulation");
-        // let sim = simulation_singleton();
+        let mut send_map: HashMap<String, Vec<SendFormat>> = HashMap::new();
+        rmq.lock()
+            .await
+            .connect()
+            .await
+            .expect("Failed to connect rabbitmq");
+            println!("Starting Simulation");
         loop {
             interval.tick().await;
             sim.lock().await.process(time).await;
             time = Instant::now();
-            if long_time.elapsed() > duration{
+            if long_time.elapsed() > duration {
                 sim.lock().await.fetch_weather().await;
-                let cs = sim.lock().await.consumers.to_vec();
-                let ms = sim.lock().await.managers.to_vec();
-                let ps = sim.lock().await.prosumers.to_vec();
                 
+                
+                let rmq_ref = rmq.clone();
+                let db = db.clone();
+            
+                let rs = sim.lock().await.generate_sendforms();
+                let mut send_map = send_map;
+                for (n, r) in rs{
+                    if send_map.contains_key(&n){
+                        send_map.get_mut(&n.to_string()).unwrap().push(r);
+                    }else{
+                        send_map.insert(n,vec![r]);
+                    }
+                }
+                let mut rrqm = Vec::new();
+                for (n, sr) in send_map.iter(){
+                    rrqm.push(tokio::spawn(async move{
+                        rmq_ref.clone().lock().await.send_rpc(n.to_string(), sr.to_vec()).await
+                    }))
+                }
+                let result: Vec<Vec<ReciveFormat>>= join_all(rrqm).await.iter_mut().map(|v| v.unwrap().unwrap()).collect();
+
+                let cs: Vec<Consumer> = sim.lock().await.consumers.iter().cloned().collect();
+                let ms: Vec<Manager> = sim.lock().await.managers.iter().cloned().collect();
+                let ps: Vec<Prosumer> = sim.lock().await.prosumers.iter().cloned().collect();
+
+                let mut ct = Vec::new();
+                let mut pt = Vec::new();
+                let mut mt = Vec::new();
+
+                for c in cs {
+                    let db_ref = db.clone();
+                    ct.push(tokio::spawn(
+                        async move { ConsumerDocument::insert(db_ref, c) },
+                    ))
+                }
+                for p in ps {
+                    let db_ref = db.clone();
+                    pt.push(tokio::spawn(
+                        async move { ProsumerDocument::insert(db_ref, p) },
+                    ))
+                }
+                for m in ms {
+                    let db_ref = db.clone();
+                    mt.push(tokio::spawn(
+                        async move { ManagerDocument::insert(db_ref, m) },
+                    ))
+                }
+
+                join_all(ct).await;
+                join_all(pt).await;
+                join_all(mt).await;
                 long_time = Instant::now();
+                send_map.clear();
             }
         }
     });
