@@ -23,7 +23,7 @@ impl ResponseFormat {
 pub enum WebRequestError{
     MemberNotFound, Other, MemberAlreadyExist,
     ResourceNotFound, InvalidFormat, InvalidRange,
-    NotAuthorized, TooLowClearance,  InvalidRequest, 
+    NotAuthorized, TooLowClearance,  InvalidRequest, OutOfBounds
 }
 
 impl Display for WebRequestError {

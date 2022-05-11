@@ -1,6 +1,7 @@
+use mongodb::Database;
 use serde::{Deserialize, Serialize};
 
-use crate::handlers::weather_handler::WeatherReport;
+use crate::{handlers::weather_handler::WeatherReport, db::manager_document::ManagerDocument};
 
 use super::node::{Asset, Node};
 
@@ -46,6 +47,10 @@ impl Manager {
     pub fn set_current(&mut self, current: f64) {
         self.current = current;
     }
+
+    pub async fn document(&self, db: Database) -> Result<mongodb::results::UpdateResult, mongodb::error::Error> {
+        ManagerDocument::update(db, &self.id.to_string(), self).await
+    }
 }
 
 impl Node<Manager> for Manager {
@@ -69,7 +74,7 @@ impl Node<Manager> for Manager {
         self.last += dt;
         
     }
-
+    
     fn get_asset(&self) -> Asset {
         Asset::Powerplant
     }

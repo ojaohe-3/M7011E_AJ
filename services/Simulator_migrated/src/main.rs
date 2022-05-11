@@ -1,22 +1,27 @@
 use std::{
+    collections::HashMap,
     env, fmt,
     sync::Arc,
-    time::{Duration, Instant}, collections::HashMap,
+    time::{Duration, Instant},
 };
 
 use actix_web::{middleware::Logger, web, App, HttpServer};
-use db::documents::ConsumerDocument;
+use db::{
+    consumer_document::ConsumerDocument, manager_document::ManagerDocument,
+    prosumer_document::ProsumerDocument,
+};
 use dotenv::dotenv;
 use env_logger::Env;
 use futures::{future::join_all, lock::Mutex, Future};
-use handlers::network_handler::{self, ReciveFormat};
+use handlers::network_handler::{self};
+use models::{appstructure::AppStructure, network_types::SendFormat};
 use mongodb::{bson::doc, options::ClientOptions, Client, Database};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 use crate::{
     app::AppState,
-    db::documents::{ManagerDocument, ProsumerDocument},
-    handlers::{network_handler::{NetworkHandler, SendFormat}, simulation_handler::SimulationHandler},
+    db::{app_document::AppDocument, grid_document::GridDocument},
+    handlers::{network_handler::NetworkHandler, simulation_handler::SimulationHandler},
     models::{consumer::Consumer, manager::Manager, prosumer::Prosumer},
 };
 
@@ -26,7 +31,7 @@ mod db;
 mod handlers;
 mod middleware;
 mod models;
-type DocumentFuture<T> = dyn Future<Output = Result<Option<T>, mongodb::error::Error>>;
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let instance = Instant::now();
@@ -54,9 +59,6 @@ async fn main() -> std::io::Result<()> {
         .expect("Could Not Connect to mongodb");
     println!("mongodb connected!");
 
-    // ==== Fetch from db ====
-    if let Some(name) = envs.NAME {}
-
     // ==== Build TLS encryption for https ====
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
     builder
@@ -70,12 +72,78 @@ async fn main() -> std::io::Result<()> {
     // TODO: Serve Rabbitmq
     let mut rmq = Arc::new(Mutex::new(NetworkHandler::new()));
     // TODO: Generate members object from db
+    // ==== Fetch from db ====
+    let mut app_state = AppStructure {
+        id: uuid::Uuid::new_v4().to_string(),
+        name: format!("Sim-{}", uuid::Uuid::new_v4().to_string()),
+        grid: sim.lock().await.grid.id.to_string(),
+    };
+    if let Some(name) = envs.NAME {
+        println!("found an name trying to fetch from mongodb");
+        let db_ref = db.clone();
+        app_state.name = name.to_string();
+        // instant might alread exist in the database thusly we want to add this to our simulation
+        if let Some(a) = AppDocument::get(db_ref.clone(), &name).await.unwrap() {
+            println!("found and entrie applying...");
+            app_state = a;
+            if let Some(grid) = GridDocument::get(db_ref.clone(), &app_state.grid.to_string())
+                .await
+                .unwrap()
+            {
+                sim.lock().await.grid = grid.clone();
+                let cs = GridDocument::get_consumers(db_ref.clone(), &grid)
+                    .await
+                    .unwrap();
+                let ps = GridDocument::get_prosumers(db_ref.clone(), &grid)
+                    .await
+                    .unwrap();
+                let ms = GridDocument::get_managers(db_ref.clone(), &grid)
+                    .await
+                    .unwrap();
+                for c in cs {
+                    sim.lock().await.add_consumer(c.clone())
+                }
+
+                for p in ps {
+                    sim.lock().await.add_prosumer(p.clone())
+                }
+
+                for m in ms {
+                    sim.lock().await.add_manager(m.clone())
+                }
+            }
+            println!("simulation succefully applied!");
+        } else {
+            println!("did not find the entry creating new...");
+            let db_ref = db.clone();
+            GridDocument::insert(db_ref.clone(), &sim.lock().await.grid.clone())
+                .await
+                .expect("failed to insert Grid");
+            AppDocument::insert(db_ref.clone(), &app_state)
+                .await
+                .expect("failed to insert App document");
+            println!("created {} app!", app_state.name);
+        }
+    } else {
+        println!("did not specify name creating new...");
+        let db_ref = db.clone();
+        GridDocument::insert(db_ref.clone(), &sim.lock().await.grid.clone())
+            .await
+            .expect("failed to insert Grid");
+        AppDocument::insert(db_ref.clone(), &app_state)
+            .await
+            .expect("failed to insert App document");
+
+        println!("created {} app!", app_state.name);
+        // we are creating a new non existing example
+    }
 
     // let data = Arc::new(Mutex::new(AppState::new(db, client, sim.clone())));
     let data = web::Data::new(AppState::new(db.clone(), client.clone(), sim.clone()));
+
     let port = format!("127.0.0.1:{}", envs.PORT);
     println!(
-        "Starting server on {}, toke {}s",
+        "Starting server on {}, start time {}s",
         port,
         instance.elapsed().as_secs_f64()
     );
@@ -91,88 +159,144 @@ async fn main() -> std::io::Result<()> {
     })
     .bind_openssl(port, builder)?
     .run();
+    let sim1 = sim.clone();
+    let db1 = db.clone();
     // ==== Simulation loop ====
     let simulation_loop = tokio::spawn(async move {
+        // let total_time = Instant::now();
         let mut time = Instant::now();
-        let mut long_time = Instant::now();
-        let duration = Duration::from_secs_f64(1.0);
         let mut interval = tokio::time::interval(Duration::from_secs_f64(
             1. / SimulationHandler::LOOP_FREQUENCY,
         ));
+        let sim_ref = sim1.clone();
+        let db_ref = db1.clone();
+        println!("Starting Simulation");
+        loop {
+            interval.tick().await;
+            sim_ref
+                .lock()
+                .await
+                .process(time, Some(db_ref.clone()))
+                .await;
+            time = Instant::now();
+        }
+    });
+    let sim2 = sim.clone();
+    let db2 = db.clone();
+    let informer = tokio::spawn(async move {
         let mut send_map: HashMap<String, Vec<SendFormat>> = HashMap::new();
+        let sim_ref = sim2.clone();
+        let db_ref = db2.clone();
         rmq.lock()
             .await
             .connect()
             .await
             .expect("Failed to connect rabbitmq");
-            println!("Starting Simulation");
+        // let mut time = Instant::now();
+        let mut interval = tokio::time::interval(Duration::from_secs_f64(1.));
+        println!("starting informer loop");
         loop {
             interval.tick().await;
-            sim.lock().await.process(time).await;
-            time = Instant::now();
-            if long_time.elapsed() > duration {
-                sim.lock().await.fetch_weather().await;
-                
-                
-                let rmq_ref = rmq.clone();
-                let db = db.clone();
-            
-                let rs = sim.lock().await.generate_sendforms();
-                let mut send_map = send_map;
-                for (n, r) in rs{
-                    if send_map.contains_key(&n){
-                        send_map.get_mut(&n.to_string()).unwrap().push(r);
-                    }else{
-                        send_map.insert(n,vec![r]);
-                    }
-                }
-                let mut rrqm = Vec::new();
-                for (n, sr) in send_map.iter(){
-                    rrqm.push(tokio::spawn(async move{
-                        rmq_ref.clone().lock().await.send_rpc(n.to_string(), sr.to_vec()).await
-                    }))
-                }
-                let result: Vec<Vec<ReciveFormat>>= join_all(rrqm).await.iter_mut().map(|v| v.unwrap().unwrap()).collect();
+            // print!("\r updating dependencies... time: {:.2}s", total_time.elapsed().as_secs_f64());
+            // === fetch weather ===
+            sim_ref.clone().lock().await.fetch_weather().await;
 
-                let cs: Vec<Consumer> = sim.lock().await.consumers.iter().cloned().collect();
-                let ms: Vec<Manager> = sim.lock().await.managers.iter().cloned().collect();
-                let ps: Vec<Prosumer> = sim.lock().await.prosumers.iter().cloned().collect();
+            // === inform the rabbitmq instant of new data and fetch it ===
+            let rmq_ref = rmq.clone();
 
-                let mut ct = Vec::new();
-                let mut pt = Vec::new();
-                let mut mt = Vec::new();
-
-                for c in cs {
-                    let db_ref = db.clone();
-                    ct.push(tokio::spawn(
-                        async move { ConsumerDocument::insert(db_ref, c) },
-                    ))
+            let rs = sim_ref.clone().lock().await.generate_sendforms();
+            for (n, r) in rs {
+                if send_map.contains_key(&n) {
+                    send_map.get_mut(&n.to_string()).unwrap().push(r);
+                } else {
+                    send_map.insert(n, vec![r]);
                 }
-                for p in ps {
-                    let db_ref = db.clone();
-                    pt.push(tokio::spawn(
-                        async move { ProsumerDocument::insert(db_ref, p) },
-                    ))
-                }
-                for m in ms {
-                    let db_ref = db.clone();
-                    mt.push(tokio::spawn(
-                        async move { ManagerDocument::insert(db_ref, m) },
-                    ))
-                }
-
-                join_all(ct).await;
-                join_all(pt).await;
-                join_all(mt).await;
-                long_time = Instant::now();
-                send_map.clear();
             }
+            for (n, sr) in send_map.iter() {
+                let rmq = rmq_ref.clone();
+
+                let res = rmq
+                    .lock()
+                    .await
+                    .send_rpc(n.to_string(), sr.to_vec())
+                    .await
+                    .ok();
+                if let Some(mut recieved) = res {
+                    sim_ref
+                        .clone()
+                        .lock()
+                        .await
+                        .append_recive_formats(&mut recieved);
+                }
+            }
+            // === Update Database of current state ===
+
+            let cs: Vec<Consumer> = sim_ref
+                .clone()
+                .lock()
+                .await
+                .consumers
+                .iter()
+                .cloned()
+                .collect();
+            let ms: Vec<Manager> = sim_ref
+                .clone()
+                .lock()
+                .await
+                .managers
+                .iter()
+                .cloned()
+                .collect();
+            let ps: Vec<Prosumer> = sim_ref
+                .clone()
+                .lock()
+                .await
+                .prosumers
+                .iter()
+                .cloned()
+                .collect();
+
+            // let mut ct = Vec::new();
+            // let mut pt = Vec::new();
+            // let mut mt = Vec::new();
+
+            for c in cs {
+                let db_ref = db_ref.clone();
+                c.document(db_ref).await.ok();
+            }
+            for p in ps {
+                let db_ref = db_ref.clone();
+                p.document(db_ref).await.ok();
+            }
+            for m in ms {
+                let db_ref = db_ref.clone();
+                m.document(db_ref).await.ok();
+            }
+
+            // join_all(ct).await;
+            // join_all(pt).await;
+            // join_all(mt).await;
+
+            // send_map.clear();
         }
     });
-
+    let db3 = db.clone();
+    let sim3 = sim.clone();
+    let flusher = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs_f64(500.));
+        println!("starting data gathering loop");
+        let sim_ref = sim3.clone();
+        loop {
+            let db_ref = db3.clone();
+            interval.tick().await;
+            sim_ref.lock().await.data_handler.flush(db_ref).await.ok();
+        }
+    });
     tokio::select! {
         _ = simulation_loop => 0,
         _ = server => 0,
+        _ = informer => 0,
+        _ = flusher => 0,
     };
 
     return Ok(());

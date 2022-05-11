@@ -24,7 +24,6 @@ pub trait Node<T> {
     fn new(obj : T) -> Self;
     fn tick(&mut self, elapsed: f64, weather_report: WeatherReport);
     fn get_asset(&self) -> Asset;
-
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]

@@ -1,8 +1,9 @@
 use chrono::{Timelike, Utc};
+use mongodb::Database;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use crate::handlers::weather_handler::{weather_singleton, WeatherHandler, WeatherReport};
+use crate::{handlers::weather_handler::{weather_singleton, WeatherHandler, WeatherReport}, db::{ consumer_document::ConsumerDocument}};
 
 use super::node::{Asset, Node};
 
@@ -84,6 +85,10 @@ impl Consumer {
 
         self.profile * (0.002 * (294.15 - temp).powf(2.) + self.timefn[hour as usize])
     }
+    pub async fn document(&self, db: Database) -> Result<mongodb::results::UpdateResult, mongodb::error::Error> {
+        ConsumerDocument::update(db, self.id.to_string(), self).await
+    }
+
     pub fn generate_time_fn() -> TimeFn {
         let mut rng = rand::thread_rng();
         let random: f64 = rng.gen::<f64>() * 10.;

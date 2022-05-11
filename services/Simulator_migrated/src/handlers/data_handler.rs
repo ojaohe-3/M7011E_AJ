@@ -1,3 +1,4 @@
+use mongodb::Database;
 use rand::prelude::IteratorRandom;
 use rand::thread_rng;
 use serde::{Deserialize, Serialize};
@@ -5,118 +6,10 @@ use time::Instant;
 use tokio::fs::{File, OpenOptions};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-trait Report {}
+use crate::db::datapoints_document::DataPointsDocument;
+use crate::models::reports::{ProsumerReport, ManagerReport, ConsumerReport, WeatherReportStore};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
 
-pub struct ManagerReport {
-    id: String,
-    output: f64,
-    time_stamp: f64,
-    ratio: f64,
-    //TODO: add more report attributes
-}
-
-impl ManagerReport {
-    pub fn new(id: String, output: f64, time_stamp: f64, ratio: f64) -> Self {
-        Self {
-            id,
-            output,
-            time_stamp,
-            ratio,
-        }
-    }
-}
-impl PartialEq for ManagerReport {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id && self.output == other.output && self.ratio == other.ratio
-    }
-}
-
-impl Report for ManagerReport {}
-#[derive(Debug, Clone, Serialize, Deserialize)]
-
-pub struct ProsumerReport {
-    id: String,
-    total_production: f64,
-    total_stored: f64,
-    demand: f64,
-    time_stamp: f64,
-}
-
-impl ProsumerReport {
-    pub fn new(
-        id: String,
-        total_production: f64,
-        total_stored: f64,
-        demand: f64,
-        time_stamp: f64,
-    ) -> Self {
-        Self {
-            id,
-            total_production,
-            total_stored,
-            demand,
-            time_stamp,
-        }
-    }
-}
-impl PartialEq for ProsumerReport {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-            && self.total_production == other.total_production
-            && self.total_stored == other.total_stored
-            && self.demand == other.demand
-    }
-}
-
-impl Report for ProsumerReport {}
-#[derive(Debug, Clone, Serialize, Deserialize)]
-
-pub struct ConsumerReport {
-    total_demand: f64,
-    time_stamp: f64,
-}
-
-impl ConsumerReport {
-    pub fn new(total_demand: f64, time_stamp: f64) -> Self {
-        Self {
-            total_demand,
-            time_stamp,
-        }
-    }
-}
-impl PartialEq for ConsumerReport {
-    fn eq(&self, other: &Self) -> bool {
-        self.total_demand == other.total_demand
-    }
-}
-
-impl Report for ConsumerReport {}
-#[derive(Debug, Clone, Serialize, Deserialize)]
-
-pub struct WeatherReportStore {
-    temp: f64,
-    wind_speed: f64,
-    time_stamp: f64,
-}
-
-impl WeatherReportStore {
-    pub fn new(temp: f64, wind_speed: f64, time_stamp: f64) -> Self {
-        Self {
-            temp,
-            wind_speed,
-            time_stamp,
-        }
-    }
-}
-impl PartialEq for WeatherReportStore {
-    fn eq(&self, other: &Self) -> bool {
-        self.temp == other.temp && self.wind_speed == other.wind_speed
-    }
-}
-
-impl Report for WeatherReportStore {}
 #[derive(Debug)]
 pub struct DataHandler {
     pub prosumer_reports: Vec<ProsumerReport>,
@@ -193,75 +86,28 @@ impl DataHandler {
         self.consumer_reports.iter().choose_multiple(&mut rng, size)
     }
 
-    /// Dumps a sample of current data to a dat file if they have more than 100 entries (otherwise ignores it).
-    /// The dat files, if file does not exist, creates them with the data, otherwise extend the file,
-    /// Then if we dumped data we remove all current entries.
-    pub async fn flush(&mut self) -> std::io::Result<()> {
-        if self.manager_reports.len() > 100 {
-            let mut f = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .append(true)
-                .open("./dat/managers_data.bin")
-                .await?;
-            f.write_all(&bincode::serialize(&self.sample_managers_data(100)).unwrap())
-                .await?;
-            self.manager_reports.clear();
-            f.flush().await?;
-        }
-
-        if self.prosumer_reports.len() > 100 {
-            let mut f = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .append(true)
-                .open("./dat/prosumers_data.bin")
-                .await?;
-            f.write_all(&bincode::serialize(&self.sample_prosumers_data(100)).unwrap())
-                .await?;
-            self.prosumer_reports.clear();
-            f.flush().await?;
-        }
-
-        if self.consumer_reports.len() > 100 {
-            let mut f = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .append(true)
-                .open("./dat/consumers_data.bin")
-                .await?;
-            f.write_all(&bincode::serialize(&self.sample_consumers_data(100)).unwrap())
-                .await?;
-            self.consumer_reports.clear();
-            f.flush().await?;
-        }
-
-        if (self.weather_reports.len() > 100) {
-            let mut f = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .append(true)
-                .open("./dat/weather_data.bin")
-                .await?;
-            f.write_all(&bincode::serialize(&self.weather_reports).unwrap())
-                .await?;
-            self.weather_reports.clear();
-            f.flush().await?;
-        }
-
+    /// Dumps a sample of current data to  database.
+    pub async fn flush(&mut self, db: Database) -> Result<(), mongodb::error::Error> {
+        DataPointsDocument::insert_consumers(db.clone(), &self.consumer_reports).await?;
+        self.consumer_reports.clear();
+        DataPointsDocument::insert_prosumers(db.clone(), &self.prosumer_reports).await?;
+        self.prosumer_reports.clear();
+        DataPointsDocument::insert_managers(db.clone(), &self.manager_reports).await?;
+        self.manager_reports.clear();
         Ok(())
     }
 
     /// Checks weather or not we excedes data_handlers invariance, in case we have a single data list that 
     /// excede the const of MAX_DATA_ENTRIES we flush all data
-    pub async fn check_status(&mut self) {
+    pub async fn check_status(&mut self, db: Database) -> Result<(), mongodb::error::Error> {
         if self.manager_reports.len() >= DataHandler::MAX_DATA_ENTRIES
             || self.prosumer_reports.len() >= DataHandler::MAX_DATA_ENTRIES
             || self.consumer_reports.len() >= DataHandler::MAX_DATA_ENTRIES
             || self.weather_reports.len() >= DataHandler::MAX_DATA_ENTRIES
         {
-            self.flush().await.expect("failed to flush");
+            self.flush(db).await?;
         }
+        Ok(())
     }
 
     ///## Log prosumer

@@ -4,17 +4,21 @@ use std::sync::Once;
 // use std::sync::{Mutex, Once, Arc};
 use std::time::{Duration, Instant};
 
+use futures::future::join_all;
 use futures::lock::Mutex;
+use mongodb::Database;
 use tokio::sync::broadcast::{channel, Sender};
 
 use crate::handlers::weather_handler::weather_singleton;
 use crate::models::consumer::Consumer;
 use crate::models::manager::Manager;
-use crate::models::node::{Node, Grid};
+use crate::models::network_types::{KeyTypes, ReciveFormat, SendFormat};
+use crate::models::node::{Grid, Node};
 use crate::models::prosumer::{Battery, Prosumer, Turbine};
+use crate::models::reports::{ConsumerReport, ManagerReport, ProsumerReport};
 
-use super::data_handler::{ConsumerReport, DataHandler, ManagerReport, ProsumerReport};
-use super::network_handler::{SendFormat, KeyTypes};
+use super::data_handler::DataHandler;
+
 use super::weather_handler::{WeatherHandler, WeatherReport};
 
 pub struct SHReader {
@@ -37,7 +41,7 @@ pub struct SHReader {
 //         SINGLETON.assume_init_ref()
 //     }
 // }
-
+pub type Tickets = Vec<ReciveFormat>;
 #[derive(Debug)]
 pub struct SimulationHandler {
     pub grid: Grid,
@@ -46,17 +50,18 @@ pub struct SimulationHandler {
     pub data_handler: DataHandler,
     pub weather_handler: WeatherHandler,
     pub consumers: Vec<Consumer>,
+    pub tickets: Tickets,
     // pub tx: Sender<u32>,
     // rx: Receiver<u32>,
     pub total_time: Instant,
     pub last_inter: Instant,
 }
 
-impl SimulationHandler {
+impl SimulationHandler{
     pub const SIZE: usize = 64; //dotenv
     pub const LOOP_FREQUENCY: f64 = 10.; //Hz
     pub const FETCH_REQUENCY: Duration = Duration::from_secs(1000);
-    pub fn new() -> Self {
+    pub fn new() ->Self {
         // let (tx, _) = channel(100);
         let grid = Grid::new(SimulationHandler::SIZE, SimulationHandler::SIZE);
 
@@ -69,13 +74,13 @@ impl SimulationHandler {
             data_handler,
             weather_handler,
             consumers: Vec::new(),
-            total_time: Instant::now(), 
-            last_inter: Instant::now()
-
+            total_time: Instant::now(),
+            last_inter: Instant::now(),
+            tickets: Vec::new(),
         }
     }
 
-    pub async fn process(&mut self, instance: Instant) {
+    pub async fn process(&mut self, instance: Instant, db: Option<Database>) {
         let mut total_demand = 0.;
 
         if let Some(report) = self.weather_handler.cache {
@@ -110,7 +115,9 @@ impl SimulationHandler {
             total_demand,
             self.total_time.elapsed().as_secs_f64(),
         ));
-        self.data_handler.check_status().await;
+        if let Some(db) = db {
+            self.data_handler.check_status(db).await;
+        }
     }
 
     pub fn add_manager(&mut self, manager: Manager) {
@@ -147,52 +154,94 @@ impl SimulationHandler {
         self.consumers.iter_mut().find(|p| (*p).id.eq(id))
     }
 
-    pub async fn fetch_weather(&mut self){
-        let result = match WeatherHandler::fetch_report().await{
-            Ok(v) => v,
-            Err(_) => {
-                println!("not able to fetch weather report defaulting to generic"); 
-                WeatherReport{temp: 273.15, wind_speed: 4.}
-            },
-        };
-        self.weather_handler.cache = Some(result);
+    pub async fn fetch_weather(&mut self) {
+        let url = dotenv::var("WEATHER_MODULE").ok();
+        let lat = dotenv::var("LAT").unwrap();
+        let lon = dotenv::var("LON").unwrap();
+        if let Some(url) = url{
+            
+            let result = match WeatherHandler::fetch_report(url, lat, lon).await {
+                Ok(v) => v,
+                Err(_) => {
+                    println!("not able to fetch weather report defaulting to generic value");
+                    WeatherReport {
+                        temp: 273.15,
+                        wind_speed: 4.,
+                    }
+                }
+            };
+            self.weather_handler.cache = Some(result);
+        }
     }
 
-    fn generate_sendform_consumers(&self) -> Vec<(String, SendFormat)>{
+    fn generate_sendform_consumers(&self) -> Vec<(String, SendFormat)> {
         let mut res = Vec::new();
-        for c in self.consumers{
-           let format = SendFormat::new(KeyTypes::Consumer, c.demand, c.id, None, None);
-           res.push((c.network, format));
+        for c in &self.consumers {
+            let format =
+                SendFormat::new(KeyTypes::Consumer, c.demand, c.id.to_string(), None, None);
+            res.push((c.network.to_string(), format));
         }
-        
+
         res
     }
-    fn generate_sendform_prosumers(&self) -> Vec<(String, SendFormat)>{
+    fn generate_sendform_prosumers(&self) -> Vec<(String, SendFormat)> {
         let mut res = Vec::new();
-        for p in self.prosumers{
-           let format = SendFormat::new(KeyTypes::Consumer, p.total_production, p.id, Some(0.05), Some(p.demand));
-           res.push((p.network, format));
+        for p in &self.prosumers {
+            let format = SendFormat::new(
+                KeyTypes::Source,
+                p.total_production,
+                p.id.to_string(),
+                Some(0.05),
+                Some(p.demand),
+            );
+            res.push((p.network.to_string(), format));
         }
-        
+
         res
     }
-    fn generate_sendform_managers(&self) -> Vec<(String, SendFormat)>{
+    fn generate_sendform_managers(&self) -> Vec<(String, SendFormat)> {
         let mut res = Vec::new();
-        for m in self.managers{
-           let format = SendFormat::new(KeyTypes::Consumer, m.output() , m.id, Some(m.price), None);
-           res.push((m.network, format));
+        for m in &self.managers {
+            let format = SendFormat::new(
+                KeyTypes::Source,
+                m.output(),
+                m.id.to_string(),
+                Some(m.price),
+                None,
+            );
+            res.push((m.network.to_string(), format));
         }
-        
+
         res
     }
-    pub fn generate_sendforms(&self) -> Vec<(String, SendFormat)>{
+    pub fn generate_sendforms(&self) -> Vec<(String, SendFormat)> {
         let mut c = self.generate_sendform_consumers();
-        let p = self.generate_sendform_prosumers();
-        let m = self.generate_sendform_managers();
+        let mut p = self.generate_sendform_prosumers();
+        let mut m = self.generate_sendform_managers();
 
         c.append(&mut p);
         c.append(&mut m);
         c
+    }
+
+    pub fn get_source_tickets(&self, target: &String) -> Tickets {
+        self.tickets
+            .iter()
+            .cloned()
+            .filter(|ticket| ticket.source.eq(target))
+            .collect()
+    }
+
+    pub fn get_target_tickets(&self, target: &String) -> Tickets {
+        self.tickets
+            .iter()
+            .cloned()
+            .filter(|ticket| ticket.target.eq(target))
+            .collect()
+    }
+
+    pub fn append_recive_formats(&mut self, recieved: &mut Tickets) {
+        self.tickets.append(recieved);
     }
 
 }
@@ -231,7 +280,7 @@ async fn test_simulation() {
     let m_c = sim.get_manager(&("1".to_string())).unwrap().current;
     // let p_c = pro.inner.lock().unwrap().get_prosumer("1").unwrap().current
 
-    sim.process(instant).await;
+    sim.process(instant, None).await;
     assert_ne!(m_c, sim.get_manager(&("1".to_string())).unwrap().current);
 
     assert!(sim.data_handler.manager_reports.len() > 0);
@@ -273,7 +322,7 @@ async fn test_loop() {
             1. / SimulationHandler::LOOP_FREQUENCY,
         ))
         .await;
-        sim.process(time).await;
+        sim.process(time, None).await;
         println!(
             "[{}]{}:ouput: {}",
             i,

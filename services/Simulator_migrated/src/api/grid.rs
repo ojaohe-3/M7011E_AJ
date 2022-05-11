@@ -13,10 +13,14 @@ use crate::{
         },
     },
     app::AppState,
+    db::{
+        consumer_document::ConsumerDocument, grid_document::GridDocument,
+        manager_document::ManagerDocument, prosumer_document::ProsumerDocument,
+    },
     models::{
         consumer::{Consumer, TimeFn},
         manager::{self, Manager},
-        node::{Asset, Cell, Grid},
+        node::{Asset, Cell, CellType, Grid},
         prosumer::Prosumer,
     },
 };
@@ -58,6 +62,14 @@ pub async fn set_manager_at(
     data: web::Data<AppState>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let info = path.into_inner();
+    let test = data.sim.lock().await.grid.get_at(info.x, info.y).ok();
+    if let Some(test) = test {
+        if test.cell_type != CellType::Empty {
+            return Err(WebRequestError::MemberAlreadyExist);
+        }
+    } else {
+        return Err(WebRequestError::InvalidRange);
+    }
     let cell = body.into_inner();
     let manager = cell.child;
     data.sim.lock().await.grid.set_at(
@@ -65,15 +77,24 @@ pub async fn set_manager_at(
         info.y,
         Cell::new(cell.id.to_string(), crate::models::node::CellType::Manager),
     );
-    data.sim.lock().await.add_manager(Manager::new(
-        cell.id,
+
+    let manager = Manager::new(
+        cell.id.to_string(),
         manager.max_production,
         0.,
         0.,
         manager.price,
         false,
-        manager.network
-    ));
+        manager.network,
+    );
+    ManagerDocument::insert(data.db.clone(), &manager)
+        .await
+        .ok();
+    data.sim.lock().await.add_manager(manager);
+
+    GridDocument::update(data.db.clone(), &cell.id, &data.sim.lock().await.grid)
+        .await
+        .ok();
 
     Ok(Json(ResponseFormat::new(format!(
         "Successfully added a node to simulation at x: {}, y: {}",
@@ -88,6 +109,14 @@ pub async fn set_consumer_at(
     data: web::Data<AppState>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let info = path.into_inner();
+    let test = data.sim.lock().await.grid.get_at(info.x, info.y).ok();
+    if let Some(test) = test {
+        if test.cell_type != CellType::Empty {
+            return Err(WebRequestError::MemberAlreadyExist);
+        }
+    } else {
+        return Err(WebRequestError::InvalidRange);
+    }
     let cell = body.into_inner();
     let consumer = cell.child;
     data.sim.lock().await.grid.set_at(
@@ -95,13 +124,20 @@ pub async fn set_consumer_at(
         info.y,
         Cell::new(cell.id.to_string(), crate::models::node::CellType::Conusmer),
     );
-    data.sim.lock().await.add_consumer(Consumer::new(
+    let consumer = Consumer::new(
         consumer.timefn,
         consumer.profile,
         consumer.asset,
         consumer.id,
-        consumer.network
-    ));
+        consumer.network,
+    );
+    GridDocument::update(data.db.clone(), &cell.id, &data.sim.lock().await.grid)
+        .await
+        .ok();
+    ConsumerDocument::insert(data.db.clone(), &consumer)
+        .await
+        .ok();
+    data.sim.lock().await.add_consumer(consumer);
 
     Ok(Json(ResponseFormat::new(format!(
         "Successfully added a node to simulation at x: {}, y: {}",
@@ -116,6 +152,14 @@ pub async fn set_prosumer_at(
     data: web::Data<AppState>,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     let info = path.into_inner();
+    let test = data.sim.lock().await.grid.get_at(info.x, info.y).ok();
+    if let Some(test) = test {
+        if test.cell_type != CellType::Empty {
+            return Err(WebRequestError::MemberAlreadyExist);
+        }
+    } else {
+        return Err(WebRequestError::InvalidRange);
+    }
     let cell = body.into_inner();
     let prosumer = cell.child;
     data.sim.lock().await.grid.set_at(
@@ -123,17 +167,23 @@ pub async fn set_prosumer_at(
         info.y,
         Cell::new(cell.id.to_string(), crate::models::node::CellType::Prosumer),
     );
-    data.sim.lock().await.add_prosumer(Prosumer::new(
+    let prosumer = Prosumer::new(
         true,
         prosumer.batteries,
         prosumer.turbines,
         1.0,
         1.,
-        cell.id,
+        cell.id.to_string(),
         0.,
-        prosumer.network
-    ));
-
+        prosumer.network,
+    );
+    ProsumerDocument::insert(data.db.clone(), &prosumer)
+        .await
+        .ok();
+    data.sim.lock().await.add_prosumer(prosumer);
+    GridDocument::update(data.db.clone(), &cell.id, &data.sim.lock().await.grid)
+        .await
+        .ok();
     Ok(Json(ResponseFormat::new(format!(
         "Successfully added a node to simulation at x: {}, y: {}",
         info.x, info.y
@@ -141,8 +191,7 @@ pub async fn set_prosumer_at(
 }
 
 pub fn construct_service() -> actix_web::Scope {
-    //TODO wrap with auth middleware
-
+    //TODO: wrap with auth middleware
     web::scope("/grid")
         .service(get_grid)
         .service(get_item_at)

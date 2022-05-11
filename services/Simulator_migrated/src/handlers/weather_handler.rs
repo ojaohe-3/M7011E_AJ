@@ -2,6 +2,7 @@ use std::mem::MaybeUninit;
 use std::sync::{Mutex, Once};
 use std::time::Instant;
 
+use reqwest::ClientBuilder;
 use serde::{Deserialize, Serialize};
 use time::Duration;
 use tokio::io::AsyncReadExt;
@@ -53,12 +54,8 @@ impl WeatherHandler {
             last_fetch: Instant::now(),
         }
     }
-
-    pub async fn fetch_report() -> Result<WeatherReport, ()> {
-        //TODO: Fix the many possible errors and and handeling for that
-        // fetch weather from api
-        let client = reqwest::Client::new();
-
+    /// Fetch Weather report from the Weather api service if specified
+    pub async fn fetch_report(url: String, lat: String, lon: String) -> Result<WeatherReport, ()> {
         let cert ={
             let mut buf = &mut Vec::new();
             tokio::fs::File::open("cert.pem")
@@ -69,13 +66,25 @@ impl WeatherHandler {
              reqwest::Certificate::from_pem(buf).unwrap()
         };
         
-        let resp = client.get("https://localhost:2551").query(&[("lat", 65.584160), ("lon", 22.154751)]).send().await.unwrap();
-        let data = resp.json::<WeatherResponse>().await.unwrap();
-        // let res = reqwest::get()
-        return Ok(WeatherReport {
-            temp: data.temp,
-            wind_speed: data.speed,
-        });
+        let client = ClientBuilder::new()
+        .add_root_certificate(cert)
+        // .danger_accept_invalid_certs(true) // temp
+        // .https_only(true)
+        .build()
+        .unwrap();
+
+        let resp = client.get(format!("{}/{}/{}",url,lat,lon))//.query(&[("lat", lat), ("lon", lon)])
+        .send().await.ok();
+        if let Some(resp) = resp{
+            // let t = resp.text().await.unwrap();
+            // println!("{}", t);            
+            let data = resp.json::<WeatherResponse>().await.unwrap();
+            return Ok(WeatherReport {
+                temp: data.temp,
+                wind_speed: data.speed,
+            });
+        }
+        Err(())
     }
 
     /// Set the weather handler's last fetch.
