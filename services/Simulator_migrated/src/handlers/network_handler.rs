@@ -66,6 +66,7 @@ impl NetworkHandler {
         network: String,
         items: Vec<SendFormat>,
     ) -> Result<Vec<ReciveFormat>, lapin::Error> {
+        println!("sending rpc, connection status: {:?}", self.connection.as_ref().unwrap().status());
         let json = serde_json::ser::to_vec(&items).unwrap();
 
         let ch = self.create_channel().await?;

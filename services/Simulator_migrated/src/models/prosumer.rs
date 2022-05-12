@@ -1,14 +1,11 @@
-use std::borrow::BorrowMut;
 
-use chrono::{DateTime, Utc};
 use mongodb::Database;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use crate::{handlers::weather_handler::{weather_singleton, WeatherReport}, db::prosumer_document::ProsumerDocument};
+use crate::{handlers::weather_handler::{WeatherReport}, db::prosumer_document::ProsumerDocument};
 
 use super::{
-    consumer::Consumer,
     node::{Asset, Node},
 };
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -110,14 +107,14 @@ impl Prosumer {
             network,
         }
     }
-    pub fn set_status(&mut self, status: bool) {
-        self.status = status;
-    }
+    // pub fn set_status(&mut self, status: bool) {
+    //     self.status = status;
+    // }
 
-    /// Set the prosumer's batteries.
-    pub fn set_batteries(&mut self, batteries: Vec<Battery>) {
-        self.batteries = batteries;
-    }
+    // /// Set the prosumer's batteries.
+    // pub fn set_batteries(&mut self, batteries: Vec<Battery>) {
+    //     self.batteries = batteries;
+    // }
 
     pub async fn document(&self, db: Database) -> Result<mongodb::results::UpdateResult, mongodb::error::Error> {
         ProsumerDocument::update(db, &self.id.to_string(), self).await

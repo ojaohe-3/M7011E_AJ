@@ -69,15 +69,17 @@ impl Report for ProsumerReport {}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 
 pub struct ConsumerReport {
+    pub delta_time: f64,
     pub total_demand: f64,
     pub time_stamp: f64,
 }
 
 impl ConsumerReport {
-    pub fn new(total_demand: f64, time_stamp: f64) -> Self {
+    pub fn new(total_demand: f64, time_stamp: f64, delta_time: f64) -> Self {
         Self {
             total_demand,
             time_stamp,
+            delta_time
         }
     }
 }

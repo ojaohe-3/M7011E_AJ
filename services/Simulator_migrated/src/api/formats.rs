@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use actix_web::{ResponseError, HttpResponse, http::header::ContentType, web::Json};
+use actix_web_httpauth::{extractors::AuthenticationError, headers::{ www_authenticate::{self, bearer::Bearer}}};
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -23,7 +24,20 @@ impl ResponseFormat {
 pub enum WebRequestError{
     MemberNotFound, ActixError(Box<dyn ResponseError>), Other(String), MemberAlreadyExist,
     ResourceNotFound,  InvalidRange, ReqwestError(Box<reqwest::Error>),
-    NotAuthorized, TooLowClearance(u32, u32), OutOfBounds
+    NotAuthorized, TooLowClearance(u32, u32), OutOfBounds, BearerAuthError(Box<AuthenticationError< Bearer>>),
+    DatabseError(Box<mongodb::error::Error>)
+}
+
+impl From<mongodb::error::Error> for WebRequestError {
+    fn from(v: mongodb::error::Error) -> Self {
+        Self::DatabseError(Box::new(v))
+    }
+}
+
+impl From<AuthenticationError< Bearer>> for WebRequestError {
+    fn from(v: AuthenticationError< Bearer>) -> Self {
+        Self::BearerAuthError(Box::new(v))
+    }
 }
 
 impl From<reqwest::Error> for WebRequestError {

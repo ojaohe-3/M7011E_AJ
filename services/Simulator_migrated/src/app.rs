@@ -1,12 +1,14 @@
 use std::sync::Arc;
 
 use actix_web::{self, web, Scope};
+use actix_web_httpauth::extractors::bearer::Config;
 use futures::lock::Mutex;
 use mongodb::{Client, Database};
 
 use crate::{
-    api::{control, datapoints, grid, members, formats::WebRequestError},
-    handlers::simulation_handler::SimulationHandler, models::user::{UserData, Privilage},
+    api::{control, datapoints, formats::WebRequestError, grid, members},
+    handlers::simulation_handler::SimulationHandler,
+    models::user::{Privilage, UserData},
 };
 
 #[derive(Clone, Debug)]
@@ -25,6 +27,7 @@ impl AppState {
 
 pub fn generate_api() -> Scope {
     web::scope(&format!("/api/v1"))
+        .app_data(Config::default().scope("Unauthorized").realm("api"))
         .service(
             web::scope(&format!("/members"))
                 .service(members::managers::construct_service())
@@ -39,4 +42,3 @@ pub fn generate_api() -> Scope {
         .service(datapoints::construct_service())
         .service(grid::construct_service())
 }
-

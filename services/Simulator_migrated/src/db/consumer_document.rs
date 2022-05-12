@@ -33,8 +33,8 @@ impl ConsumerDocument {
             "id": id
         };
 
-        let demand = item.demand.to_string();
-        let profile = item.profile.to_string();
+        let demand = bson::to_bson(&item.demand).unwrap();
+        let profile = bson::to_bson(&item.profile).unwrap();
         let timefn = bson::to_bson(&item.timefn).unwrap();
         let network = item.network.to_string();
         let update = doc! {

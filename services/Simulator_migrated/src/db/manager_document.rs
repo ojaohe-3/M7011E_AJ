@@ -32,11 +32,11 @@ impl ManagerDocument {
         let query = doc! {
             "id": id
         };
-        let current = item.current.to_string();
-        let max_producion = item.max_production.to_string();
-        let price = item.price.to_string();
-        let ratio = item.ratio.to_string();
-        let status = item.status.to_string();
+        let current = bson::to_bson(&item.current).unwrap();
+        let max_producion = bson::to_bson(&item.max_production).unwrap();
+        let price = bson::to_bson(&item.price).unwrap();
+        let ratio = bson::to_bson(&item.ratio).unwrap();
+        let status = bson::to_bson(&item.status).unwrap();
 
         let update = doc! {
             "$set" : { 

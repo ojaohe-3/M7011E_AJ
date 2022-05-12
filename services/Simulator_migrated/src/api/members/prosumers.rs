@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
     app::AppState,
-    models::prosumer::{Battery, Prosumer, Turbine}, middleware::auth::Authentication,
+    models::{prosumer::{Battery, Prosumer, Turbine}, user::Privilage}, middleware::auth::Authentication,
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -68,9 +68,11 @@ pub async fn generate_member(
 pub async fn get_member(
     id: Path<String>,
     data: web::Data<AppState>,
+    auth: BearerAuth
 ) -> Result<Json<Prosumer>, WebRequestError> {
-    let prsoumer = data.sim.lock().await.get_prosumer(&id).cloned();
-    match prsoumer {
+    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("view")), id.to_string())).await?;
+    let prosumer = data.sim.lock().await.get_prosumer(&id).cloned();
+    match prosumer {
         Some(m) => return Ok(Json(m)),
         None => return Err(WebRequestError::MemberNotFound),
     }
@@ -81,7 +83,9 @@ pub async fn update_member(
     id: Path<String>,
     body: Json<CreateProsumerInfo>,
     data: web::Data<AppState>,
+    auth: BearerAuth
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
+    Authentication::claims(auth.token().to_string(), Privilage::new(5, Some(format!("modify")), id.to_string())).await?;
     let member = body.into_inner();
     let response = data
         .sim

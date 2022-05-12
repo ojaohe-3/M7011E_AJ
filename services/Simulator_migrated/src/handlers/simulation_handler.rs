@@ -114,9 +114,10 @@ impl SimulationHandler{
         self.data_handler.log_consumer(ConsumerReport::new(
             total_demand,
             self.total_time.elapsed().as_secs_f64(),
+            instance.elapsed().as_secs_f64(),
         ));
         if let Some(db) = db {
-            self.data_handler.check_status(db).await;
+            self.data_handler.check_status(db).await.ok();
         }
     }
 

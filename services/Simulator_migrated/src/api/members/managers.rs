@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
     app::AppState,
-    models::manager::{self, Manager}, middleware::auth::Authentication,
+    models::{manager::{self, Manager}, user::Privilage}, middleware::auth::Authentication,
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -67,7 +67,9 @@ pub async fn generate_member(
 pub async fn get_member(
     id: Path<String>,
     data: web::Data<AppState>,
+    auth: BearerAuth
 ) -> Result<Json<Manager>, WebRequestError> {
+    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("view")), id.to_string())).await?;
     let manager = data.sim.lock().await.get_manager(&id).cloned();
     match manager {
         Some(m) => return Ok(Json(m)),
@@ -80,7 +82,9 @@ pub async fn update_member(
     id: Path<String>,
     body: Json<CreateManagerInfo>,
     data: web::Data<AppState>,
+    auth: BearerAuth
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
+    Authentication::claims(auth.token().to_string(), Privilage::new(5, Some(format!("modify")), id.to_string())).await?;
     let member = body.into_inner();
     let response = data.sim.lock().await.get_manager_mut(&id).and_then(|m| {
         m.price = member.price;

@@ -6,6 +6,7 @@ use std::{
 };
 
 use actix_web::{middleware::Logger, web, App, HttpServer};
+use actix_web_httpauth::middleware::HttpAuthentication;
 use db::{
     consumer_document::ConsumerDocument, manager_document::ManagerDocument,
     prosumer_document::ProsumerDocument,
@@ -151,10 +152,12 @@ async fn main() -> std::io::Result<()> {
     // ==== Server serving the API ====
     let server = HttpServer::new(move || {
         let api = app::generate_api();
+        // let auth = HttpAuthentication::bearer(middleware::auth::validator);
         App::new()
             .app_data(data.clone())
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
+            // .wrap(auth)
             .service(api)
     })
     .bind_openssl(port, builder)?
@@ -220,14 +223,15 @@ async fn main() -> std::io::Result<()> {
                     .await
                     .send_rpc(n.to_string(), sr.to_vec())
                     .await
-                    .ok();
-                if let Some(mut recieved) = res {
-                    sim_ref
-                        .clone()
-                        .lock()
-                        .await
-                        .append_recive_formats(&mut recieved);
-                }
+                    .unwrap();
+                println!("response rmq: {:?}", res);
+                // if let Some(mut recieved) = res {
+                //     sim_ref
+                //         .clone()
+                //         .lock()
+                //         .await
+                //         .append_recive_formats(&mut recieved);
+                // }
             }
             // === Update Database of current state ===
 
@@ -294,9 +298,9 @@ async fn main() -> std::io::Result<()> {
     });
     tokio::select! {
         _ = simulation_loop => 0,
-        _ = server => 0,
         _ = informer => 0,
         _ = flusher => 0,
+        _ = server => 0,
     };
 
     return Ok(());

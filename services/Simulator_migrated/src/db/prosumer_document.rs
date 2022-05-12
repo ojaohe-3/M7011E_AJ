@@ -33,14 +33,14 @@ impl ProsumerDocument {
             "id": id
         };
 
-        let status = item.status.to_string();
+        let status = bson::to_bson(&item.status).unwrap();
         let batteries = bson::to_bson(&item.batteries).unwrap();
         let turbines = bson::to_bson(&item.turbines).unwrap();
-        let input_ratio = item.input_ratio.to_string();
+        let input_ratio = bson::to_bson(&item.input_ratio).unwrap();
         let network = &item.network;
-        let output_ratio = item.output_ratio.to_string();
-        let demand = item.demand.to_string();
-        let total_stored = item.total_stored.to_string();
+        let output_ratio = bson::to_bson(&item.output_ratio).unwrap();
+        let demand = bson::to_bson(&item.demand).unwrap();
+        let total_stored = bson::to_bson(&item.total_stored).unwrap();
         let update = doc! {
             "$set" : { 
                 "status": status,

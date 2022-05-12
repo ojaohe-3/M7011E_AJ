@@ -1,11 +1,10 @@
 use mongodb::{
-    bson::{self, doc, DateTime, Document},
+    bson::{self, doc},
     options::UpdateOptions,
     results, Database,
 };
 
 use crate::models::{
-    appstructure::AppStructure,
     consumer::Consumer,
     manager::Manager,
     node::{CellType, Grid},
@@ -36,8 +35,8 @@ impl GridDocument {
         let query = doc! {
             "id": id
         };
-        let width = grid.width.to_string();
-        let height = grid.height.to_string();
+        let width = bson::to_bson(&grid.width).unwrap();
+        let height =  bson::to_bson(&grid.height).unwrap();
         let nodes = bson::to_bson(&grid.nodes).unwrap();
         let update = doc! {
             "$set" : { "width": &width, "height":&height, "nodes":  nodes}

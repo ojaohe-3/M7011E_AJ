@@ -61,9 +61,9 @@ impl Grid {
         let id = &Uuid::new_v4().to_string();
         let mut grid: NodeGrid = Vec::new();
 
-        for j in 0..height {
+        for _ in 0..height {
             let mut row = Vec::new();
-            for i in 0..width {
+            for _ in 0..width {
                 row.push(Cell {
                     // x: i,
                     // y: j,
@@ -92,18 +92,18 @@ impl Grid {
         self.nodes[y][x] = item;
     }
 
-    pub fn get_all_id(&self, id: &String) -> Vec<Cell>{
-        let mut temp = Vec::new();
-        for col in &self.nodes{
-            for cell in col{
-                if cell.id.eq(id)
-                {
-                    temp.push(cell);
-                }
-            }
-        }
-        temp.into_iter().cloned().collect()
-    }
+    // pub fn get_all_id(&self, id: &String) -> Vec<Cell>{
+    //     let mut temp = Vec::new();
+    //     for col in &self.nodes{
+    //         for cell in col{
+    //             if cell.id.eq(id)
+    //             {
+    //                 temp.push(cell);
+    //             }
+    //         }
+    //     }
+    //     temp.into_iter().cloned().collect()
+    // }
 
     pub fn get_all_type(&self, cell_type: CellType)-> Vec<Cell>{
         let mut temp = Vec::new();

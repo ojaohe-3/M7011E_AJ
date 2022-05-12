@@ -2,6 +2,7 @@ use actix_web::{
     get, post, put,
     web::{self, Json, Path},
 };
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -17,6 +18,7 @@ use crate::{
         consumer_document::ConsumerDocument, grid_document::GridDocument,
         manager_document::ManagerDocument, prosumer_document::ProsumerDocument,
     },
+    middleware::auth::Authentication,
     models::{
         consumer::{Consumer, TimeFn},
         manager::{self, Manager},
@@ -60,7 +62,9 @@ pub async fn set_manager_at(
     path: Path<PathInfo>,
     body: Json<CreateMemeberInfo<CreateManagerInfo>>,
     data: web::Data<AppState>,
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
+    Authentication::is_admin(auth.token().to_string()).await?;
     let info = path.into_inner();
     let test = data.sim.lock().await.grid.get_at(info.x, info.y).ok();
     if let Some(test) = test {
@@ -72,12 +76,7 @@ pub async fn set_manager_at(
     }
     let cell = body.into_inner();
     let manager = cell.child;
-    data.sim.lock().await.grid.set_at(
-        info.x,
-        info.y,
-        Cell::new(cell.id.to_string(), crate::models::node::CellType::Manager),
-    );
-
+    
     let manager = Manager::new(
         cell.id.to_string(),
         manager.max_production,
@@ -87,15 +86,18 @@ pub async fn set_manager_at(
         false,
         manager.network,
     );
+    let grid = data.sim.lock().await.grid.clone();
+    let id = grid.id.to_string();
+    GridDocument::update(data.db.clone(), &id, &grid).await?;
     ManagerDocument::insert(data.db.clone(), &manager)
-        .await
-        .ok();
+    .await?;
     data.sim.lock().await.add_manager(manager);
-
-    GridDocument::update(data.db.clone(), &data.sim.lock().await.grid.id.to_string(), &data.sim.lock().await.grid)
-        .await
-        .ok();
-
+    data.sim.lock().await.grid.set_at(
+        info.x,
+        info.y,
+        Cell::new(cell.id.to_string(), crate::models::node::CellType::Manager),
+    );
+    
     Ok(Json(ResponseFormat::new(format!(
         "Successfully added a node to simulation at x: {}, y: {}",
         info.x, info.y
@@ -107,7 +109,10 @@ pub async fn set_consumer_at(
     path: Path<PathInfo>,
     body: Json<CreateMemeberInfo<CreateConsumerInfo>>,
     data: web::Data<AppState>,
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
+    Authentication::is_admin(auth.token().to_string()).await?;
+
     let info = path.into_inner();
     let test = data.sim.lock().await.grid.get_at(info.x, info.y).ok();
     if let Some(test) = test {
@@ -119,11 +124,6 @@ pub async fn set_consumer_at(
     }
     let cell = body.into_inner();
     let consumer = cell.child;
-    data.sim.lock().await.grid.set_at(
-        info.x,
-        info.y,
-        Cell::new(cell.id.to_string(), crate::models::node::CellType::Conusmer),
-    );
     let consumer = Consumer::new(
         consumer.timefn,
         consumer.profile,
@@ -131,13 +131,16 @@ pub async fn set_consumer_at(
         consumer.id,
         consumer.network,
     );
-    GridDocument::update(data.db.clone(), &data.sim.lock().await.grid.id.to_string(), &data.sim.lock().await.grid)
-        .await
-        .ok();
-    ConsumerDocument::insert(data.db.clone(), &consumer)
-        .await
-        .ok();
+    let grid = data.sim.lock().await.grid.clone();
+    let id = grid.id.to_string();
+    GridDocument::update(data.db.clone(), &id, &grid).await?;
+    ConsumerDocument::insert(data.db.clone(), &consumer).await?;
     data.sim.lock().await.add_consumer(consumer);
+    data.sim.lock().await.grid.set_at(
+        info.x,
+        info.y,
+        Cell::new(cell.id.to_string(), crate::models::node::CellType::Conusmer),
+    );
 
     Ok(Json(ResponseFormat::new(format!(
         "Successfully added a node to simulation at x: {}, y: {}",
@@ -150,7 +153,10 @@ pub async fn set_prosumer_at(
     path: Path<PathInfo>,
     body: Json<CreateMemeberInfo<CreateProsumerInfo>>,
     data: web::Data<AppState>,
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
+    Authentication::is_admin(auth.token().to_string()).await?;
+
     let info = path.into_inner();
     let test = data.sim.lock().await.grid.get_at(info.x, info.y).ok();
     if let Some(test) = test {
@@ -162,11 +168,6 @@ pub async fn set_prosumer_at(
     }
     let cell = body.into_inner();
     let prosumer = cell.child;
-    data.sim.lock().await.grid.set_at(
-        info.x,
-        info.y,
-        Cell::new(cell.id.to_string(), crate::models::node::CellType::Prosumer),
-    );
     let prosumer = Prosumer::new(
         true,
         prosumer.batteries,
@@ -177,13 +178,17 @@ pub async fn set_prosumer_at(
         0.,
         prosumer.network,
     );
-    ProsumerDocument::insert(data.db.clone(), &prosumer)
-        .await
-        .ok();
+    let grid = data.sim.lock().await.grid.clone();
+    let id = grid.id.to_string();
+    GridDocument::update(data.db.clone(), &id, &grid).await?;
+    ProsumerDocument::insert(data.db.clone(), &prosumer).await?;
+
     data.sim.lock().await.add_prosumer(prosumer);
-    GridDocument::update(data.db.clone(), &data.sim.lock().await.grid.id.to_string(), &data.sim.lock().await.grid)
-        .await
-        .ok();
+    data.sim.lock().await.grid.set_at(
+        info.x,
+        info.y,
+        Cell::new(cell.id.to_string(), crate::models::node::CellType::Prosumer),
+    );
     Ok(Json(ResponseFormat::new(format!(
         "Successfully added a node to simulation at x: {}, y: {}",
         info.x, info.y
@@ -191,7 +196,6 @@ pub async fn set_prosumer_at(
 }
 
 pub fn construct_service() -> actix_web::Scope {
-
     web::scope("/grid")
         .service(get_grid)
         .service(get_item_at)
