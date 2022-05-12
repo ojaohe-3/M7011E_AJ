@@ -50,7 +50,7 @@ pub async fn get_item_at(
     let info = path.into_inner();
     let data = data.sim.lock().await.grid.get_at(info.x, info.y);
     match data {
-        Err(_) => Err(WebRequestError::InvalidRange),
+        Err(_) => Err(WebRequestError::OutOfBounds),
         Ok(v) => Ok(Json(v)),
     }
 }
@@ -68,7 +68,7 @@ pub async fn set_manager_at(
             return Err(WebRequestError::MemberAlreadyExist);
         }
     } else {
-        return Err(WebRequestError::InvalidRange);
+        return Err(WebRequestError::OutOfBounds);
     }
     let cell = body.into_inner();
     let manager = cell.child;
@@ -92,7 +92,7 @@ pub async fn set_manager_at(
         .ok();
     data.sim.lock().await.add_manager(manager);
 
-    GridDocument::update(data.db.clone(), &cell.id, &data.sim.lock().await.grid)
+    GridDocument::update(data.db.clone(), &data.sim.lock().await.grid.id.to_string(), &data.sim.lock().await.grid)
         .await
         .ok();
 
@@ -115,7 +115,7 @@ pub async fn set_consumer_at(
             return Err(WebRequestError::MemberAlreadyExist);
         }
     } else {
-        return Err(WebRequestError::InvalidRange);
+        return Err(WebRequestError::OutOfBounds);
     }
     let cell = body.into_inner();
     let consumer = cell.child;
@@ -131,7 +131,7 @@ pub async fn set_consumer_at(
         consumer.id,
         consumer.network,
     );
-    GridDocument::update(data.db.clone(), &cell.id, &data.sim.lock().await.grid)
+    GridDocument::update(data.db.clone(), &data.sim.lock().await.grid.id.to_string(), &data.sim.lock().await.grid)
         .await
         .ok();
     ConsumerDocument::insert(data.db.clone(), &consumer)
@@ -158,7 +158,7 @@ pub async fn set_prosumer_at(
             return Err(WebRequestError::MemberAlreadyExist);
         }
     } else {
-        return Err(WebRequestError::InvalidRange);
+        return Err(WebRequestError::OutOfBounds);
     }
     let cell = body.into_inner();
     let prosumer = cell.child;
@@ -181,7 +181,7 @@ pub async fn set_prosumer_at(
         .await
         .ok();
     data.sim.lock().await.add_prosumer(prosumer);
-    GridDocument::update(data.db.clone(), &cell.id, &data.sim.lock().await.grid)
+    GridDocument::update(data.db.clone(), &data.sim.lock().await.grid.id.to_string(), &data.sim.lock().await.grid)
         .await
         .ok();
     Ok(Json(ResponseFormat::new(format!(
@@ -191,7 +191,7 @@ pub async fn set_prosumer_at(
 }
 
 pub fn construct_service() -> actix_web::Scope {
-    //TODO: wrap with auth middleware
+
     web::scope("/grid")
         .service(get_grid)
         .service(get_item_at)

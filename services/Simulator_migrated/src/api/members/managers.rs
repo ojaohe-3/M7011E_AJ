@@ -2,12 +2,13 @@ use actix_web::{
     get, post, put,
     web::{self, Json, Path},
 };
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
     app::AppState,
-    models::manager::{self, Manager},
+    models::manager::{self, Manager}, middleware::auth::Authentication,
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -28,7 +29,9 @@ pub async fn get_all(data: web::Data<AppState>) -> Json<Vec<Manager>> {
 pub async fn generate_member(
     body: Json<CreateManagerInfo>,
     data: web::Data<AppState>,
+    auth: BearerAuth
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
+    Authentication::is_admin(auth.token().to_string()).await?;
     let manager = body.into_inner();
     if let Some(id) = manager.id {
         if data.sim.lock().await.get_manager(&id).is_some() {

@@ -1,21 +1,21 @@
-
 use mongodb::{
     bson::{self, doc, DateTime, Document},
     options::UpdateOptions,
     results, Database,
 };
 
-use crate::{
-    models::{
-        appstructure::AppStructure,
-        consumer::Consumer,
-        manager::Manager,
-        node::{CellType, Grid},
-        prosumer::Prosumer,
-    },
+use crate::models::{
+    appstructure::AppStructure,
+    consumer::Consumer,
+    manager::Manager,
+    node::{CellType, Grid},
+    prosumer::Prosumer,
 };
 
-use super::{consumer_document::ConsumerDocument, prosumer_document::ProsumerDocument, manager_document::ManagerDocument};
+use super::{
+    consumer_document::ConsumerDocument, manager_document::ManagerDocument,
+    prosumer_document::ProsumerDocument,
+};
 
 pub struct GridDocument;
 
@@ -28,14 +28,18 @@ impl GridDocument {
             .insert_one(item.to_owned(), None)
             .await
     }
-    pub async fn update(db: Database, id: &String, grid: &Grid) -> Result<results::UpdateResult, mongodb::error::Error> {
+    pub async fn update(
+        db: Database,
+        id: &String,
+        grid: &Grid,
+    ) -> Result<results::UpdateResult, mongodb::error::Error> {
         let query = doc! {
             "id": id
         };
         let width = grid.width.to_string();
-        let height =  grid.height.to_string();
-        let nodes =  bson::to_bson(&grid.nodes).unwrap();
-        let update = doc!{
+        let height = grid.height.to_string();
+        let nodes = bson::to_bson(&grid.nodes).unwrap();
+        let update = doc! {
             "$set" : { "width": &width, "height":&height, "nodes":  nodes}
         };
 

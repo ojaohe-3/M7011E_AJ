@@ -70,7 +70,7 @@ async fn main() -> std::io::Result<()> {
     let sim = Arc::new(Mutex::new(SimulationHandler::new()));
 
     // TODO: Serve Rabbitmq
-    let mut rmq = Arc::new(Mutex::new(NetworkHandler::new()));
+    let rmq = Arc::new(Mutex::new(NetworkHandler::new()));
     // TODO: Generate members object from db
     // ==== Fetch from db ====
     let mut app_state = AppStructure {
@@ -277,7 +277,7 @@ async fn main() -> std::io::Result<()> {
             // join_all(pt).await;
             // join_all(mt).await;
 
-            // send_map.clear();
+            send_map.clear();
         }
     });
     let db3 = db.clone();

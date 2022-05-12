@@ -21,10 +21,24 @@ impl ResponseFormat {
 
 #[derive(Debug)]
 pub enum WebRequestError{
-    MemberNotFound, Other, MemberAlreadyExist,
-    ResourceNotFound, InvalidFormat, InvalidRange,
-    NotAuthorized, TooLowClearance,  InvalidRequest, OutOfBounds
+    MemberNotFound, ActixError(Box<dyn ResponseError>), Other(String), MemberAlreadyExist,
+    ResourceNotFound,  InvalidRange, ReqwestError(Box<reqwest::Error>),
+    NotAuthorized, TooLowClearance(u32, u32), OutOfBounds
 }
+
+impl From<reqwest::Error> for WebRequestError {
+    fn from(v: reqwest::Error) -> Self {
+        Self::ReqwestError(Box::new(v))
+    }
+}
+
+impl From<Box<dyn ResponseError>> for WebRequestError {
+    fn from(v: Box<dyn ResponseError>) -> Self {
+        Self::ActixError(v)
+    }
+}
+
+
 
 impl Display for WebRequestError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

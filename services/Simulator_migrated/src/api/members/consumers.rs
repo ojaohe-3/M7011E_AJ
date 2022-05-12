@@ -2,12 +2,13 @@ use actix_web::{
     get, post, put,
     web::{self, Json, Path},
 };
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
     app::AppState,
-    models::{consumer::Consumer, node::Asset},
+    models::{consumer::Consumer, node::Asset, user::Privilage}, middleware::auth::Authentication,
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -29,7 +30,10 @@ pub async fn get_all(data: web::Data<AppState>) -> Json<Vec<Consumer>> {
 pub async fn generate_member(
     body: Json<CreateConsumerInfo>,
     data: web::Data<AppState>,
+    auth: BearerAuth
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
+    Authentication::is_admin(auth.token().to_string()).await?;
+
     let consumer = body.into_inner();
     if let Some(id) = &consumer.id {
         if data.sim.lock().await.get_consumer(id).is_some() {
@@ -51,7 +55,9 @@ pub async fn generate_member(
 pub async fn get_member(
     id: Path<String>,
     data: web::Data<AppState>,
+    auth: BearerAuth
 ) -> Result<Json<Consumer>, WebRequestError> {
+    Authentication::claims(auth.token().to_string(), Privilage::new(1, None, id.to_string())).await?;
     let consumer = data.sim.lock().await.get_consumer(&id).cloned();
     match consumer {
         Some(m) => return Ok(Json(m)),
@@ -63,8 +69,11 @@ pub async fn get_member(
 pub async fn update_member(
     id: Path<String>,
     body: Json<CreateConsumerInfo>,
-    data:  web::Data<AppState>
+    data:  web::Data<AppState>,
+    auth: BearerAuth
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
+    Authentication::claims(auth.token().to_string(), Privilage::new(2, None, id.to_string())).await?;
+
     let member = body.into_inner();
     let response = data.sim.lock().await.get_consumer_mut(&id).and_then(|m| {
         if let Some(p) = member.profile {
