@@ -15,7 +15,7 @@ export interface Arguments{
     replyTo: any
 }
 export interface ReceiveFormat {
-    type: KeyTypes
+    key_type: KeyTypes
     amount: number
     id: string
     price?: number
@@ -114,6 +114,7 @@ export default class RabbitHandler {
             c.prefetch(1);
             this._channels.set(name, c);
             c.consume(name, (msg) => {
+                console.log('recived message processing...')
                 if (msg === null) {
                     console.log('received null!')
                     return;

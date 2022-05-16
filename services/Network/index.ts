@@ -6,8 +6,8 @@ require('dotenv').config();
 
 const fs = require('fs');
 const credentials = {
-    key: fs.readFileSync('net.key'),
-    cert: fs.readFileSync('net.crt'),
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem'),
 };
 
 const server = createServer(credentials, app)

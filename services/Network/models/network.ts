@@ -19,13 +19,12 @@ export interface INetwork {
 const env = process.env.MAX_TICKETS_BACKLOG
 const MAX_LENGHT_TICKETS_BACKLOG: number = env ? +env : 10_000
 
+type KeyMap<T> = {[key: string]: T} 
 export default class Network implements INetwork {
 
     // private _network: INetwork;
-    private _consumers: Map<string, Consumer>;
-    private _suppliers: Map<string, Source>;
-    private _remainder_sources: Source[] = [];
-    private _remainder_consumers: Consumer[] = [];
+    private _consumers: KeyMap<Consumer>;
+    private _suppliers:KeyMap<Source>;
 
     public tickets: ITicket[];
     public name: string;
@@ -35,8 +34,8 @@ export default class Network implements INetwork {
     private _netpower: number = 0;
 
     constructor(network?: INetwork) {
-        this._consumers = new Map();
-        this._suppliers = new Map();
+        this._consumers = {};
+        this._suppliers = {};
 
         if (network) {
             this.tickets = network.tickets;
@@ -67,18 +66,19 @@ export default class Network implements INetwork {
 
 
     public addSuppliers(...sources: Source[]) {
-        sources.forEach(s => this._suppliers.set(s.id, s))
+        sources.forEach(s => this._suppliers[s.id] = s)
     }
     public addConsumers(...consumers: Consumer[]) {
-        consumers.forEach(c => this._consumers.set(c.id, c))
+        consumers.forEach(c => this._consumers[c.id] = c)
     }
 
     public removeSupplier(s: Source) {
-        this._suppliers.delete(s.id);
+    
+        delete this._suppliers[s.id];
     }
 
     public removeConsumer(c: Consumer) {
-        this._consumers.delete(c.id);
+        delete this._consumers[c.id];
     }
 
     public async document() {
@@ -104,22 +104,20 @@ export default class Network implements INetwork {
     public tick(demanders: Consumer[], producers: Source[]): ITicket[] {
         this.addSuppliers(...producers);
         this.addConsumers(...demanders);
-        // Add left overs and remove them
-        demanders.push(...this._remainder_consumers)
-        this._remainder_consumers = [];
-        producers.push(...this._remainder_sources)
-        this._remainder_sources = [];
+
 
 
         let total_demand = 0;
         let total_supply = 0;
-        // accumulated supply and demand
-        producers.forEach(s => {
+
+        // full defined network at this point, this might be reused later in other services that is fine
+        Object.entries(this._suppliers).forEach(([_, s]) => {
             total_demand += s.demand;
             total_supply += s.output;
         });
-        demanders.forEach(c => total_demand += c.demand);
+        Object.entries(this._consumers).forEach(([_, c]) => total_demand += c.demand);
 
+        console.log("demand:", total_demand,"supply:", total_supply)
 
         const tickets: ITicket[] = [];
 
@@ -129,47 +127,39 @@ export default class Network implements INetwork {
         // While we still have a consumer or prosumer left
         while (consumer && producer) {
             // supply the producer first 
-            let supply: number = producer.output - producer.demand;
+            let supply: number = producer.output - producer.demand; 
             // tickets infere where the energy was tacken from, it can be from multiple sources
-            tickets.push({
-                target: producer.id,
-                price: 0,
-                source: producer.id,
-                amount: supply > 0 ? producer.demand : producer.output
-            });
+            if(producer.demand > 0){
+                tickets.push({
+                    target: producer.id,
+                    price: 0,
+                    source: producer.id,
+                    amount: supply > 0 ? producer.demand : producer.output
+                });
+            }
             // demander has demand, producer exist and there is supply
             while (consumer !== undefined && producer !== undefined && supply > 0) {
                 // take from supply
                 let take: number = supply - consumer.demand;
 
                 // if we dont have enough supply to take
-                if (take < 0) {
-                    supply = 0
-                    take = consumer.demand + take
-
-                } else {
+                if (take > 0) {
                     // otherwise supply demander with all.
                     supply -= consumer.demand;
+                    tickets.push({
+                        target: consumer!.id,
+                        price: take * producer.price,
+                        source: producer.id,
+                        amount: take
+                    });
+                    console.log(consumer.id, "took", take, "from", producer.id)
                     consumer = demanders.pop();
                 }
-
-                tickets.push({
-                    target: consumer!.id,
-                    price: take * producer.price,
-                    source: producer.id,
-                    amount: take
-                });
+               
 
             }
             producer = producers.pop();
 
-        }
-
-        // If we have left over add them over to remainder to be reused next tick
-        if (consumer) {
-            this._remainder_consumers.push(consumer, ...demanders)
-        } else if (producer) {
-            this._remainder_sources.push(producer, ...producers)
         }
 
         this._netpower += total_supply - total_demand;

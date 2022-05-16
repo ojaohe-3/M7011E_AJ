@@ -19,13 +19,15 @@ export default class NetworkHandler {
 
         RabbitHandler.instance.on("receive_rpc", (msg) => {
             if (msg) {
+                // console.log('processing:',msg)
                 const { channel, content, correlationID, replyTo, target } = msg;
                 const network = this._networks.get(target);
                 const sources: Source[] = [];
                 const consumers: Consumer[] = [];
 
                 content.forEach(v => {
-                    switch (v.type) {
+                    // console.log(v)
+                    switch (v.key_type.toLowerCase()) {
                         case "consumer":
                             consumers.push({
                                 id: v.id,
@@ -44,6 +46,7 @@ export default class NetworkHandler {
                 })
 
                 const tickets = network?.tick(consumers, sources);
+                // console.log(tickets)
                 channel.sendToQueue(replyTo, Buffer.from(JSON.stringify(tickets || [])), correlationID)
             }
 
