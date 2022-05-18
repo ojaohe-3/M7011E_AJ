@@ -3,18 +3,16 @@ import UserData from "../../../models/userdata";
 import { Action, ActionTypes } from "../../actions/types";
 
 // Define the initial state using that type
-const initialState: UserData = {
-    username: "anon"
-}
 
 
 
-export default function UserReducer(state = initialState, action: Action) {
+
+export default function UserReducer(state: UserData, action: Action) {
     switch (action.type) {
         case ActionTypes.UpdateUser:
             return action.payload;
         case ActionTypes.ResetUser:
-            return initialState;
+            return undefined;
         default:
             // console.log("fallthough!:", action)
             return state

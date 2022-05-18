@@ -12,4 +12,5 @@ export default interface UserData {
     consumers?: Array < string >,
     // admin: boolean,
     last_login?: Date
+    token :string
 }
