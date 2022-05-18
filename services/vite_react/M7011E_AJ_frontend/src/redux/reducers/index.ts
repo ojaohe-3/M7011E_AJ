@@ -7,7 +7,7 @@ import simdataReducer from "./simdata";
 const reducers = combineReducers({
     // tasks: taskReducer,
     user: UserReducer,
-    simdata: simdataReducer,
+    // simdata: simdataReducer,
 })
 
 export default reducers;

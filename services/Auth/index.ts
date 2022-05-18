@@ -191,13 +191,11 @@ const PORT =  process.env.PORT || 5000;
 
 // });
 
-
 const fs = require('fs');
 const credentials = {
-    key: fs.readFileSync('auth.key'),
-    cert: fs.readFileSync('auth.crt'),
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem'),
 };
-
 const server = createServer(credentials, app)
 console.log("creating server on",PORT)
 server.listen(PORT);

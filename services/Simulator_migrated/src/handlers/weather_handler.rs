@@ -4,7 +4,6 @@ use std::time::Instant;
 
 use reqwest::ClientBuilder;
 use serde::{Deserialize, Serialize};
-use time::Duration;
 use tokio::io::AsyncReadExt;
 
 pub struct WHReader {
@@ -87,13 +86,5 @@ impl WeatherHandler {
         Err(())
     }
 
-    /// Set the weather handler's last fetch.
-    pub fn set_last_fetch(&mut self, last_fetch: Instant) {
-        self.last_fetch = last_fetch;
-    }
 
-    /// Set the weather handler's cache.
-    pub fn set_cache(&mut self, cache: WeatherReport) {
-        self.cache = Some(cache);
-    }
 }

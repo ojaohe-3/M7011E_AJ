@@ -25,16 +25,16 @@ pub struct ReciveFormat {
     pub amount: f64,
 }
 
-impl ReciveFormat {
-    pub fn new(target: String, price: f64, source: String, amount: f64) -> Self {
-        Self {
-            target,
-            price,
-            source,
-            amount,
-        }
-    }
-}
+// impl ReciveFormat {
+//     pub fn new(target: String, price: f64, source: String, amount: f64) -> Self {
+//         Self {
+//             target,
+//             price,
+//             source,
+//             amount,
+//         }
+//     }
+// }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SendFormat {
     pub key_type: KeyTypes,

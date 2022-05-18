@@ -92,7 +92,11 @@ pub async fn update_member(
         .lock()
         .await
         .get_prosumer_mut(&id)
-        .and_then(|m| Some(ResponseFormat::new("Success!".to_string())));
+        .and_then(|m: &mut Prosumer| {
+            m.batteries=member.batteries;
+            m.turbines=member.turbines;
+            return Some(ResponseFormat::new("Success!".to_string()));
+        });
     match response {
         Some(res) => return Ok(Json(res)),
         None => return Err(WebRequestError::MemberNotFound),

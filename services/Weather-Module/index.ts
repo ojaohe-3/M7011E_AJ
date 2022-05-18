@@ -163,6 +163,7 @@ setInterval(activiy, 10 * 60 * 1000);
 let activit_per_hour = 0;
 let requests = 0;
 let last_activiy = Date.now();
+
 function activiy(){
     let hours = (Date.now() - last_activiy) / (3600*1000) // get Hours
     activit_per_hour = requests / hours;

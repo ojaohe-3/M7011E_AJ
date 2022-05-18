@@ -1,3 +1,5 @@
+
+use chrono::{Local, DateTime};
 use serde::{Deserialize, Serialize};
 
 trait Report {}
@@ -9,6 +11,8 @@ pub struct ManagerReport {
     pub output: f64,
     pub time_stamp: f64,
     pub ratio: f64,
+    time_date: DateTime<Local>
+
     //TODO: add more report attributes
 }
 
@@ -19,6 +23,8 @@ impl ManagerReport {
             output,
             time_stamp,
             ratio,
+            time_date: Local::now()
+
         }
     }
 }
@@ -37,6 +43,8 @@ pub struct ProsumerReport {
     pub total_stored: f64,
     pub demand: f64,
     pub time_stamp: f64,
+    time_date: DateTime<Local>
+
 }
 
 impl ProsumerReport {
@@ -53,6 +61,8 @@ impl ProsumerReport {
             total_stored,
             demand,
             time_stamp,
+            time_date: Local::now()
+
         }
     }
 }
@@ -72,6 +82,8 @@ pub struct ConsumerReport {
     pub delta_time: f64,
     pub total_demand: f64,
     pub time_stamp: f64,
+    time_date: DateTime<Local>
+
 }
 
 impl ConsumerReport {
@@ -79,7 +91,8 @@ impl ConsumerReport {
         Self {
             total_demand,
             time_stamp,
-            delta_time
+            delta_time,
+            time_date: Local::now()
         }
     }
 }
@@ -96,6 +109,7 @@ pub struct WeatherReportStore {
     temp: f64,
     wind_speed: f64,
     time_stamp: f64,
+    time_date: DateTime<Local>
 }
 
 impl WeatherReportStore {
@@ -104,6 +118,7 @@ impl WeatherReportStore {
             temp,
             wind_speed,
             time_stamp,
+            time_date: Local::now()
         }
     }
 }

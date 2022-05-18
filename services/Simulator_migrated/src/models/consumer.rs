@@ -3,7 +3,7 @@ use mongodb::Database;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use crate::{handlers::weather_handler::{weather_singleton, WeatherHandler, WeatherReport}, db::{ consumer_document::ConsumerDocument}};
+use crate::{handlers::weather_handler::{ WeatherReport}, db::{ consumer_document::ConsumerDocument}};
 
 use super::node::{Asset, Node};
 
@@ -83,7 +83,7 @@ impl Consumer {
         let now = Utc::now();
         let hour = now.hour();
 
-        self.profile * (0.002 * (294.15 - temp).powf(2.) + self.timefn[hour as usize])
+        self.profile * (0.002 * (294.15 - temp).powf(2.) + self.timefn[hour as usize]) / 3.6 // kw 
     }
     pub async fn document(&self, db: Database) -> Result<mongodb::results::UpdateResult, mongodb::error::Error> {
         ConsumerDocument::update(db, self.id.to_string(), self).await
@@ -122,7 +122,7 @@ impl Consumer {
 }
 
 impl Node<Consumer> for Consumer {
-    fn tick(&mut self, elapsed: f64, weather_report: WeatherReport) {
+    fn tick(&mut self, _elapsed: f64, weather_report: WeatherReport) {
         self.demand = self.consumption(weather_report.temp);
     }
 

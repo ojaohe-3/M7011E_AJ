@@ -1,4 +1,3 @@
-use std::fmt::Display;
 
 use futures::StreamExt;
 use lapin::{
@@ -6,8 +5,6 @@ use lapin::{
     types::{FieldTable, ShortString},
     BasicProperties, Connection, ConnectionProperties,
 };
-use serde::{Deserialize, Serialize};
-use tokio::sync::broadcast;
 
 use crate::models::network_types::{ReciveFormat, SendFormat};
 
@@ -15,7 +12,7 @@ use crate::models::network_types::{ReciveFormat, SendFormat};
 
 #[derive(Debug)]
 pub struct NetworkHandler {
-    tx: broadcast::Sender<ReciveFormat>,
+    // tx: broadcast::Sender<ReciveFormat>,
     // rx: broadcast::Receiver<ReciveFormat>
     connection: Option<Connection>,
 }
@@ -23,9 +20,9 @@ pub struct NetworkHandler {
 
 impl NetworkHandler {
     pub fn new() -> Self {
-        let (tx, rx) = broadcast::channel(1);
+        // let (tx, rx) = broadcast::channel(1);
         Self {
-            tx,
+            // tx,
             connection: None, // rx
         }
     }
@@ -66,7 +63,6 @@ impl NetworkHandler {
         network: String,
         items: Vec<SendFormat>,
     ) -> Result<Vec<ReciveFormat>, lapin::Error> {
-        println!("sending rpc, connection status: {:?}", self.connection.as_ref().unwrap().status());
         let json = serde_json::ser::to_vec(&items).unwrap();
 
         let ch = self.create_channel().await?;
@@ -92,20 +88,24 @@ impl NetworkHandler {
             .basic_consume(queue.name().as_str(), "", coptions, FieldTable::default())
             .await?;
         let task = tokio::spawn(async move {
-            let cid: String = cid.to_string();
+            // let cid: String = cid.to_string();
+            //FIXME: there is an issue with connection not timing out.
             while let Some(delv) = consumer.next().await {
+                // println!("got some message, cid: {}" ,cid);
                 let delv = match delv {
                     Ok(v) => v,
                     Err(_) => return None,
                 };
 
-                let id = delv.properties.correlation_id();
-                if let Some(id) = id {
-                    if id.eq(&ShortString::from(cid.to_string())) {
+                // let id = delv.properties.correlation_id();
+                
+                // println!("comparing against ,delv.properties: {:?}" ,delv);
+                // if let Some(id) = id {
+                    // if id.eq(&ShortString::from(cid.to_string())) {
                         let data = serde_json::from_slice::<Vec<ReciveFormat>>(&delv.data).ok();
                         return data;
-                    }
-                }
+                    // } 
+                // }
             }
             return None;
         });
@@ -115,7 +115,7 @@ impl NetworkHandler {
         }
     }
 
-    pub fn subscribe(&self) -> broadcast::Receiver<ReciveFormat> {
-        self.tx.subscribe()
-    }
+    // pub fn subscribe(&self) -> broadcast::Receiver<ReciveFormat> {
+    //     self.tx.subscribe()
+    // }
 }

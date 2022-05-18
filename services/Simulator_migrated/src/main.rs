@@ -6,10 +6,9 @@ use std::{
 };
 
 use actix_web::{middleware::Logger, web, App, HttpServer};
-use actix_web_httpauth::middleware::HttpAuthentication;
 use db::{
     consumer_document::ConsumerDocument, manager_document::ManagerDocument,
-    prosumer_document::ProsumerDocument,
+    prosumer_document::ProsumerDocument, tickets_document::TicketDocuments,
 };
 use dotenv::dotenv;
 use env_logger::Env;
@@ -38,16 +37,13 @@ async fn main() -> std::io::Result<()> {
     let instance = Instant::now();
     // ==== Assert enviormental variables
     dotenv().ok();
-    let envs = match assert_all_env_loaded() {
-        Ok(v) => v,
-        Err(e) => panic!("{}", e),
-    };
+    assert_all_env_loaded().expect("Failed to load envs");
     // std::env::set_var("RUST_LOG", "debug");
     // std::env::set_var("RUST_BACKTRACE", "1");
     println!("env file loaded!");
 
     // ==== Connect and configure mongodb connector ====
-    let options = ClientOptions::parse(envs.DB_CONNECT)
+    let options = ClientOptions::parse(dotenv::var("DB_CONNECT").unwrap())
         .await
         .expect("Could not get database");
 
@@ -79,13 +75,13 @@ async fn main() -> std::io::Result<()> {
         name: format!("Sim-{}", uuid::Uuid::new_v4().to_string()),
         grid: sim.lock().await.grid.id.to_string(),
     };
-    if let Some(name) = envs.NAME {
+    if let Some(name) = dotenv::var("NAME").ok() {
         println!("found an name trying to fetch from mongodb");
         let db_ref = db.clone();
         app_state.name = name.to_string();
         // instant might alread exist in the database thusly we want to add this to our simulation
         if let Some(a) = AppDocument::get(db_ref.clone(), &name).await.unwrap() {
-            println!("found and entrie applying...");
+            println!("found and entry applying...");
             app_state = a;
             if let Some(grid) = GridDocument::get(db_ref.clone(), &app_state.grid.to_string())
                 .await
@@ -101,19 +97,25 @@ async fn main() -> std::io::Result<()> {
                 let ms = GridDocument::get_managers(db_ref.clone(), &grid)
                     .await
                     .unwrap();
-                for c in cs {
+                for c in &cs {
                     sim.lock().await.add_consumer(c.clone())
                 }
 
-                for p in ps {
+                for p in &ps {
                     sim.lock().await.add_prosumer(p.clone())
                 }
 
-                for m in ms {
+                for m in &ms {
                     sim.lock().await.add_manager(m.clone())
                 }
+                println!(
+                    "added {} managers, {} consumers and {} prosumers to simulation!",
+                    ms.len(),
+                    cs.len(),
+                    ps.len()
+                );
             }
-            println!("simulation succefully applied!");
+            println!("simulation successfully applied!");
         } else {
             println!("did not find the entry creating new...");
             let db_ref = db.clone();
@@ -141,11 +143,20 @@ async fn main() -> std::io::Result<()> {
 
     // let data = Arc::new(Mutex::new(AppState::new(db, client, sim.clone())));
     let data = web::Data::new(AppState::new(db.clone(), client.clone(), sim.clone()));
-
-    let port = format!("127.0.0.1:{}", envs.PORT);
+    let port: u32 = match dotenv::var("PORT") {
+        Ok(v) => {
+            if let Ok(v) = v.parse() {
+                v
+            } else {
+                panic!("{} invalid port format!", v)
+            }
+        }
+        Err(_) => 5000,
+    };
+    let binding = format!("127.0.0.1:{}", port);
     println!(
         "Starting server on {}, start time {}s",
-        port,
+        binding,
         instance.elapsed().as_secs_f64()
     );
     env_logger::init_from_env(Env::default().default_filter_or("info"));
@@ -160,7 +171,7 @@ async fn main() -> std::io::Result<()> {
             // .wrap(auth)
             .service(api)
     })
-    .bind_openssl(port, builder)?
+    .bind_openssl(binding, builder)?
     .run();
     let sim1 = sim.clone();
     let db1 = db.clone();
@@ -197,6 +208,7 @@ async fn main() -> std::io::Result<()> {
             .expect("Failed to connect rabbitmq");
         // let mut time = Instant::now();
         let mut interval = tokio::time::interval(Duration::from_secs_f64(1.));
+        let mut time_elapsed = Instant::now();
         println!("starting informer loop");
         loop {
             interval.tick().await;
@@ -207,7 +219,8 @@ async fn main() -> std::io::Result<()> {
             // === inform the rabbitmq instant of new data and fetch it ===
             let rmq_ref = rmq.clone();
 
-            let rs = sim_ref.clone().lock().await.generate_sendforms();
+            let rs = sim_ref.clone().lock().await.generate_sendforms(time_elapsed.elapsed().as_secs_f64());
+            time_elapsed = Instant::now();
             for (n, r) in rs {
                 if send_map.contains_key(&n) {
                     send_map.get_mut(&n.to_string()).unwrap().push(r);
@@ -223,8 +236,15 @@ async fn main() -> std::io::Result<()> {
                     .await
                     .send_rpc(n.to_string(), sr.to_vec())
                     .await
-                    .unwrap();
-                println!("response rmq: {:?}", res);
+                    .ok();
+                if let Some(res) = res {
+                    println!("response rmq: {:?}", res);
+                    // if res.len() > 0 {
+                    //     TicketDocuments::insert(db_ref.clone(), &res).await.ok();
+                    // }
+                } else {
+                    println!("failed to call rpc...");
+                }
                 // if let Some(mut recieved) = res {
                 //     sim_ref
                 //         .clone()
@@ -266,15 +286,15 @@ async fn main() -> std::io::Result<()> {
 
             for c in cs {
                 let db_ref = db_ref.clone();
-                c.document(db_ref).await.ok();
+                c.document(db_ref).await.unwrap();
             }
             for p in ps {
                 let db_ref = db_ref.clone();
-                p.document(db_ref).await.ok();
+                p.document(db_ref).await.unwrap();
             }
             for m in ms {
                 let db_ref = db_ref.clone();
-                m.document(db_ref).await.ok();
+                m.document(db_ref).await.unwrap();
             }
 
             // join_all(ct).await;
@@ -328,13 +348,14 @@ impl EnvErrors {
 
 impl fmt::Display for EnvErrors {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Env missing required keys {:?}", self.keys)
+        write!(f, "Env missing required keys: {:?}", self.keys)
     }
 }
 
-fn assert_all_env_loaded() -> Result<Envs, EnvErrors> {
+fn assert_all_env_loaded() -> Result<(), EnvErrors> {
     let mut missing: Vec<EnvKey> = Vec::new();
 
+    // TODO: make into list and just pare all envs loaded, all missing will be part of hash set
     if env::var("DB_CONNECT").is_err() {
         missing.push(EnvKey::DB_CONNECT);
     }
@@ -355,36 +376,70 @@ fn assert_all_env_loaded() -> Result<Envs, EnvErrors> {
         return Err(EnvErrors::new(missing));
     }
 
-    Ok(Envs {
-        NAME: env::var("NAME").ok(),
-        DB_CONNECT: env::var("DB_CONNECT").ok().unwrap(),
-        API_URL: env::var("API_URL").ok(),
-        LAT: env::var("LAT").ok().unwrap().parse::<f64>().unwrap(),
-        LON: env::var("LON").ok().unwrap().parse::<f64>().unwrap(),
-        WEATHER_MODULE: env::var("WEATHER_MODULE").ok(),
-        AUTH_ENDPOINT: env::var("AUTH_ENDPOINT").ok().unwrap(),
-        RABBITMQ_CONNECTION_STRING: env::var("RABBITMQ_CONNECTION_STRING").ok().unwrap(),
-        RABBITMQ_USER: env::var("RABBITMQ_USER").ok(),
-        RABBITMQ_PASS: env::var("RABBITMQ_PASS").ok(),
-        PORT: match env::var("PORT").ok().unwrap().parse::<u32>() {
-            Ok(v) => v,
-            Err(_) => 5000,
-        },
-    })
+    // let name = match env::var("NAME") {
+    //     Ok(v) => Some(Envs::NAME(v)),
+    //     Err(_) => None,
+    // };
+    // let dbc = match env::var("DB_CONNECT") {
+    //     Ok(v) => Some(Envs::DB_CONNECT(v)),
+    //     Err(_) => None,
+    // };
+    // let apiurl = match env::var("API_URL") {
+    //     Ok(v) => Some(Envs::API_URL(v)),
+    //     Err(_) => None,
+    // };
+    // let lat = match env::var("LAT") {
+    //     Ok(v) => Some(Envs::LAT(v.parse().unwrap())),
+    //     Err(_) => None,
+    // };
+    // let lon = match env::var("LON") {
+    //     Ok(v) => Some(Envs::LON(v.parse().unwrap())),
+    //     Err(_) => None,
+    // };
+    // let wm = match env::var("WEATHER_MODULE") {
+    //     Ok(v) => Some(Envs::WEATHER_MODULE(v)),
+    //     Err(_) => None,
+    // };
+    // let ae = match env::var("AUTH_ENDPOINT") {
+    //     Ok(v) => Some(Envs::AUTH_ENDPOINT(v)),
+    //     Err(_) => None,
+    // };
+    // let rcs = match env::var("RABBITMQ_CONNECTION_STRING") {
+    //     Ok(v) => Some(Envs::RABBITMQ_CONNECTION_STRING(v)),
+    //     Err(_) => None,
+    // };
+    // let ru = match env::var("RABBITMQ_USER") {
+    //     Ok(v) => Some(Envs::RABBITMQ_USER(v)),
+    //     Err(_) => None,
+    // };
+    // let rp = match env::var("RABBITMQ_PASS") {
+    //     Ok(v) => Some(Envs::RABBITMQ_PASS(v)),
+    //     Err(_) => None,
+    // };
+    // let port = match env::var("PORT") {
+    //     Ok(v) => Some(Envs::PORT(match v.parse() {
+    //         Ok(v) => v,
+    //         Err(_) => 5000,
+    //     })),
+    //     Err(_) => None,
+    // };
+    //vec![name, dbc, apiurl, lat, lon, wm, ae, rcs, ru, rp, port]
+    Ok(())
 }
 
 // TODO make into #[structopt(name = "simulation web service", about = "Creates an performant web instance with a connecting api, rabbitmq connection etc")]
-#[derive(Clone, Debug)]
-struct Envs {
-    NAME: Option<String>,
-    DB_CONNECT: String,
-    API_URL: Option<String>,
-    LAT: f64,
-    LON: f64,
-    WEATHER_MODULE: Option<String>,
-    AUTH_ENDPOINT: String,
-    RABBITMQ_CONNECTION_STRING: String,
-    RABBITMQ_USER: Option<String>,
-    RABBITMQ_PASS: Option<String>,
-    PORT: u32,
-}
+// #[derive(Clone, Debug)]
+// enum Envs {
+//     //TODO: make to enum instead
+//     NAME(String),
+//     DB_CONNECT(String),
+//     API_URL(String),
+//     LAT(f64),
+//     LON(f64),
+//     WEATHER_MODULE(String),
+//     AUTH_ENDPOINT(String),
+//     RABBITMQ_CONNECTION_STRING(String),
+//     RABBITMQ_USER(String),
+//     RABBITMQ_PASS(String),
+//     PORT(u32),
+// }

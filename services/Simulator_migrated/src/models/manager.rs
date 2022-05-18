@@ -7,7 +7,7 @@ use super::node::{Asset, Node};
 
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Manager {
     pub id: String, // hash 128bit
     pub max_production: f64, // in kw
@@ -16,9 +16,9 @@ pub struct Manager {
     pub price: f64, // price in kr
     pub status: bool, // active or not
     pub network: String, // Network instant that is to be supplied
-    #[serde(skip_serializing)]
+    #[serde(skip)]
     pub last: f64, // seconds as f64
-    #[serde(skip_serializing)]
+    #[serde(skip)]
     pub acc: f64, // accumilated acceleration
 }
 
@@ -54,7 +54,7 @@ impl Manager {
 }
 
 impl Node<Manager> for Manager {
-    fn tick(&mut self, dt: f64, weather_report: WeatherReport){
+    fn tick(&mut self, dt: f64, _weather_report: WeatherReport){
         self.acc += Manager::ACCELERATION / dt;
         // if self.last > 1.{
         //     self.acc = 0.;

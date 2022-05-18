@@ -12,7 +12,7 @@ pub struct Authentication;
 struct VerificationStruct {
     message: String,
     status: u32,
-    body: NestedBody,
+    body: Option<NestedBody>,
     reason: Option<String>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -33,7 +33,7 @@ struct NestedBody {
 //     }
 // }
 impl Authentication {
-    pub async fn verify_token(token: String) -> Result<UserData, reqwest::Error> {
+    pub async fn verify_token(token: String) -> Result<Option<UserData>, reqwest::Error> {
         let url = format!("{}/api/validate", dotenv::var("AUTH_ENDPOINT").unwrap());
         let client = reqwest::ClientBuilder::new()
             .danger_accept_invalid_certs(true) // temp until tls fix for reqwests is found
@@ -43,69 +43,73 @@ impl Authentication {
         let res = client.get(url).bearer_auth(token).send().await?;
         // let text = res.text().await?;
         // println!("response was: {}", text);
-        let raw: VerificationStruct = res.json().await.unwrap();
-
-        return Ok(raw.body.data);
+        let raw: VerificationStruct = res.json().await?;
+        if raw.status == 1 {
+            return Ok(Some(raw.body.unwrap().data));
+        }
+        Ok(None)
     }
     pub async fn is_admin(token: String) -> Result<(), WebRequestError> {
         let user = match Authentication::verify_token(token).await {
             Ok(v) => v,
             Err(e) => return Err(WebRequestError::from(e)),
         };
-
-        if user.admin {
-            return Ok(());
+        if let Some(user) = user {
+            if user.admin {
+                return Ok(());
+            }
         }
 
         Err(WebRequestError::NotAuthorized)
     }
-
+ 
     pub async fn claims(token: String, guarded: Privilage) -> Result<(), WebRequestError> {
         let claimant = match Authentication::verify_token(token).await {
             Ok(v) => v,
             Err(e) => return Err(WebRequestError::from(e)),
         };
-        if claimant.admin {
-            return Ok(());
-        }
-        // TODO: access field
+        if let Some(claimant) = claimant {
+            if claimant.admin {
+                return Ok(());
+            }
+            // TODO: access field
 
-        if let Some(conumers) = claimant.consumers {
-            for c in conumers {
-                if c.id.eq(&guarded.id) {
-                    if c.level >= guarded.level {
-                        return Ok(());
-                    } else {
-                        return Err(WebRequestError::TooLowClearance(c.level, guarded.level));
+            if let Some(conumers) = claimant.consumers {
+                for c in conumers {
+                    if c.id.eq(&guarded.id) {
+                        if c.level >= guarded.level {
+                            return Ok(());
+                        } else {
+                            return Err(WebRequestError::TooLowClearance(c.level, guarded.level));
+                        }
+                    }
+                }
+            }
+
+            if let Some(prosumers) = claimant.prosumers {
+                for p in prosumers {
+                    if p.id.eq(&guarded.id) {
+                        if p.level >= guarded.level {
+                            return Ok(());
+                        } else {
+                            return Err(WebRequestError::TooLowClearance(p.level, guarded.level));
+                        }
+                    }
+                }
+            }
+
+            if let Some(managers) = claimant.managers {
+                for m in managers {
+                    if m.id.eq(&guarded.id) {
+                        if m.level >= guarded.level {
+                            return Ok(());
+                        } else {
+                            return Err(WebRequestError::TooLowClearance(m.level, guarded.level));
+                        }
                     }
                 }
             }
         }
-
-        if let Some(prosumers) = claimant.prosumers {
-            for p in prosumers {
-                if p.id.eq(&guarded.id) {
-                    if p.level >= guarded.level {
-                        return Ok(());
-                    } else {
-                        return Err(WebRequestError::TooLowClearance(p.level, guarded.level));
-                    }
-                }
-            }
-        }
-
-        if let Some(managers) = claimant.managers {
-            for m in managers {
-                if m.id.eq(&guarded.id) {
-                    if m.level >= guarded.level {
-                        return Ok(());
-                    } else {
-                        return Err(WebRequestError::TooLowClearance(m.level, guarded.level));
-                    }
-                }
-            }
-        }
-
         Err(WebRequestError::NotAuthorized)
     }
 }

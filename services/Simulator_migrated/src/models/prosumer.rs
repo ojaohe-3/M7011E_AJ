@@ -64,7 +64,7 @@ impl Battery {
         self.current += give;
     }
 }
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Default,Debug, Serialize, Deserialize)]
 
 pub struct Prosumer {
     pub id: String,
@@ -73,9 +73,9 @@ pub struct Prosumer {
     pub turbines: Vec<Turbine>,
     pub input_ratio: f64,
     pub output_ratio: f64,
-    #[serde(skip_serializing)]
+    #[serde(skip)]
     pub timeout: f64,
-    #[serde(skip_serializing)]
+    #[serde(skip)]
     pub total_production: f64,
     pub total_stored: f64,
     pub demand: f64,

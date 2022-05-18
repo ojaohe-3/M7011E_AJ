@@ -116,11 +116,10 @@ async function verify(token: string): Promise<UserData | null> {
         return null;
     }
 }
-
 const fs = require('fs');
 const credentials = {
-    key: fs.readFileSync('rms.key'),
-    cert: fs.readFileSync('rms.crt'),
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem'),
 };
 
 const server = createServer(credentials, app)

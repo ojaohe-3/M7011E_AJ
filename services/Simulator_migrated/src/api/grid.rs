@@ -1,5 +1,5 @@
 use actix_web::{
-    get, post, put,
+    get, post,
     web::{self, Json, Path},
 };
 use actix_web_httpauth::extractors::bearer::BearerAuth;
@@ -20,9 +20,9 @@ use crate::{
     },
     middleware::auth::Authentication,
     models::{
-        consumer::{Consumer, TimeFn},
-        manager::{self, Manager},
-        node::{Asset, Cell, CellType, Grid},
+        consumer::{Consumer},
+        manager::{Manager},
+        node::{Cell, CellType, Grid},
         prosumer::Prosumer,
     },
 };
@@ -88,15 +88,14 @@ pub async fn set_manager_at(
     );
     let grid = data.sim.lock().await.grid.clone();
     let id = grid.id.to_string();
-    GridDocument::update(data.db.clone(), &id, &grid).await?;
-    ManagerDocument::insert(data.db.clone(), &manager)
-    .await?;
+    ManagerDocument::insert(data.db.clone(), &manager).await?;
     data.sim.lock().await.add_manager(manager);
     data.sim.lock().await.grid.set_at(
         info.x,
         info.y,
         Cell::new(cell.id.to_string(), crate::models::node::CellType::Manager),
     );
+    GridDocument::update(data.db.clone(), &id, &grid).await?;
     
     Ok(Json(ResponseFormat::new(format!(
         "Successfully added a node to simulation at x: {}, y: {}",
@@ -133,7 +132,6 @@ pub async fn set_consumer_at(
     );
     let grid = data.sim.lock().await.grid.clone();
     let id = grid.id.to_string();
-    GridDocument::update(data.db.clone(), &id, &grid).await?;
     ConsumerDocument::insert(data.db.clone(), &consumer).await?;
     data.sim.lock().await.add_consumer(consumer);
     data.sim.lock().await.grid.set_at(
@@ -141,6 +139,7 @@ pub async fn set_consumer_at(
         info.y,
         Cell::new(cell.id.to_string(), crate::models::node::CellType::Conusmer),
     );
+    GridDocument::update(data.db.clone(), &id, &grid).await?;
 
     Ok(Json(ResponseFormat::new(format!(
         "Successfully added a node to simulation at x: {}, y: {}",

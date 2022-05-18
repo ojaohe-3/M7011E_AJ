@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
     app::AppState,
-    models::{manager::{self, Manager}, user::Privilage}, middleware::auth::Authentication,
+    models::{manager::{Manager}, user::Privilage}, middleware::auth::Authentication,
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

@@ -6,11 +6,11 @@ use mongodb::{
 use crate::{
        models::{
         appstructure::AppStructure,
-        node::{Grid},
+        // node::{Grid},
     },
 };
 
-use super::grid_document::GridDocument;
+// use super::grid_document::GridDocument;
 pub struct AppDocument;
 
 impl AppDocument {
@@ -41,10 +41,10 @@ impl AppDocument {
             .await
     }
 
-    pub async fn get_grid(
-        db: Database,
-        id: &String,
-    ) -> Result<Option<Grid>, mongodb::error::Error> {
-        GridDocument::get(db, id).await
-    }
+    // pub async fn get_grid(
+    //     db: Database,
+    //     id: &String,
+    // ) -> Result<Option<Grid>, mongodb::error::Error> {
+    //     GridDocument::get(db, id).await
+    // }
 }

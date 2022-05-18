@@ -72,7 +72,7 @@ impl GridDocument {
         db: Database,
         gr: &Grid,
     ) -> Result<Vec<Prosumer>, mongodb::error::Error> {
-        let prosumer_cells = gr.get_all_type(CellType::Conusmer);
+        let prosumer_cells = gr.get_all_type(CellType::Prosumer);
         let mut result = Vec::new();
         for cell in prosumer_cells {
             if let Some(p) = ProsumerDocument::get(db.clone(), &cell.id).await? {
@@ -86,7 +86,7 @@ impl GridDocument {
         db: Database,
         gr: &Grid,
     ) -> Result<Vec<Manager>, mongodb::error::Error> {
-        let managers_cells = gr.get_all_type(CellType::Conusmer);
+        let managers_cells = gr.get_all_type(CellType::Manager);
         let mut result = Vec::new();
         for cell in managers_cells {
             if let Some(m) = ManagerDocument::get(db.clone(), &cell.id).await? {

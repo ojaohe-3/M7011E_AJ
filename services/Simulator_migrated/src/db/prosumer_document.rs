@@ -4,7 +4,7 @@ use mongodb::{
     results, Database,
 };
 
-use crate::models::{node::Grid, prosumer::Prosumer};
+use crate::models::{ prosumer::Prosumer};
 
 pub struct ProsumerDocument;
 
@@ -13,12 +13,7 @@ impl ProsumerDocument {
         db: Database,
         item: &Prosumer,
     ) -> Result<results::InsertOneResult, mongodb::error::Error> {
-        // let query = doc! {
-        //     "id": &item.id
-        // };
-        // let bson_item = bson::to_bson(&item)?;
-        // let document = bson_item.as_document().unwrap();
-        // let options = UpdateOptions::builder().upsert(true).build();
+
         db.collection::<Prosumer>("prosumers")
             .insert_one(item.to_owned(), None)
             .await
