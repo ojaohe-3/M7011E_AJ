@@ -8,17 +8,18 @@ import useFetch from '../../../customHooks/useFetch'
 import Manager from '../../../models/Manager'
 import Prosumer from '../../../models/Prosumer'
 import UserData from '../../../models/userdata'
+import GridTable from '../../utils/GridTable'
 import ControlTemplate from '../template'
-import ProsumerBody from './body'
 import ProsumerHeader from './header'
-
-export interface ProsumerControlProps{
+import '../../../public/style/prosumer.css'
+import ControlCard from '../controlcard'
+export interface ProsumerControlProps {
   id: string,
   sim: string,
 
 }
 
-export default function ProsumerControlComponent({sim, id}: ProsumerControlProps) {
+export default function ProsumerControlComponent({ sim, id }: ProsumerControlProps) {
   const managers = useArray<Manager>();
   const prosumers = useArray<Prosumer>();
   const updateValues = async () => {
@@ -27,8 +28,17 @@ export default function ProsumerControlComponent({sim, id}: ProsumerControlProps
   const sendNewValues = () => {
 
   }
-  
+
   return (
-    <ControlTemplate body={<ProsumerBody />} head={<ProsumerHeader />} />
+    <ControlTemplate head={<ProsumerHeader />}>
+      
+
+        <ControlCard title={'Price'}>
+            Price
+        </ControlCard>
+        <ControlCard title={'Total Demand'}>
+            Demand
+        </ControlCard>
+    </ControlTemplate>
   )
 }

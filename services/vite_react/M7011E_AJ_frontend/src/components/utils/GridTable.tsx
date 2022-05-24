@@ -3,15 +3,15 @@ import '../../public/style/grid.css'
 
 
 export interface GridTable {
-  Body: () => JSX.Element
-  Head: () => JSX.Element
-  Item: () => JSX.Element
-  Foot: () => JSX.Element
+  Body: any | React.FC 
+  Head: any | React.FC 
+  Item: any | React.FC 
+  Foot: any | React.FC 
 
 }
 
 interface Props {
-  child?: JSX.Element | JSX.Element[]
+  children?: React.ReactNode |  React.ReactNode [] | any
   style?: CSSProperties
 }
 // TODO:
@@ -26,33 +26,33 @@ interface FootProps extends Props {
 }
 // ======
 
-const Body = ({ child, style }: Props) => {
+const Body: React.FC  = ({ children, style }: any) => {
   return (
     <div style={style} className="grid">
-      {child}
+      {children}
     </div>
   )
 }
 
-const Head = ({ child, style }: HeadProps) => {
+const Head: React.FC  = ({ children, style }: any) => {
   return (
     <div style={style} className="grid-head">
-      {child}
+      {children}
     </div>
   )
 }
 
 
-const Item = ({ child, style }: ItemProps) => {
+const Item: React.FC  = ({ children, style }: any) => {
   return (
-    <div style={style} className="grid-item">{child}</div>
+    <div style={style} className="grid-item">{children}</div>
   )
 }
 
 
-const Foot = ({ child, style }: FootProps) => {
+const Foot: React.FC  = ({ children, style }: any) => {
   return (
-    <div style={style} className="grid-foot">{child}</div>
+    <div style={style} className="grid-foot">{children}</div>
   )
 }
 

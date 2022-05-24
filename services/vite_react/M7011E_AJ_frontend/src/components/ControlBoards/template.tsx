@@ -1,24 +1,24 @@
 import React from 'react'
 import { Card, Col, Row } from 'react-bootstrap'
+import GridTable from '../utils/GridTable'
 import ControlCard, { ControlCardProps } from './controlcard'
 
 export interface ControlTemplateProps {
     head: React.ReactNode,
-    body: React.ReactNode,
+    children?: JSX.Element | JSX.Element[]
 }
-export default function ControlTemplate({ head, body }: ControlTemplateProps) {
+export default function ControlTemplate({ head, children }: ControlTemplateProps) {
+
     return (
         <>
-        <Row>
-            <Col>
-                {head}
-            </Col>
-        </Row>
-        <Row>
-                <Col>
-                    {body}
-                </Col>
-        </Row>
-            </>
+            <GridTable.Body>
+                <GridTable.Head>
+                    {head}
+                </GridTable.Head>
+                <GridTable.Item>
+                    {children}
+                </GridTable.Item>
+            </GridTable.Body>
+        </>
     )
 }

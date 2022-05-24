@@ -41,7 +41,7 @@ function App() {
   return (
       <>
       <ManagerControlComponent id={''} sim={''} />
-      <ProsumerControlComponent id={''} sim={''} />
+      {/* <ProsumerControlComponent id={''} sim={''} /> */}
       </>
     // <div id="App" style={{width: "100vw", height: "100vh", margin: '0 auto'}}>
     // </div>
