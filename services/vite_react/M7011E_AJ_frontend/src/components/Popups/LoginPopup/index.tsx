@@ -16,17 +16,17 @@ export default function LoginPopup() {
     const [active, setActive] = useState(true);
     const [pass, setPass] = useState<string>("");
     const [username, setuser] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
+    // const [loading, setLoading] = useState<boolean>(false);
 
-    const [value, setValue, remove] =  useSessionStorage<UserData>("user", {username: "NaN", token: ""});
+    let [loading, error, value]: any[] = [false, null, null];
+    // const [user, setValue, remove] =  useSessionStorage<UserData>("user", {username: "NaN", token: ""});
 
     const handleChange = (user: string, pass: string) => { setPass(pass); setuser(user) };
     const handleLogin = async () => {
-        const res = useFetch.post(`${process.env.AUTH_ENDPOINT}/api/login`, "", { username, password: pass })
-
-        setLoading(res.loading);
-        // ...
-        // action.updateSimdata(res.value)
+        const [l, e, v] = useFetch.post<UserData>(`${process.env.AUTH_ENDPOINT}/api/login`, "", { username, password: pass })
+        loading = l;
+        error = e;
+        value = v;
         
     }
     return (

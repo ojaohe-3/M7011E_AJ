@@ -1,7 +1,5 @@
 import axios from 'axios'
 import React, { useState } from 'react'
-import { Row } from 'react-bootstrap'
-import { Container } from 'react-bootstrap/lib/Tab'
 
 import useArray from '../../../customHooks/useArray'
 import useFetch from '../../../customHooks/useFetch'

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BoxGeometry, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from 'three';
 import ManagerControlComponent from './components/ControlBoards/MangerBoard';
 import ProsumerControlComponent from './components/ControlBoards/ProsumerBoard';
+import LoginPopup from './components/popups/LoginPopup';
 
 import { SceneManager } from './scene/scene'
 
@@ -39,12 +40,9 @@ function App() {
 
   
   return (
-      <>
-      <ManagerControlComponent id={''} sim={''} />
-      {/* <ProsumerControlComponent id={''} sim={''} /> */}
-      </>
-    // <div id="App" style={{width: "100vw", height: "100vh", margin: '0 auto'}}>
-    // </div>
+    <div id="App" style={{width: "100vw", height: "100vh", margin: '0 auto'}}>
+      <LoginPopup/>
+    </div>
   )
 }
 

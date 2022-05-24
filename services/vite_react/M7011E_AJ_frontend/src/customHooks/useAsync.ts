@@ -7,10 +7,10 @@ import { useCallback, useEffect, useState } from 'react'
  * @param dependencies any dependencies that the async will wait for
  * @returns 
  */
-const useAsync = (callback: () => Promise<any>, dependencies: any[] = []) => {
+const useAsync = <T>(callback: () => Promise<any>, dependencies: any[] = []) => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState()
-    const [value, setValue] = useState()
+    const [value, setValue] = useState<T>()
 
     const callbackMemoized = useCallback(() => {
         setLoading(true)
@@ -26,7 +26,7 @@ const useAsync = (callback: () => Promise<any>, dependencies: any[] = []) => {
         callbackMemoized()
     }, [callbackMemoized])
 
-    return { loading, error, value }
+    return [ loading, error, value ]
 }
 
 export default useAsync
