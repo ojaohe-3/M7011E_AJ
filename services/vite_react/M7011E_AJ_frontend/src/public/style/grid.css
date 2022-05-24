@@ -1,0 +1,22 @@
+.grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 10px;
+    grid-template-rows: auto;
+    grid-template-areas: 
+    "header header"
+    "item item"
+    "footer footer";
+}
+
+.grid-head{
+    grid-area: header;
+}
+
+.grid-item{
+    grid-area: item;
+}
+
+.grid-foot{
+    grid-area: footer;
+}

@@ -18,7 +18,7 @@ const useStateWithHistory = <T>(defaultValue: T, options?: StateHistoryOptions) 
     const capacity = options?.capacity ?? 10
 
     const set = useCallback(
-        (v) => {
+        (v: (arg0: T) => any) => {
             const resolvedValue = typeof v === 'function' ? v(value) : v
             if (historyRef.current[pointerRef.current] !== resolvedValue) {
                 if (pointerRef.current < historyRef.current.length - 1) {
@@ -48,7 +48,7 @@ const useStateWithHistory = <T>(defaultValue: T, options?: StateHistoryOptions) 
         setValue(historyRef.current[pointerRef.current])
     }, [])
 
-    const go = useCallback((index) => {
+    const go = useCallback((index: number) => {
         if (index < 0 || index >= historyRef.current.length - 1) return
         pointerRef.current = index
         setValue(historyRef.current[pointerRef.current])

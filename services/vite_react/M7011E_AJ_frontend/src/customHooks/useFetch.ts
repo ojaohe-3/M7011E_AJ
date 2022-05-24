@@ -1,25 +1,31 @@
+import axios, { AxiosRequestHeaders } from 'axios'
 import useAsync from './useAsync'
+const header = (token?: string) => { return { headers: { "content-type": "application/json", "Authenticate": token ? `Bearer ${token}` : "" } } }
 
-const DEFAULT_OPTIONS = {
-    headers: { 'Content-Type': 'application/json' }
+const get = async (url: string, token: string = "", dependencies: any[] = []) => {
+    return useAsync(() => {
+        return axios.get(url, header(token)).then((v) => v.data).catch(e => e)
+
+    }, dependencies)
 }
+const put = (url: string, token: string = "", data: any = {}, dependencies: any[] = []) => {
+    return useAsync(() => {
+        return axios.put(url, data, header(token)).then((v) => v.data).catch(e => e)
 
-/**
- * a wrapper for fetch requests
- *
- * @param url string url
- * @param options a dictionary of options for the fetch request
- * @param dependencies any dependencies for the fetch request
- * @returns
- */
-const useFetch = (url: string, options: RequestInit = {}, dependencies: any[] = []) => {
-    return useAsync(async () => {
-        const res = await fetch(url, { ...DEFAULT_OPTIONS, ...options })
-        if (res.ok)
-            return res.json()
-        const json = await res.json()
-        return await Promise.reject(json)
+    }, dependencies)
+}
+const post = (url: string, token: string = "", data: any = {}, dependencies: any[] = []) => {
+    return useAsync(() => {
+        return axios.post(url, data, header(token)).then((v) => v.data).catch(e => e)
+
     }, dependencies)
 }
 
-export default useFetch
+// const delete_http = (url: string, token: string = "", dependencies: any[] = []) => {
+//     return useAsync(() => {
+//         return axios.delete(url, header(token)).then((v) => v.data).catch(e => e)
+
+//     }, dependencies)
+// }
+
+export default { get, post, put }

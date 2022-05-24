@@ -1,3 +1,4 @@
-export default inferface Prosumer{
+export default interface Prosumer{
+    id: String,
     
 }

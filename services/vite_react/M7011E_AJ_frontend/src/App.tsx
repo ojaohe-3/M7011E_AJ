@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { BoxGeometry, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from 'three';
+import ManagerControlComponent from './components/ControlBoards/MangerBoard';
+import ProsumerControlComponent from './components/ControlBoards/ProsumerBoard';
+
 import { SceneManager } from './scene/scene'
 
 function App() {
@@ -36,9 +39,12 @@ function App() {
 
   
   return (
-    <div id="App" style={{width: "100vw", height: "100vh", margin: '0 auto'}}>
-      {/* <div id="container" style={{width: "70%", height: "70%", margin: '0 auto'}} /> */}
-    </div>
+      <>
+      <ManagerControlComponent id={''} sim={''} />
+      <ProsumerControlComponent id={''} sim={''} />
+      </>
+    // <div id="App" style={{width: "100vw", height: "100vh", margin: '0 auto'}}>
+    // </div>
   )
 }
 

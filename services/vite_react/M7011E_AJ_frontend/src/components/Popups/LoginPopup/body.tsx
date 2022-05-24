@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Container, FormControl, FormGroup, FormLabel, FormText } from 'react-bootstrap'
 
 export interface BodyProps {
-    onChange?: (user: String, pass: String) => void
+    onChange?: (user: string, pass: string) => void
 
 }
 
