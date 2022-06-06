@@ -8,23 +8,23 @@ interface PopupTemplateProps {
     footer?: React.ReactNode 
     show: boolean
     onClose: (e: any) => void
-    size: 'sm' | 'lg' | 'xl'
+    size?: 'sm' | 'lg' | 'xl'
 }
 
 const PopupTemplate: React.FC<PopupTemplateProps> = (props: PopupTemplateProps) => {
     return (
         <>
             <Modal size={props.size} show={props.show}>
-                <ModalHeader>
+                <Modal.Header>
                     {props.head}
                     <CloseButton onClick={props.onClose} />
-                </ModalHeader>
-                <ModalBody>
+                </Modal.Header>
+                <Modal.Body>
                     {props.body}
-                </ModalBody>
-                <ModalFooter>
+                </Modal.Body>
+                <Modal.Footer>
                     {props.footer}
-                </ModalFooter>
+                </Modal.Footer>
             </Modal>
         </>
     );

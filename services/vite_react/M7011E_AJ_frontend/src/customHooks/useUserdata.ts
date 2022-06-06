@@ -1,31 +1,35 @@
 
+import axios from "axios";
+import { useState } from "react";
 import Manager from "../models/Manager";
 import Prosumer from "../models/Prosumer";
 import UserData from "../models/userdata";
-import useArray from "./useArray";
-import useFetch from "./useFetch";
-import useToggle from "./useToggle";
+import useAsync from "./useAsync";
 
 const useUserdata = async (user: UserData, sim: string, token: string) => {
-    const managers = useArray<Manager>();
-    const prosumers = useArray<Prosumer>();
-    const err: any[] = [];
-    user.managers?.forEach(async v => {
-        const m = await useFetch.get(process.env.BACKEND_URL + `/${sim}/api/v1/members/managers/${v.id}`, user.token)
-        if (!m.error && m.value) {
-            managers.push(m.value as Manager);
-        } else
-            err.push(m.error)
+    const [loading, setLoading] = useState(true);
+    const [_l, managers, err1] = useAsync<Manager[]>(async () => {
+        const ms: Manager[] = [];
+        user.managers?.forEach(async v => {
+                const res = await axios.get(import.meta.env.VITE_BACKEND_URL + `/${sim}/api/v1/members/managers/${v.id}`, { headers: { "content-type": "application/json", "Authenticate": `Bearer ${token}` } });
+                if (res.status === 200) {
+                    ms.push(res.data)
+                }
+        });
+        return ms;
+    });
 
+    const [_l2, prosumers, err2] = useAsync<Manager[]>(async () => {
+        const ps: Prosumer[] = [];
+        user.prosumers?.forEach(async v => {
+            const res = await axios.get(import.meta.env.VITE_BACKEND_URL + `/${sim}/api/v1/members/managers/${v.id}`, { headers: { "content-type": "application/json", "Authenticate": `Bearer ${token}` } });
+            if (res.status === 200) {
+                ps.push(res.data)
+            }
+        })
+        return ps;
     });
-    user.prosumers?.forEach(async v => {
-        const p = await useFetch.get(process.env.BACKEND_URL + `/${sim}/api/v1/members/prosumers/${v.id}`, user.token)
-        if (!p.error && p.value) {
-            prosumers.push(p.value as Prosumer);
-        } else
-            err.push(p.error)
-    });
-    return [managers, prosumers, err]
+    return [loading, managers, prosumers, err1, err2]
 }
 
 export default useUserdata;

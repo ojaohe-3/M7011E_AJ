@@ -11,7 +11,8 @@ export default function CardContainer({ children, width }: CardContainerProps | 
         return {
             display: "grid",
             gridTemplateColumns: "repeat(" + width + ", 1fr)",
-            columnGap: "10px"
+            columnGap: `calc(100% / ${width*4})`,
+            rowGap: `calc(100% / ${width*8})`
         } as CSSProperties
     }
 

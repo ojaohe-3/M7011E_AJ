@@ -5,7 +5,8 @@ use std::{
     time::{Duration, Instant},
 };
 
-use actix_web::{middleware::Logger, web, App, HttpServer};
+use actix_cors::Cors;
+use actix_web::{middleware::Logger, web, App, HttpServer, http::header};
 use db::{
     consumer_document::ConsumerDocument, manager_document::ManagerDocument,
     prosumer_document::ProsumerDocument, tickets_document::TicketDocuments,
@@ -161,11 +162,19 @@ async fn main() -> std::io::Result<()> {
     );
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     // ==== Server serving the API ====
+
     let server = HttpServer::new(move || {
+        let cors = Cors::default()
+        .allowed_origin("localhost")
+        .allowed_methods(vec!["GET", "POST", "PUT"])
+        .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
+        .allowed_header(header::CONTENT_TYPE)
+        .max_age(3600);
         let api = app::generate_api();
         // let auth = HttpAuthentication::bearer(middleware::auth::validator);
         App::new()
             .app_data(data.clone())
+            .wrap(cors)
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
             // .wrap(auth)
@@ -239,19 +248,12 @@ async fn main() -> std::io::Result<()> {
                     .ok();
                 if let Some(res) = res {
                     println!("response rmq: {:?}", res);
-                    // if res.len() > 0 {
-                    //     TicketDocuments::insert(db_ref.clone(), &res).await.ok();
-                    // }
+                    if res.len() > 0 {
+                        TicketDocuments::insert(db_ref.clone(), &res).await.ok();
+                    }
                 } else {
                     println!("failed to call rpc...");
                 }
-                // if let Some(mut recieved) = res {
-                //     sim_ref
-                //         .clone()
-                //         .lock()
-                //         .await
-                //         .append_recive_formats(&mut recieved);
-                // }
             }
             // === Update Database of current state ===
 
@@ -375,71 +377,6 @@ fn assert_all_env_loaded() -> Result<(), EnvErrors> {
     if missing.len() > 0 {
         return Err(EnvErrors::new(missing));
     }
-
-    // let name = match env::var("NAME") {
-    //     Ok(v) => Some(Envs::NAME(v)),
-    //     Err(_) => None,
-    // };
-    // let dbc = match env::var("DB_CONNECT") {
-    //     Ok(v) => Some(Envs::DB_CONNECT(v)),
-    //     Err(_) => None,
-    // };
-    // let apiurl = match env::var("API_URL") {
-    //     Ok(v) => Some(Envs::API_URL(v)),
-    //     Err(_) => None,
-    // };
-    // let lat = match env::var("LAT") {
-    //     Ok(v) => Some(Envs::LAT(v.parse().unwrap())),
-    //     Err(_) => None,
-    // };
-    // let lon = match env::var("LON") {
-    //     Ok(v) => Some(Envs::LON(v.parse().unwrap())),
-    //     Err(_) => None,
-    // };
-    // let wm = match env::var("WEATHER_MODULE") {
-    //     Ok(v) => Some(Envs::WEATHER_MODULE(v)),
-    //     Err(_) => None,
-    // };
-    // let ae = match env::var("AUTH_ENDPOINT") {
-    //     Ok(v) => Some(Envs::AUTH_ENDPOINT(v)),
-    //     Err(_) => None,
-    // };
-    // let rcs = match env::var("RABBITMQ_CONNECTION_STRING") {
-    //     Ok(v) => Some(Envs::RABBITMQ_CONNECTION_STRING(v)),
-    //     Err(_) => None,
-    // };
-    // let ru = match env::var("RABBITMQ_USER") {
-    //     Ok(v) => Some(Envs::RABBITMQ_USER(v)),
-    //     Err(_) => None,
-    // };
-    // let rp = match env::var("RABBITMQ_PASS") {
-    //     Ok(v) => Some(Envs::RABBITMQ_PASS(v)),
-    //     Err(_) => None,
-    // };
-    // let port = match env::var("PORT") {
-    //     Ok(v) => Some(Envs::PORT(match v.parse() {
-    //         Ok(v) => v,
-    //         Err(_) => 5000,
-    //     })),
-    //     Err(_) => None,
-    // };
-    //vec![name, dbc, apiurl, lat, lon, wm, ae, rcs, ru, rp, port]
     Ok(())
 }
 
-// TODO make into #[structopt(name = "simulation web service", about = "Creates an performant web instance with a connecting api, rabbitmq connection etc")]
-// #[derive(Clone, Debug)]
-// enum Envs {
-//     //TODO: make to enum instead
-//     NAME(String),
-//     DB_CONNECT(String),
-//     API_URL(String),
-//     LAT(f64),
-//     LON(f64),
-//     WEATHER_MODULE(String),
-//     AUTH_ENDPOINT(String),
-//     RABBITMQ_CONNECTION_STRING(String),
-//     RABBITMQ_USER(String),
-//     RABBITMQ_PASS(String),
-//     PORT(u32),
-// }

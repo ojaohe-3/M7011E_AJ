@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react'
 import { Card } from 'react-bootstrap'
-import "../../public/style/cards.css"
+import "./cards.css"
 export interface ControlCardProps {
   children?: React.ReactNode | React.ReactNode[]
   footer?: React.ReactNode
@@ -15,7 +15,7 @@ export default function ControlCard({ children, footer, title, style}: ControlCa
         <Card.Header className={"control-card-head"}>
           <Card.Title><h4>{title}</h4></Card.Title>
         </Card.Header>
-        <Card.Body className={"control-card-body"}>
+        <Card.Body className={"control-card-container"}>
           {children}
         </Card.Body>
         <Card.Footer className={"control-card-footer"}>

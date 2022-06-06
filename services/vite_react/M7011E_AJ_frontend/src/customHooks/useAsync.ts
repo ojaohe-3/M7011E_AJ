@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from 'react'
  * @param dependencies any dependencies that the async will wait for
  * @returns 
  */
-const useAsync = <T>(callback: () => Promise<any>, dependencies: any[] = []) => {
+const useAsync = <T extends unknown>(callback: () => Promise<any>, dependencies: any[] = []) => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState()
     const [value, setValue] = useState<T>()

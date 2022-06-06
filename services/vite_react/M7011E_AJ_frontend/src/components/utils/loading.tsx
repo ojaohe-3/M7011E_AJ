@@ -1,15 +1,17 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import { Spinner } from 'react-bootstrap'
 
 export interface LoadingProps {
-    active: boolean,
-    children?: JSX.Element | JSX.Element[]
+    loading: boolean,
+    children?: JSX.Element | JSX.Element[] | any
 }
 
-function Loading({ active, children }: LoadingProps) {
 
-    return active ? (
-        <Spinner animation="border" />)
+function Loading({ loading, children }: LoadingProps) {
+
+    return loading ? (
+
+        <Spinner animation="border" style={{marginRight: '45px'}}/>)
         : (
             <>
                 {children}

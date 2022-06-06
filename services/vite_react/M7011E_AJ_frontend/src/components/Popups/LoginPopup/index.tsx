@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react'
 import { useSessionStorage } from '../../../customHooks';
 import useFetch from '../../../customHooks/useFetch';
@@ -8,37 +9,62 @@ import Body from './body';
 import Footer from './footer';
 
 export interface LoginPopupProps {
-
+    display: boolean
+    onClose: () => void
+    onLogin: (u: UserData) => void
 }
 
 
-export default function LoginPopup() {
-    const [active, setActive] = useState(true);
+export default function LoginPopup({ display, onClose, onLogin }: LoginPopupProps) {
     const [pass, setPass] = useState<string>("");
     const [username, setuser] = useState<string>("");
-    // const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>("");
 
-    let [loading, error, value]: any[] = [false, null, null];
-    // const [user, setValue, remove] =  useSessionStorage<UserData>("user", {username: "NaN", token: ""});
-
-    const handleChange = (user: string, pass: string) => { setPass(pass); setuser(user) };
+    const handleChange = (user: string, pass: string) => {
+        setPass(pass);
+        setuser(user);
+    };
     const handleLogin = async () => {
-        const [l, e, v] = useFetch.post<UserData>(`${process.env.AUTH_ENDPOINT}/api/login`, "", { username, password: pass })
-        loading = l;
-        error = e;
-        value = v;
-        
+        try {
+            setLoading(true);
+            console.log("sending", username, pass)
+            const res = await axios.post(`${import.meta.env.VITE_AUTH_ENDPOINT}/api/login`, { username: username, password: pass }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            setLoading(false);
+            setMessage(res.data.message);
+            if (res.data.status !== 0 || !res.data.status) {
+                const user: UserData = {
+                    ...res.data.user,
+                    token: res.data.jwt
+                }
+                onLogin(user)
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
+
     }
     return (
-        <Loading active={loading}>
+        <>
             <PopupTemplate
-                show={active}
-                onClose={() => setActive(false)}
-                size={'lg'}
-                body={<Body onChange={handleChange} />}
-                footer={<Footer onLogin={handleLogin} onCancle={() => setActive(false)} />}
-            />
-        </Loading>
+                show={display}
+                onClose={onClose}
+                body={
+                    <>
+                        <Body onChange={handleChange} />
+                        <Loading loading={loading}>
+                            <p style={{color: 'darkgrey', textAlign: 'center'}}>{message}</p>
+                        </Loading>
+                    </>
+                }
+                footer={<Footer onLogin={handleLogin} onCancle={onClose} />} />
+
+        </>
 
     )
 }

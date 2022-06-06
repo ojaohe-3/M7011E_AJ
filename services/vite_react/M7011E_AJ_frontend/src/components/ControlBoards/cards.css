@@ -1,7 +1,8 @@
 .control-card {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
-    color: #ecf0f1;
+    color: #34495e;
+    font-size: medium;
   }
   
   .control-card:hover {
@@ -12,11 +13,17 @@
 padding: 2px 16px;
 
 }
+.control-card-container .col{
+    border-style: groove;
+    border-width: 1px;
+    min-height: 30px;
+}
 
 .control-card-head {
-    background-color: #34495e;
+    background-color: #ecf0f1;
+    color: #34495e;
     padding: 30px;
-    width: 180px;
+    width: 100%;
 }
 
 .smallScreen {

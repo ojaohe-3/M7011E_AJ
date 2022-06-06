@@ -15,8 +15,8 @@ export default function Body({ onChange }: BodyProps) {
         <Container>
             <FormGroup>
                 <FormLabel>Username</FormLabel>
-                <FormControl type="username" placeholder='user name' onChange={(u: React.ChangeEvent<Element>) => {
-                    let value = u.currentTarget.nodeValue;
+                <FormControl type="username" placeholder='user name' onChange={(u: React.ChangeEvent<HTMLInputElement>) => {
+                    let value = u.target.value;
                     if (value !== null) {
                         setUser(value);
                         if (onChange)
@@ -29,8 +29,8 @@ export default function Body({ onChange }: BodyProps) {
             </FormGroup>
             <FormGroup>
                 <FormLabel>Password</FormLabel>
-                <FormControl type="password" onChange={(u: React.ChangeEvent<Element>) => {
-                    let value = u.currentTarget.nodeValue;
+                <FormControl type="password" onChange={(u: React.ChangeEvent<HTMLInputElement>) => {
+                    let value = u.target.value;
                     if (value !== null) {
                         setPass(value);
                         if (onChange)

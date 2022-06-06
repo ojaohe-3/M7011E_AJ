@@ -8,7 +8,7 @@ export interface ControlTemplateProps {
     children?: JSX.Element | JSX.Element[]
 }
 export default function ControlTemplate({ head, children }: ControlTemplateProps) {
-
+    
     return (
         <>
             <GridTable.Body>

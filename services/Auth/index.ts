@@ -8,8 +8,8 @@ import { DB } from "./DB-Connector/db-connector";
 import { IUser, UserSchema } from "./DB-Connector/user";
 require('dotenv').config();
 
-const jwt = require('jsonwebtoken');
-const saltedSha256 = require('salted-sha256');
+import jwt, { SignOptions } from 'jsonwebtoken';
+import saltedSha256 from 'salted-sha256';
 
 //todo clean this file up
 //todo add TLS, functionallity to only allow certine endpoints if valid certification exist, such as an X509 certification of each service, and that enforced "discovery" and certification can be done in good order.
@@ -32,7 +32,7 @@ declare interface UserData {
 
 
 
-const options = {
+const options: SignOptions = {
     algorithm: 'HS512',
     expiresIn: '4h'
 }
@@ -88,12 +88,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 
 app.get("/api/validate", async (req, res) => {
-    const token = req.headers.authorization.split(' ')[1]; 
     // const token = req.body
 
 
     try {
-        jwt.verify(token,process.env.JWT_SECRET)
+        const token = req.headers.authorization.split(' ')[1];
+        jwt.verify(token, process.env.JWT_SECRET)
 
         const data = jwt.decode(token)
         res.json({ message: "Valid Token!", status: 1, body: data }) //todo enforce TLS 
@@ -106,19 +106,23 @@ app.get("/api/validate", async (req, res) => {
 
 
 app.post("/api/login", async (req, res) => {
+    interface Format {
+        username: string,
+        password: string
+    }
+    const data: Partial<Format> = req.body;
+    if (!data.username || !data.password) {
+        res.status(200).json({ message: "no login credentials", reason: 'no credentials provided', status: 0 });
+    }
+
     try {
-        interface Format{
-            username: string,
-            password: string
-        }
-        const data: Format = req.body;
         const raw: IUser | null = await DB.Models.User.findOne({ username: data.username! }).exec();
-       
-        if(raw === null){
-            res.json({ message: "invalid login credentials", reason: 'invalid password or username', status: 0 });
+        if (raw === null) {
+            res.status(200).json({ message: "invalid login credentials", reason: 'invalid username or password', status: 0 });
+            return; //why is this needed?
         }
         // const str_id: string = raw._id.toString(); //this is some bug with the packages
-        const entry : UserData= {
+        const entry: Partial<UserData> = {
             username: raw.username,
             password: raw.password,
             type: raw.type,
@@ -128,32 +132,29 @@ app.post("/api/login", async (req, res) => {
             admin: raw.admin,
             last_login: raw.last_login
         }
-        if (entry) {
-            if (saltedSha256(data.password!, data.username) === entry.password) {
+        if (saltedSha256(data.password!, data.username) === entry.password) {
 
-                raw.last_login = new Date();
-                await DB.Models.User.findOneAndUpdate({ username: data.username }, raw.last_login).exec();
+            raw.last_login = new Date();
+            await DB.Models.User.findOneAndUpdate({ username: data.username }, raw.last_login).exec();
 
-                const display = {
-                    username: entry.username,
-                    main: entry.main,
-                    managers: entry.managers,
-                    prosumers: entry.prosumers,
-                    admin: entry.admin,
-                    last_login: entry.last_login
-                }
-
-                const token = jwt.sign({ data: display }, process.env.JWT_SECRET, options);
-                res.json({ message: 'success!', jwt: token, user: display });
-            } else {
-                res.json({ message: "invalid login credentials", reason: 'invalid password or username', status: 0 });
+            const display = {
+                username: entry.username,
+                main: entry.main,
+                managers: entry.managers,
+                prosumers: entry.prosumers,
+                admin: entry.admin,
+                last_login: entry.last_login
             }
+
+            const token = jwt.sign({ data: display }, process.env.JWT_SECRET, options);
+            res.json({ message: 'success!', jwt: token, user: display, status: 1});
         } else {
-            res.status(401).send("no such us" + data.username);
+            res.json({ message: "invalid login credentials", reason: 'invalid password or username', status: 0 });
         }
+
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'error', error: error, status: 500 });
+        res.status(500).json({ message: 'error', error: error.message, status: 500 });
     }
 });
 
@@ -176,7 +177,7 @@ app.post("/api/register", async (req, res) => {
         data.last_login = new Date();
         data.admin = false;
         console.log(data);
-        const display = {...data, password: ''}
+        const display = { ...data, password: '' }
         await DB.Models.User.create(data);
         res.json({ message: 'User created successfully!', jwt: 'token', user: data });
     } catch (error) {
@@ -185,18 +186,18 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
-const PORT =  process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 // app.listen(PORT, () => {
 //     console.log(`lisening on ${PORT}`);
 
 // });
 
-const fs = require('fs');
+import fs from 'fs';
 const credentials = {
     key: fs.readFileSync('key.pem'),
     cert: fs.readFileSync('cert.pem'),
 };
 const server = createServer(credentials, app)
-console.log("creating server on",PORT)
+console.log("creating server on", PORT)
 server.listen(PORT);
 DB.Instance;
