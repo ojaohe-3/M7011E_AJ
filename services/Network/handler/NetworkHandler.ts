@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { DB } from "../DB-Connector/db-connector";
 import Network, { INetwork } from "../models/network"
 import { Consumer, Source } from "../models/node";
-import RabbitHandler from "./RabbitSeverHandler";
+import RabbitHandler, { ReceiveFormat } from "./RabbitSeverHandler";
 
 export default class NetworkHandler {
 
@@ -25,13 +25,15 @@ export default class NetworkHandler {
                 const sources: Source[] = [];
                 const consumers: Consumer[] = [];
 
-                content.forEach(v => {
+                content.forEach((v: ReceiveFormat) => {
                     // console.log(v)
                     switch (v.key_type.toLowerCase()) {
                         case "consumer":
                             consumers.push({
                                 id: v.id,
                                 demand: v.amount,
+                                time_stamp: v.time_stamp ?? 0,
+                                updated: false,
                             })
                             break;
                         case "source":
@@ -39,7 +41,9 @@ export default class NetworkHandler {
                                 id: v.id,
                                 price: v.price!,
                                 output: v.amount,
-                                demand: v.additional || 0
+                                demand: v.additional || 0,
+                                time_stamp: v.time_stamp ?? 0,
+                                updated: false,
                             })
                             break;
                     }
@@ -81,12 +85,12 @@ export default class NetworkHandler {
         return Array.from(this._networks.values());
     }
     public addNet(data: Partial<INetwork>) {
-        if(data.name){
+        if (data.name) {
             let id = data.id || Types.ObjectId.createFromTime(Date.now()).toHexString();
-            const net = new Network({id, name: data.name!, tickets: data.tickets || [], updatedAt: data.updatedAt || new Date()});
+            const net = new Network({ id, name: data.name!, tickets: data.tickets || [], updatedAt: data.updatedAt || new Date() });
             this._networks.set(net.id, net)
             net.document();
-        }else{
+        } else {
             const net = new Network();
             this._networks.set(net.id, net);
             net.document();

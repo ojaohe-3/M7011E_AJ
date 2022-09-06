@@ -4,6 +4,7 @@ declare interface IPrivilage {
   level: Number;
   access?: string;
   id: string;
+  type: string;
 }
 
 export declare interface IUser extends Document {

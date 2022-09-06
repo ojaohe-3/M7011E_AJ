@@ -2,7 +2,8 @@
 export interface Privilage {
     level: Number,
     access?: string,
-    id: string
+    id: string,
+    type: string,
 }
 export default interface UserData {
     username: string,

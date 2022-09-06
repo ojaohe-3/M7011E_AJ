@@ -7,7 +7,7 @@ export type KeyTypes = "source" | "consumer"
 
 export type RabbitWorker = Handler<Arguments>
 export type RabbitWorkHandler = WorkHandler<Arguments>
-export interface Arguments{
+export interface Arguments {
     target: string
     content: ReceiveFormat[]
     channel: Channel
@@ -20,6 +20,8 @@ export interface ReceiveFormat {
     id: string
     price?: number
     additional?: number
+    time_stamp?: number
+
 }
 export default class RabbitHandler {
     private static _instance: RabbitHandler;
@@ -58,7 +60,7 @@ export default class RabbitHandler {
             const opt = {
                 credentials: credentials.plain(process.env.RABBITMQ_USER || "user", process.env.RABBITMQ_PASS || "password")
             }
-            console.log("connecting to",process.env.RABBITMQ_CONNECTION_STRING|| 'amqp://localhost:5672')
+            console.log("connecting to", process.env.RABBITMQ_CONNECTION_STRING || 'amqp://localhost:5672')
             this._connector = await client.connect(process.env.RABBITMQ_CONNECTION_STRING || 'amqp://localhost:5672', opt);
             this._connected = true;
             console.log("rabbitmq connected!")
@@ -67,19 +69,19 @@ export default class RabbitHandler {
             console.log(error);
             setTimeout(this.connect, 10000); // try to reconnect after 10s
             this._connected = false;
-        
+
 
         }
     }
 
 
-    public async sendData(channel: string, data: any): Promise<void>{
-        if(!this._connected){
+    public async sendData(channel: string, data: any): Promise<void> {
+        if (!this._connected) {
             return;
         }
         try {
             const json = JSON.stringify(data);
-            if(!this._channels.has(channel)){
+            if (!this._channels.has(channel)) {
                 await this.createChannel(channel);
             }
             const c = this._channels.get(channel);
@@ -88,8 +90,8 @@ export default class RabbitHandler {
             console.log(error);
         }
     }
-    public async createChannel(name: string){
-        if(!this._connected){
+    public async createChannel(name: string) {
+        if (!this._connected) {
             setTimeout(this.createChannel, 1000, name);
         }
         try {
@@ -104,7 +106,7 @@ export default class RabbitHandler {
     }
 
     public async createRPCChannel(name: string): Promise<client.Channel | undefined> {
-        if (this._connected === false){
+        if (this._connected === false) {
             console.log("Not Connected!")
             return undefined;
         }
@@ -122,8 +124,8 @@ export default class RabbitHandler {
                 const json: ReceiveFormat[] = JSON.parse(msg?.content.toString());
                 const cid = msg!.properties.correlationId;
                 const replyTo = msg!.properties.replyTo;
-                
-                this._workhandler.run("receive_rpc" , { target: name, content: json, channel: c, correlationID: cid, replyTo: replyTo})
+
+                this._workhandler.run("receive_rpc", { target: name, content: json, channel: c, correlationID: cid, replyTo: replyTo })
                 c.ack(msg);
             })
             return c;

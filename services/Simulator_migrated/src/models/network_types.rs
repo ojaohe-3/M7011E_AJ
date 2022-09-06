@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
-use serde::{Serialize, Deserialize};
+use chrono::Local;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum KeyTypes {
@@ -21,6 +22,8 @@ impl Display for KeyTypes {
 pub struct ReciveFormat {
     pub target: String,
     pub price: f64,
+    pub time_stamp: Option<i64>,
+    pub time_stamp_ended: Option<i64>,
     pub source: String,
     pub amount: f64,
 }
@@ -41,6 +44,7 @@ pub struct SendFormat {
     pub amount: f64,
     pub id: String,
     pub price: Option<f64>,
+    pub time_stamp: Option<i64>,
     pub additional: Option<f64>,
 }
 
@@ -58,6 +62,7 @@ impl SendFormat {
             id,
             price,
             additional,
+            time_stamp: Some(Local::now().timestamp_millis()),
         }
     }
 }

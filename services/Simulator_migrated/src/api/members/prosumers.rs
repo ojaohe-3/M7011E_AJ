@@ -70,7 +70,7 @@ pub async fn get_member(
     data: web::Data<AppState>,
     auth: BearerAuth
 ) -> Result<Json<Prosumer>, WebRequestError> {
-    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("view")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("view")), id.to_string(),"Prosumer".to_string())).await?;
     let prosumer = data.sim.lock().await.get_prosumer(&id).cloned();
     match prosumer {
         Some(m) => return Ok(Json(m)),
@@ -85,7 +85,7 @@ pub async fn update_member(
     data: web::Data<AppState>,
     auth: BearerAuth
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
-    Authentication::claims(auth.token().to_string(), Privilage::new(5, Some(format!("modify")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(5, Some(format!("modify")), id.to_string(), "Prosumer".to_string())).await?;
     let member = body.into_inner();
     let response = data
         .sim

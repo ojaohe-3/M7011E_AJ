@@ -5,6 +5,8 @@ export interface ITicket extends Document {
     source: string
     amount: number
     target: string
+    time_stamp?: number
+    time_stamp_ended?: number
 }
 export declare interface INetwork extends Document {
     tickets: ITicket[]
@@ -14,7 +16,7 @@ export declare interface INetwork extends Document {
 export interface NetworkModel extends Model<INetwork> { };
 
 export class NetworkSchema {
- 
+
     private _model: Model<INetwork>;
 
     constructor() {
@@ -23,6 +25,8 @@ export class NetworkSchema {
             source: { type: String, required: true },
             target: { type: String, required: true },
             amount: { type: Number, required: true },
+            time_stamp: { type: Number, required: false },
+            time_stamp_ended: { type: Number, required: false },
         });
 
 

@@ -8,11 +8,12 @@ pub struct Privilage {
     ///  clearance have the option of having access to specific things and services.
     pub access: Option<String>, 
     pub id: String,
+    pub _type: String,
 }
 
 impl Privilage {
-    pub fn new(level: u32, access: Option<String>, id: String) -> Self {
-        Self { level, access, id }
+    pub fn new(level: u32, access: Option<String>, id: String, _type: String) -> Self {
+        Self { level, access, id, _type: _type }
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]

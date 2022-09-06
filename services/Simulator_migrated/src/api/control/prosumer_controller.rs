@@ -28,7 +28,7 @@ async fn get_ratio(
     auth: BearerAuth
 ) -> actix_web::Result<Json<MemberData>, WebRequestError> {
     let id = &path.id;
-    Authentication::claims(auth.token().to_string(), Privilage::new(1, Some(format!("view;control")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(1, Some(format!("view;control")), id.to_string(), "Prosumer".to_string())).await?;
 
     let response = data.sim.lock().await.get_prosumer_mut(&id).and_then(|p| {
         Some(MemberData {
@@ -52,7 +52,7 @@ async fn set_ratio(
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     
     let id = &path.id;
-    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("modify;control")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("modify;control")), id.to_string(), "Prosumer".to_string())).await?;
     let ratio = body.into_inner();
     let response = data.sim.lock().await.get_prosumer_mut(&id).and_then(|p| {
         p.input_ratio = ratio.input_ratio;
@@ -75,7 +75,7 @@ async fn set_active(
     auth: BearerAuth
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let (id, status) = path.into_inner();
-    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("enable;control")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("enable;control")), id.to_string(), "Prosumer".to_string())).await?;
 
     let response = data.sim.lock().await.get_prosumer_mut(&id).and_then(|m| {
         m.status = status;
@@ -98,7 +98,7 @@ async fn pause(
     auth: BearerAuth
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let (id, duration) = path.into_inner();
-    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("enable;control")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("enable;control")), id.to_string(), "Prosumer".to_string())).await?;
 
     let response = data.sim.lock().await.get_prosumer_mut(&id).and_then(|p| {
         p.status = false;

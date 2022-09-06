@@ -26,7 +26,7 @@ async fn get_ratio(
     auth: BearerAuth
 ) -> actix_web::Result<Json<MemberData>, WebRequestError> {
     let id = &path.id;
-    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("view;control")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("view;control")), id.to_string(), "Manager".to_string())).await?;
 
     let response = data
         .sim
@@ -50,7 +50,7 @@ async fn set_ratio(
 
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let id = &path.id;
-    Authentication::claims(auth.token().to_string(), Privilage::new(4, Some(format!("modify;control")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(4, Some(format!("modify;control")), id.to_string(),"Manager".to_string())).await?;
 
     let ratio = body.ratio;
     let response = data.sim.lock().await.get_manager_mut(&id).and_then(|m| {
@@ -74,7 +74,7 @@ async fn set_active(
     auth: BearerAuth
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let (id, status) = path.into_inner();
-    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("enable;control")), id.to_string())).await?;
+    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("enable;control")), id.to_string(),"Manager".to_string())).await?;
     let response = data.sim.lock().await.get_manager_mut(&id).and_then(|m| {
         m.status = status;
         Some(ResponseFormat {

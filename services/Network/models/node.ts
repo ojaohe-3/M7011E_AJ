@@ -4,6 +4,8 @@ export interface Node {
     demand: number;
     // cost?: number;
     id: string;
+    time_stamp: number;
+    updated: boolean;
 
 }
 

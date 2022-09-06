@@ -92,7 +92,8 @@ app.post('/api/assets/profile/:id', async (req : Request, res : Response) => {
 interface Privilage {
     level: Number,
     access?: string,
-    id: string
+    id: string,
+    type: string,
 }
 interface UserData {
     username: string,

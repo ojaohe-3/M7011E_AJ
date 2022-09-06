@@ -16,7 +16,8 @@ import saltedSha256 from 'salted-sha256';
 declare interface Privilage {
     level: Number,
     access?: string,
-    id: string
+    id: string,
+    type: string,
 }
 declare interface UserData {
     // _id: string,

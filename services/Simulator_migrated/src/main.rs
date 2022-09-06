@@ -6,7 +6,7 @@ use std::{
 };
 
 use actix_cors::Cors;
-use actix_web::{middleware::Logger, web, App, HttpServer, http::header};
+use actix_web::{http::header, middleware::Logger, web, App, HttpServer};
 use db::{
     consumer_document::ConsumerDocument, manager_document::ManagerDocument,
     prosumer_document::ProsumerDocument, tickets_document::TicketDocuments,
@@ -36,7 +36,7 @@ mod models;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let instance = Instant::now();
-    // ==== Assert enviormental variables
+    // ==== Assert enviormental variables ====
     dotenv().ok();
     assert_all_env_loaded().expect("Failed to load envs");
     // std::env::set_var("RUST_LOG", "debug");
@@ -66,10 +66,8 @@ async fn main() -> std::io::Result<()> {
 
     // ==== Build application Data ====
     let sim = Arc::new(Mutex::new(SimulationHandler::new()));
-
-    // TODO: Serve Rabbitmq
     let rmq = Arc::new(Mutex::new(NetworkHandler::new()));
-    // TODO: Generate members object from db
+
     // ==== Fetch from db ====
     let mut app_state = AppStructure {
         id: uuid::Uuid::new_v4().to_string(),
@@ -165,11 +163,11 @@ async fn main() -> std::io::Result<()> {
 
     let server = HttpServer::new(move || {
         let cors = Cors::default()
-        .allowed_origin("localhost")
-        .allowed_methods(vec!["GET", "POST", "PUT"])
-        .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
-        .allowed_header(header::CONTENT_TYPE)
-        .max_age(3600);
+            .allowed_origin("*")
+            .allowed_methods(vec!["GET", "POST", "PUT"])
+            .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
+            .allowed_header(header::CONTENT_TYPE)
+            .max_age(3600);
         let api = app::generate_api();
         // let auth = HttpAuthentication::bearer(middleware::auth::validator);
         App::new()
@@ -228,7 +226,11 @@ async fn main() -> std::io::Result<()> {
             // === inform the rabbitmq instant of new data and fetch it ===
             let rmq_ref = rmq.clone();
 
-            let rs = sim_ref.clone().lock().await.generate_sendforms(time_elapsed.elapsed().as_secs_f64());
+            let rs = sim_ref
+                .clone()
+                .lock()
+                .await
+                .generate_sendforms(time_elapsed.elapsed().as_secs_f64());
             time_elapsed = Instant::now();
             for (n, r) in rs {
                 if send_map.contains_key(&n) {
@@ -318,13 +320,15 @@ async fn main() -> std::io::Result<()> {
             sim_ref.lock().await.data_handler.flush(db_ref).await.ok();
         }
     });
+    let mut erf: u8 = 0;
     tokio::select! {
-        _ = simulation_loop => 0,
-        _ = informer => 0,
-        _ = flusher => 0,
-        _ = server => 0,
+        erf = simulation_loop => 0,
+        erf = informer => 1,
+        erf = flusher => 2,
+        erf = server => 3,
     };
-
+    println!("close code {erf}");
+    // TODO: resolve or crash
     return Ok(());
 }
 
@@ -379,4 +383,3 @@ fn assert_all_env_loaded() -> Result<(), EnvErrors> {
     }
     Ok(())
 }
-

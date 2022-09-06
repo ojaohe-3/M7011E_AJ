@@ -27,12 +27,13 @@ class Privilage:
     level: int
     access: str
     id: str
-
+    type: str
     def toJson(self) -> dict:
         return {
             "level": self.level,
             "access": self.access,
-            "id": self.id
+            "id": self.id,
+            "type": self.type
         }
 
 

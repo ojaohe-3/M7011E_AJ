@@ -9,6 +9,7 @@ export interface ITicket {
     price: number
     source: string // IProducer id who gave you power (takes the last one, i.e if you take from one source 99% first then 1% later 100% will be to the latter part for simplisity)
     amount: number
+    time_stamp?: number
 }
 export interface INetwork {
     id: string
@@ -18,13 +19,17 @@ export interface INetwork {
 }
 const env = process.env.MAX_TICKETS_BACKLOG
 const MAX_LENGHT_TICKETS_BACKLOG: number = env ? +env : 10_000
+const TIME_DELTA_MS = 1000;
 
-type KeyMap<T> = {[key: string]: T} 
+type KeyMap<T> = { [key: string]: T }
 export default class Network implements INetwork {
 
     // private _network: INetwork;
     private _consumers: KeyMap<Consumer>;
-    private _suppliers:KeyMap<Source>;
+    private _suppliers: KeyMap<Source>;
+    private _last_update: number;
+    private _total_demand: number;
+    private _total_supply: number;
 
     public tickets: ITicket[];
     public name: string;
@@ -36,6 +41,9 @@ export default class Network implements INetwork {
     constructor(network?: INetwork) {
         this._consumers = {};
         this._suppliers = {};
+        this._last_update = Date.now() - TIME_DELTA_MS * 2;
+        this._total_demand = 0;
+        this._total_supply = 0;
 
         if (network) {
             this.tickets = network.tickets;
@@ -73,7 +81,7 @@ export default class Network implements INetwork {
     }
 
     public removeSupplier(s: Source) {
-    
+
         delete this._suppliers[s.id];
     }
 
@@ -102,22 +110,38 @@ export default class Network implements INetwork {
 
 
     public tick(demanders: Consumer[], producers: Source[]): ITicket[] {
+        // Add and update all nodes
         this.addSuppliers(...producers);
         this.addConsumers(...demanders);
 
 
-
-        let total_demand = 0;
-        let total_supply = 0;
-
-        // full defined network at this point, this might be reused later in other services that is fine
-        Object.entries(this._suppliers).forEach(([_, s]) => {
-            total_demand += s.demand;
-            total_supply += s.output;
+        // Lets multiple nodes update the same tick
+        let time_stamp = Date.now() - TIME_DELTA_MS;
+        if (this._last_update - Date.now() > TIME_DELTA_MS) {
+            this._total_demand = 0;
+            this._total_supply = 0;
+        }
+        // sum demand and output from entries in suppliers, e.g. prosumers demand and output. 
+        Object.entries(this._suppliers).forEach(([k, s]) => {
+            if (s.updated != true && s.time_stamp <= s.time_stamp) {
+                this._total_demand += s.demand;
+                this._total_supply += s.output;
+                this._suppliers[k].updated = true; /// should be negated when RabbitMQHandler received new value.
+            }
         });
-        Object.entries(this._consumers).forEach(([_, c]) => total_demand += c.demand);
+        // sum demand from consumers only
+        Object.entries(this._consumers).forEach(([k, c]) => {
+            if (c.updated != true && c.time_stamp <= c.time_stamp) {
+                this._total_demand += c.demand
+                this._consumers[k].updated = true;
 
-        console.log("demand:", total_demand,"supply:", total_supply)
+            }
+        }
+        );
+        let total_demand = this._total_demand;
+        let total_supply = this._total_supply;
+
+        console.log("demand:", total_demand, "supply:", total_supply, "at:", new Date(time_stamp));
 
         const tickets: ITicket[] = [];
 
@@ -127,9 +151,9 @@ export default class Network implements INetwork {
         // While we still have a consumer or prosumer left
         while (consumer && producer) {
             // supply the producer first 
-            let supply: number = producer.output - producer.demand; 
+            let supply: number = producer.output - producer.demand;
             // tickets infere where the energy was tacken from, it can be from multiple sources
-            if(producer.demand > 0){
+            if (producer.demand > 0) {
                 tickets.push({
                     target: producer.id,
                     price: 0,
@@ -155,7 +179,7 @@ export default class Network implements INetwork {
                     console.log(consumer.id, "took", take, "from", producer.id)
                     consumer = demanders.pop();
                 }
-               
+
 
             }
             producer = producers.pop();
@@ -172,6 +196,7 @@ export default class Network implements INetwork {
             this.clear_tickets();
         }
         this.document();
+        this._last_update = Date.now();
         return tickets;
     }
     public async clear_tickets() {
