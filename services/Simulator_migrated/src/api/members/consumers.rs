@@ -8,7 +8,8 @@ use serde::{Deserialize, Serialize};
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
     app::AppState,
-    models::{consumer::Consumer, node::Asset, user::Privilage}, middleware::auth::Authentication,
+    middleware::auth::Authentication,
+    models::{consumer::Consumer, node::Asset, user::Privilege},
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -30,7 +31,7 @@ pub async fn get_all(data: web::Data<AppState>) -> Json<Vec<Consumer>> {
 pub async fn generate_member(
     body: Json<CreateConsumerInfo>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     Authentication::is_admin(auth.token().to_string()).await?;
 
@@ -45,7 +46,7 @@ pub async fn generate_member(
         consumer.profile,
         consumer.asset,
         consumer.id,
-        consumer.network
+        consumer.network,
     ));
 
     return Ok(Json(ResponseFormat::new(format!("Success!"))));
@@ -55,9 +56,18 @@ pub async fn generate_member(
 pub async fn get_member(
     id: Path<String>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> Result<Json<Consumer>, WebRequestError> {
-    Authentication::claims(auth.token().to_string(), Privilage::new(1, Some(format!("view")), id.to_string(), "Consumer".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            1,
+            Some(format!("view")),
+            id.to_string(),
+            "Consumer".to_string(),
+        ),
+    )
+    .await?;
     let consumer = data.sim.lock().await.get_consumer(&id).cloned();
     match consumer {
         Some(m) => return Ok(Json(m)),
@@ -69,10 +79,19 @@ pub async fn get_member(
 pub async fn update_member(
     id: Path<String>,
     body: Json<CreateConsumerInfo>,
-    data:  web::Data<AppState>,
-    auth: BearerAuth
+    data: web::Data<AppState>,
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
-    Authentication::claims(auth.token().to_string(), Privilage::new(5, Some(format!("modify")), id.to_string(), "Consumer".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            5,
+            Some(format!("modify")),
+            id.to_string(),
+            "Consumer".to_string(),
+        ),
+    )
+    .await?;
 
     let member = body.into_inner();
     let response = data.sim.lock().await.get_consumer_mut(&id).and_then(|m| {

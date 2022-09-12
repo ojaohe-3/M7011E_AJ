@@ -1,7 +1,7 @@
 import client, { Connection, Channel, credentials } from 'amqplib';
 import WorkHandler, { Handler } from './WorkHandler';
 // import { buffer } from 'stream/consumers';
-export type EventKeys = "receive_rpc" | "data_gatherd" | "clear" //TODO
+export type EventKeys = "receive_rpc" | "data_gatherd" | "clear" | "receive_msg" //TODO
 export type KeyTypes = "source" | "consumer"
 
 
@@ -11,8 +11,8 @@ export interface Arguments {
     target: string
     content: ReceiveFormat[]
     channel: Channel
-    correlationID: any
-    replyTo: any
+    correlationID?: any
+    replyTo?: any
 }
 export interface ReceiveFormat {
     key_type: KeyTypes
@@ -38,9 +38,10 @@ export default class RabbitHandler {
     private _connector!: Connection;
     private _connected: boolean;
     private _workhandler: RabbitWorkHandler;
-
+    private _connecting: boolean;
 
     constructor() {
+        this._connecting = false;
         this._connected = false;
         this._channels = new Map();
         this._workhandler = new WorkHandler();
@@ -55,7 +56,9 @@ export default class RabbitHandler {
         return this._workhandler.on(key, handler);
     }
 
-    private async connect() {
+    public async connect() {
+        if (this._connected || this._connecting) return;
+        this._connecting = true;
         try {
             const opt = {
                 credentials: credentials.plain(process.env.RABBITMQ_USER || "user", process.env.RABBITMQ_PASS || "password")
@@ -67,9 +70,9 @@ export default class RabbitHandler {
 
         } catch (error) {
             console.log(error);
-            setTimeout(this.connect, 10000); // try to reconnect after 10s
             this._connected = false;
-
+            setTimeout(this.connect, 10000); // try to reconnect after 10s
+            this._connecting = false;
 
         }
     }
@@ -90,50 +93,69 @@ export default class RabbitHandler {
             console.log(error);
         }
     }
-    public async createChannel(name: string) {
-        if (!this._connected) {
-            setTimeout(this.createChannel, 1000, name);
-        }
-        try {
-            console.log("creating channel")
-            const c = await this._connector.createChannel()
-            console.log("created channel", c)
-            c.assertQueue(name, { durable: false });
-            this._channels.set(name, c);
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    public async createRPCChannel(name: string): Promise<client.Channel | undefined> {
+    public async createChannel(name: string): Promise<client.Channel | undefined> {
         if (this._connected === false) {
             console.log("Not Connected!")
             return undefined;
         }
         try {
-            const c = await this._connector.createChannel()
-            c.assertQueue(name, { durable: false });
-            c.prefetch(1);
-            this._channels.set(name, c);
-            c.consume(name, (msg) => {
-                console.log('recived message processing...')
+
+            console.log("creating channel")
+            const c = await this._connector.createChannel();
+            c.assertExchange(name, 'fanout', { durable: false });
+            let q = await c.assertQueue("", { exclusive: true });
+            await c.bindQueue(q.queue, name, "");
+            c.consume(q.queue, (msg) => {
+                // console.log('recived message processing...', msg)
                 if (msg === null) {
                     console.log('received null!')
                     return;
                 }
-                const json: ReceiveFormat[] = JSON.parse(msg?.content.toString());
-                const cid = msg!.properties.correlationId;
-                const replyTo = msg!.properties.replyTo;
 
-                this._workhandler.run("receive_rpc", { target: name, content: json, channel: c, correlationID: cid, replyTo: replyTo })
-                c.ack(msg);
+                const json: ReceiveFormat[] = JSON.parse(msg?.content.toString());
+
+
+                this._workhandler.run("receive_msg", { target: name, content: json, channel: c })
+                //             c.ack(msg);
             })
-            return c;
+            // this._channels.set(name, c);
+            console.log("created channel", name)
+            return c!;
         } catch (error) {
             console.log(error)
-            return undefined
+            return undefined;
         }
     }
+
+    // public async createRPCChannel(name: string): Promise<client.Channel | undefined> {
+    //     if (this._connected === false) {
+    //         console.log("Not Connected!")
+    //         return undefined;
+    //     }
+    //     try {
+    //         const c = await this._connector.createChannel()
+    //         c.assertQueue(name, { durable: false });
+    //         c.prefetch(1);
+    //         this._channels.set(name, c);
+    //         c.consume(name, (msg) => {
+    //             console.log('recived message processing...')
+    //             if (msg === null) {
+    //                 console.log('received null!')
+    //                 return;
+    //             }
+    //             const json: ReceiveFormat[] = JSON.parse(msg?.content.toString());
+    //             const cid = msg!.properties.correlationId;
+    //             const replyTo = msg!.properties.replyTo;
+
+    //             this._workhandler.run("receive_rpc", { target: name, content: json, channel: c, correlationID: cid, replyTo: replyTo })
+    //             c.ack(msg);
+    //         })
+    //         return c;
+    //     } catch (error) {
+    //         console.log(error)
+    //         return undefined
+    //     }
+    // }
 
     public close() {
         this._connected = false;

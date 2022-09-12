@@ -8,7 +8,11 @@ use serde::{Deserialize, Serialize};
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
     app::AppState,
-    models::{prosumer::{Battery, Prosumer, Turbine}, user::Privilage}, middleware::auth::Authentication,
+    middleware::auth::Authentication,
+    models::{
+        prosumer::{Battery, Prosumer, Turbine},
+        user::Privilege,
+    },
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -29,7 +33,7 @@ pub async fn get_all(data: web::Data<AppState>) -> Json<Vec<Prosumer>> {
 pub async fn generate_member(
     body: Json<CreateProsumerInfo>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     Authentication::is_admin(auth.token().to_string()).await?;
     let prosumer = body.into_inner();
@@ -45,7 +49,7 @@ pub async fn generate_member(
                 1.,
                 id,
                 0.,
-                format!("")
+                format!(""),
             ));
         }
     } else {
@@ -58,7 +62,7 @@ pub async fn generate_member(
             1.,
             id,
             0.,
-            prosumer.network
+            prosumer.network,
         ));
     }
     return Ok(Json(ResponseFormat::new(format!("Success!"))));
@@ -68,9 +72,18 @@ pub async fn generate_member(
 pub async fn get_member(
     id: Path<String>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> Result<Json<Prosumer>, WebRequestError> {
-    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("view")), id.to_string(),"Prosumer".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            3,
+            Some(format!("view")),
+            id.to_string(),
+            "Prosumer".to_string(),
+        ),
+    )
+    .await?;
     let prosumer = data.sim.lock().await.get_prosumer(&id).cloned();
     match prosumer {
         Some(m) => return Ok(Json(m)),
@@ -83,9 +96,18 @@ pub async fn update_member(
     id: Path<String>,
     body: Json<CreateProsumerInfo>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
-    Authentication::claims(auth.token().to_string(), Privilage::new(5, Some(format!("modify")), id.to_string(), "Prosumer".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            5,
+            Some(format!("modify")),
+            id.to_string(),
+            "Prosumer".to_string(),
+        ),
+    )
+    .await?;
     let member = body.into_inner();
     let response = data
         .sim
@@ -93,8 +115,8 @@ pub async fn update_member(
         .await
         .get_prosumer_mut(&id)
         .and_then(|m: &mut Prosumer| {
-            m.batteries=member.batteries;
-            m.turbines=member.turbines;
+            m.batteries = member.batteries;
+            m.turbines = member.turbines;
             return Some(ResponseFormat::new("Success!".to_string()));
         });
     match response {

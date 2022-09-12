@@ -1,5 +1,4 @@
-
-use chrono::{Local, DateTime};
+use chrono::Local;
 use serde::{Deserialize, Serialize};
 
 trait Report {}
@@ -11,9 +10,7 @@ pub struct ManagerReport {
     pub output: f64,
     pub time_stamp: f64,
     pub ratio: f64,
-    time_date: DateTime<Local>
-
-    //TODO: add more report attributes
+    time_date: i64, //TODO: add more report attributes
 }
 
 impl ManagerReport {
@@ -23,8 +20,7 @@ impl ManagerReport {
             output,
             time_stamp,
             ratio,
-            time_date: Local::now()
-
+            time_date: Local::now().timestamp_millis(),
         }
     }
 }
@@ -42,9 +38,8 @@ pub struct ProsumerReport {
     pub total_production: f64,
     pub total_stored: f64,
     pub demand: f64,
-    pub time_stamp: f64,
-    time_date: DateTime<Local>
-
+    pub delta_time: f64,
+    time_date: i64,
 }
 
 impl ProsumerReport {
@@ -60,9 +55,8 @@ impl ProsumerReport {
             total_production,
             total_stored,
             demand,
-            time_stamp,
-            time_date: Local::now()
-
+            delta_time: time_stamp,
+            time_date: Local::now().timestamp_millis(),
         }
     }
 }
@@ -82,8 +76,7 @@ pub struct ConsumerReport {
     pub delta_time: f64,
     pub total_demand: f64,
     pub time_stamp: f64,
-    time_date: DateTime<Local>
-
+    time_date: i64,
 }
 
 impl ConsumerReport {
@@ -92,7 +85,7 @@ impl ConsumerReport {
             total_demand,
             time_stamp,
             delta_time,
-            time_date: Local::now()
+            time_date: Local::now().timestamp_millis(),
         }
     }
 }
@@ -108,17 +101,17 @@ impl Report for ConsumerReport {}
 pub struct WeatherReportStore {
     temp: f64,
     wind_speed: f64,
-    time_stamp: f64,
-    time_date: DateTime<Local>
+    delta_time: f64,
+    time_date: i64,
 }
 
 impl WeatherReportStore {
-    pub fn new(temp: f64, wind_speed: f64, time_stamp: f64) -> Self {
+    pub fn new(temp: f64, wind_speed: f64, delta_time: f64) -> Self {
         Self {
             temp,
             wind_speed,
-            time_stamp,
-            time_date: Local::now()
+            delta_time,
+            time_date: Local::now().timestamp_millis(),
         }
     }
 }

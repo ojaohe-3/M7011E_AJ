@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
-    app::AppState, middleware::auth::Authentication, models::user::Privilage,
+    app::AppState,
+    middleware::auth::Authentication,
+    models::user::Privilege,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -25,10 +27,19 @@ struct MemberData {
 async fn get_ratio(
     path: Path<MemberInfo>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> actix_web::Result<Json<MemberData>, WebRequestError> {
     let id = &path.id;
-    Authentication::claims(auth.token().to_string(), Privilage::new(1, Some(format!("view;control")), id.to_string(), "Prosumer".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            1,
+            Some(format!("view;control")),
+            id.to_string(),
+            "Prosumer".to_string(),
+        ),
+    )
+    .await?;
 
     let response = data.sim.lock().await.get_prosumer_mut(&id).and_then(|p| {
         Some(MemberData {
@@ -47,12 +58,20 @@ async fn get_ratio(
 async fn set_ratio(
     path: Path<MemberInfo>,
     body: Json<MemberData>,
-    data:  web::Data<AppState>,
-    auth: BearerAuth
+    data: web::Data<AppState>,
+    auth: BearerAuth,
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
-    
     let id = &path.id;
-    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("modify;control")), id.to_string(), "Prosumer".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            3,
+            Some(format!("modify;control")),
+            id.to_string(),
+            "Prosumer".to_string(),
+        ),
+    )
+    .await?;
     let ratio = body.into_inner();
     let response = data.sim.lock().await.get_prosumer_mut(&id).and_then(|p| {
         p.input_ratio = ratio.input_ratio;
@@ -72,10 +91,19 @@ async fn set_ratio(
 async fn set_active(
     path: Path<(String, bool)>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let (id, status) = path.into_inner();
-    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("enable;control")), id.to_string(), "Prosumer".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            2,
+            Some(format!("enable;control")),
+            id.to_string(),
+            "Prosumer".to_string(),
+        ),
+    )
+    .await?;
 
     let response = data.sim.lock().await.get_prosumer_mut(&id).and_then(|m| {
         m.status = status;
@@ -95,10 +123,19 @@ async fn set_active(
 async fn pause(
     path: Path<(String, f64)>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let (id, duration) = path.into_inner();
-    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("enable;control")), id.to_string(), "Prosumer".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            2,
+            Some(format!("enable;control")),
+            id.to_string(),
+            "Prosumer".to_string(),
+        ),
+    )
+    .await?;
 
     let response = data.sim.lock().await.get_prosumer_mut(&id).and_then(|p| {
         p.status = false;

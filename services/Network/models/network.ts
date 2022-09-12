@@ -1,3 +1,4 @@
+import { Channel } from "amqplib";
 import { randomUUID } from "crypto";
 import { Types } from "mongoose";
 import { DB } from "../DB-Connector/db-connector";
@@ -16,6 +17,8 @@ export interface INetwork {
     tickets: ITicket[]
     name: string
     updatedAt: Date
+    total_demand?: number
+    total_supply?: number
 }
 const env = process.env.MAX_TICKETS_BACKLOG
 const MAX_LENGHT_TICKETS_BACKLOG: number = env ? +env : 10_000
@@ -30,6 +33,13 @@ export default class Network implements INetwork {
     private _last_update: number;
     private _total_demand: number;
     private _total_supply: number;
+
+    public get total_demand() {
+        return this._total_demand;
+    }
+    public get total_supply() {
+        return this._total_supply
+    }
 
     public tickets: ITicket[];
     public name: string;
@@ -58,11 +68,18 @@ export default class Network implements INetwork {
             this.updatedAt = new Date()
             this.document();
         }
-        RabbitHandler.instance.createRPCChannel(this.name);
+        this.init_rmq();
         RabbitHandler.instance.on("clear", this.clear_tickets);
     }
     //#region getters and setters
-
+    private async init_rmq() {
+        const result = await RabbitHandler.instance.createChannel(this.name);
+        if (result) {
+            console.log("created channel", this.name);
+        } else {
+            setTimeout(() => this.init_rmq(), 2000);
+        }
+    }
     public get netpower(): number {
         return this._netpower;
     }
@@ -197,6 +214,7 @@ export default class Network implements INetwork {
         }
         this.document();
         this._last_update = Date.now();
+
         return tickets;
     }
     public async clear_tickets() {

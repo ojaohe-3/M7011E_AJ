@@ -8,7 +8,8 @@ use serde::{Deserialize, Serialize};
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
     app::AppState,
-    models::{manager::{Manager}, user::Privilage}, middleware::auth::Authentication,
+    middleware::auth::Authentication,
+    models::{manager::Manager, user::Privilege},
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -16,7 +17,7 @@ pub struct CreateManagerInfo {
     id: Option<String>,
     pub max_production: f64, // in kw
     pub price: f64,          // price in kr
-    pub network: String
+    pub network: String,
 }
 
 #[get("/")]
@@ -29,7 +30,7 @@ pub async fn get_all(data: web::Data<AppState>) -> Json<Vec<Manager>> {
 pub async fn generate_member(
     body: Json<CreateManagerInfo>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
     Authentication::is_admin(auth.token().to_string()).await?;
     let manager = body.into_inner();
@@ -44,7 +45,7 @@ pub async fn generate_member(
                 0.,
                 manager.price,
                 false,
-                manager.network
+                manager.network,
             ));
         }
     } else {
@@ -56,8 +57,7 @@ pub async fn generate_member(
             0.,
             manager.price,
             false,
-            manager.network
-
+            manager.network,
         ));
     }
     return Ok(Json(ResponseFormat::new(format!("Success!"))));
@@ -67,9 +67,18 @@ pub async fn generate_member(
 pub async fn get_member(
     id: Path<String>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> Result<Json<Manager>, WebRequestError> {
-    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("view")), id.to_string(), "Manager".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            3,
+            Some(format!("view")),
+            id.to_string(),
+            "Manager".to_string(),
+        ),
+    )
+    .await?;
     let manager = data.sim.lock().await.get_manager(&id).cloned();
     match manager {
         Some(m) => return Ok(Json(m)),
@@ -82,9 +91,18 @@ pub async fn update_member(
     id: Path<String>,
     body: Json<CreateManagerInfo>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> Result<Json<ResponseFormat>, WebRequestError> {
-    Authentication::claims(auth.token().to_string(), Privilage::new(5, Some(format!("modify")), id.to_string(), "Manager".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            5,
+            Some(format!("modify")),
+            id.to_string(),
+            "Manager".to_string(),
+        ),
+    )
+    .await?;
     let member = body.into_inner();
     let response = data.sim.lock().await.get_manager_mut(&id).and_then(|m| {
         m.price = member.price;

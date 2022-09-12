@@ -64,7 +64,7 @@ services:
     image: simulator
     ports:
       - "5001:5001"
-    env_file: auth.env
+    env_file: sim.env
     networks:
       - database
       - rabbit

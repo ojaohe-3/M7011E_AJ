@@ -7,8 +7,7 @@ use time::Instant;
 // use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 use crate::db::datapoints_document::DataPointsDocument;
-use crate::models::reports::{ProsumerReport, ManagerReport, ConsumerReport, WeatherReportStore};
-
+use crate::models::reports::{ConsumerReport, ManagerReport, ProsumerReport, WeatherReportStore};
 
 #[derive(Debug)]
 pub struct DataHandler {
@@ -56,7 +55,7 @@ impl DataHandler {
         if size >= all.len() {
             all
         } else {
-            all[..size].to_vec()
+            all[size..(all.len() - 1)].to_vec()
         }
     }
     pub fn get_prosumer_data(&self, id: &String, size: usize) -> Vec<ProsumerReport> {
@@ -69,7 +68,7 @@ impl DataHandler {
         if size >= all.len() {
             all
         } else {
-            all[..size].to_vec()
+            all[size..(all.len() - 1)].to_vec()
         }
     }
 
@@ -97,7 +96,7 @@ impl DataHandler {
         Ok(())
     }
 
-    /// Checks weather or not we excedes data_handlers invariance, in case we have a single data list that 
+    /// Checks weather or not we excedes data_handlers invariance, in case we have a single data list that
     /// excede the const of MAX_DATA_ENTRIES we flush all data
     pub async fn check_status(&mut self, db: Database) -> Result<(), mongodb::error::Error> {
         if self.manager_reports.len() >= DataHandler::MAX_DATA_ENTRIES
@@ -163,5 +162,9 @@ impl DataHandler {
         }
         self.weather_reports.push(report);
         // self.check_status()
+    }
+
+    pub fn last_weather(&self) -> Option<&WeatherReportStore> {
+        self.last_weather.as_ref()
     }
 }

@@ -6,9 +6,8 @@ use futures::lock::Mutex;
 use mongodb::{Client, Database};
 
 use crate::{
-    api::{control, datapoints, formats::WebRequestError, grid, members},
+    api::{control, datapoints, grid, members},
     handlers::simulation_handler::SimulationHandler,
-    models::user::{Privilage, UserData},
 };
 
 #[derive(Clone, Debug)]

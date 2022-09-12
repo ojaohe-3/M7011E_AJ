@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::formats::{ResponseFormat, WebRequestError},
-    app::AppState, models::user::Privilage, middleware::auth::Authentication,
+    app::AppState,
+    middleware::auth::Authentication,
+    models::user::Privilege,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -23,10 +25,19 @@ struct MemberData {
 async fn get_ratio(
     path: Path<MemberInfo>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> actix_web::Result<Json<MemberData>, WebRequestError> {
     let id = &path.id;
-    Authentication::claims(auth.token().to_string(), Privilage::new(2, Some(format!("view;control")), id.to_string(), "Manager".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            2,
+            Some(format!("view;control")),
+            id.to_string(),
+            "Manager".to_string(),
+        ),
+    )
+    .await?;
 
     let response = data
         .sim
@@ -46,11 +57,19 @@ async fn set_ratio(
     path: Path<MemberInfo>,
     body: Json<MemberData>,
     data: web::Data<AppState>,
-    auth: BearerAuth
-
+    auth: BearerAuth,
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let id = &path.id;
-    Authentication::claims(auth.token().to_string(), Privilage::new(4, Some(format!("modify;control")), id.to_string(),"Manager".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            4,
+            Some(format!("modify;control")),
+            id.to_string(),
+            "Manager".to_string(),
+        ),
+    )
+    .await?;
 
     let ratio = body.ratio;
     let response = data.sim.lock().await.get_manager_mut(&id).and_then(|m| {
@@ -71,10 +90,19 @@ async fn set_ratio(
 async fn set_active(
     path: Path<(String, bool)>,
     data: web::Data<AppState>,
-    auth: BearerAuth
+    auth: BearerAuth,
 ) -> actix_web::Result<Json<ResponseFormat>, WebRequestError> {
     let (id, status) = path.into_inner();
-    Authentication::claims(auth.token().to_string(), Privilage::new(3, Some(format!("enable;control")), id.to_string(),"Manager".to_string())).await?;
+    Authentication::claims(
+        auth.token().to_string(),
+        Privilege::new(
+            3,
+            Some(format!("enable;control")),
+            id.to_string(),
+            "Manager".to_string(),
+        ),
+    )
+    .await?;
     let response = data.sim.lock().await.get_manager_mut(&id).and_then(|m| {
         m.status = status;
         Some(ResponseFormat {

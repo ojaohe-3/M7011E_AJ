@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::formats::WebRequestError,
-    models::user::{Privilage, UserData},
+    models::user::{Privilege, UserData},
 };
 
 pub struct Authentication;
@@ -36,7 +36,7 @@ impl Authentication {
     pub async fn verify_token(token: String) -> Result<Option<UserData>, reqwest::Error> {
         let url = format!("{}/api/validate", dotenv::var("AUTH_ENDPOINT").unwrap());
         let client = reqwest::ClientBuilder::new()
-            .danger_accept_invalid_certs(true) // temp until tls fix for reqwests is found
+            .danger_accept_invalid_certs(true) // FIXME: temp until tls fix for reqwests is found
             .connect_timeout(Duration::from_secs_f64(3.0))
             .build()
             .unwrap();
@@ -62,8 +62,8 @@ impl Authentication {
 
         Err(WebRequestError::NotAuthorized)
     }
- 
-    pub async fn claims(token: String, guarded: Privilage) -> Result<(), WebRequestError> {
+
+    pub async fn claims(token: String, guarded: Privilege) -> Result<(), WebRequestError> {
         let claimant = match Authentication::verify_token(token).await {
             Ok(v) => v,
             Err(e) => return Err(WebRequestError::from(e)),

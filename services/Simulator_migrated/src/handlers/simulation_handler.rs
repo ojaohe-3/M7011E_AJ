@@ -1,38 +1,17 @@
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 use crate::models::consumer::Consumer;
 use crate::models::manager::Manager;
 use crate::models::network_types::{KeyTypes, ReciveFormat, SendFormat};
 use crate::models::node::{Grid, Node};
-use crate::models::prosumer::{Battery, Prosumer, Turbine};
+use crate::models::prosumer::Prosumer;
 use crate::models::reports::{ConsumerReport, ManagerReport, ProsumerReport};
-use futures::lock::Mutex;
 use mongodb::Database;
 
 use super::data_handler::DataHandler;
 
-use super::weather_handler::{weather_singleton, WeatherHandler, WeatherReport};
+use super::weather_handler::{WeatherHandler, WeatherReport};
 
-pub struct SHReader {
-    pub inner: Mutex<SimulationHandler>,
-}
-
-// //TODO: move to arc::mutex in shared app data
-// pub fn simulation_singleton() -> &'static SHReader {
-//     static mut SINGLETON: MaybeUninit<SHReader> = MaybeUninit::uninit();
-//     static ONCE: Once = Once::new();
-
-//     unsafe {
-//         ONCE.call_once(|| {
-//             let singleton = SHReader {
-//                 inner: Mutex::new(SimulationHandler::new()),
-//             };
-//             SINGLETON.write(singleton);
-//         });
-
-//         SINGLETON.assume_init_ref()
-//     }
-// }
 pub type Tickets = Vec<ReciveFormat>;
 #[derive(Debug)]
 pub struct SimulationHandler {
@@ -168,8 +147,13 @@ impl SimulationHandler {
     fn generate_sendform_consumers(&self, elapsed: f64) -> Vec<(String, SendFormat)> {
         let mut res = Vec::new();
         for c in &self.consumers {
-            let format =
-                SendFormat::new(KeyTypes::Consumer, c.demand*elapsed, c.id.to_string(), None, None);
+            let format = SendFormat::new(
+                KeyTypes::Consumer,
+                c.demand * elapsed,
+                c.id.to_string(),
+                None,
+                None,
+            );
             res.push((c.network.to_string(), format));
         }
 
@@ -183,7 +167,7 @@ impl SimulationHandler {
                 p.total_production * elapsed,
                 p.id.to_string(),
                 Some(0.05),
-                Some(p.demand* elapsed),
+                Some(p.demand * elapsed),
             );
             res.push((p.network.to_string(), format));
         }
@@ -255,8 +239,8 @@ async fn test_simulation() {
     ));
     sim.add_prosumer(Prosumer::new(
         true,
-        vec![Battery::new(1000., 0., 100., 100.)],
-        vec![Turbine::new(2000.)],
+        vec![crate::models::prosumer::Battery::new(1000., 0., 100., 100.)],
+        vec![crate::models::prosumer::Turbine::new(2000.)],
         1.,
         0.,
         "1".to_string(),
@@ -294,8 +278,8 @@ async fn test_loop() {
     ));
     sim.add_prosumer(Prosumer::new(
         true,
-        vec![Battery::new(1000., 0., 100., 100.)],
-        vec![Turbine::new(2000.)],
+        vec![crate::models::prosumer::Battery::new(1000., 0., 100., 100.)],
+        vec![crate::models::prosumer::Turbine::new(2000.)],
         1.,
         0.,
         "1".to_string(),
@@ -306,7 +290,7 @@ async fn test_loop() {
     sim.fetch_weather().await;
 
     for i in 0..2300 {
-        tokio::time::sleep(Duration::from_secs_f64(
+        tokio::time::sleep(std::time::Duration::from_secs_f64(
             1. / SimulationHandler::LOOP_FREQUENCY,
         ))
         .await;

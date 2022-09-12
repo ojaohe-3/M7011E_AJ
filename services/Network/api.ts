@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import Authenticate from "./authentication/authenticator";
 import NetworkHandler from "./handler/NetworkHandler";
+import RabbitHandler from "./handler/RabbitSeverHandler";
 import Network, { INetwork } from "./models/network";
 
 const app = Router();
@@ -14,13 +15,13 @@ app.post('/', Authenticate("admin"), (req: Request, res: Response) => {
     try {
         const data: Partial<INetwork> = req.body;
         net.addNet(data);
-        res.json({message: "success!"})
+        res.json({ message: "success!" })
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error when trying to post an invalid format', error: error })
     }
 })
-app.delete('/:id',Authenticate("admin"),(req: Request, res: Response)=> {
+app.delete('/:id', Authenticate("admin"), (req: Request, res: Response) => {
     try {
         const id = req.params.id;
         net.deleteNet(id);
@@ -29,13 +30,13 @@ app.delete('/:id',Authenticate("admin"),(req: Request, res: Response)=> {
         res.status(500).json({ message: 'Could not parse id', error: error })
     }
 })
-app.get('/:id',(req: Request, res: Response) => {
+app.get('/:id', (req: Request, res: Response) => {
     const id = req.params.id;
     const member = net.get(id);
-    if(member){
+    if (member) {
         res.json(member);
-    }else{
-        res.status(404).json({message: "not found", status: 404})
+    } else {
+        res.status(404).json({ message: "not found", status: 404 })
     }
 })
 export default app;

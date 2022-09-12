@@ -15,12 +15,11 @@ export default class NetworkHandler {
 
     constructor() {
         this._networks = new Map<string, Network>();
-        this.fetchAll();
 
-        RabbitHandler.instance.on("receive_rpc", (msg) => {
+        RabbitHandler.instance.on("receive_msg", (msg) => {
             if (msg) {
-                // console.log('processing:',msg)
-                const { channel, content, correlationID, replyTo, target } = msg;
+                const { channel, content, target } = msg;
+                console.log(`info { ch: ${channel} cnt: ${content} trg: ${target} }`)
                 const network = this._networks.get(target);
                 const sources: Source[] = [];
                 const consumers: Consumer[] = [];
@@ -51,7 +50,7 @@ export default class NetworkHandler {
 
                 const tickets = network?.tick(consumers, sources);
                 // console.log(tickets)
-                channel.sendToQueue(replyTo, Buffer.from(JSON.stringify(tickets || [])), correlationID)
+                // channel.sendToQueue(replyTo, Buffer.from(JSON.stringify(tickets || [])), correlationID)
             }
 
         })
@@ -71,7 +70,7 @@ export default class NetworkHandler {
                     id,
                     tickets: m.tickets,
                     name: m.name,
-                    updatedAt: m.updatedAt
+                    updatedAt: m.updatedAt,
                 }
                 const network = new Network(_net);
                 this._networks.set(m.name, network);

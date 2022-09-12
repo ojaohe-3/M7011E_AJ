@@ -2,7 +2,7 @@ FROM rust:latest as build
 
 WORKDIR /usr/src/api-service
 COPY . .
-
-RUN cargo install --path .
+EXPOSE 5001
+RUN cargo install --path . --profile release
 
 CMD ["Simulator"]

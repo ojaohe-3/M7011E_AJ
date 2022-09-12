@@ -1,4 +1,4 @@
-use std::{
+pub(crate) use std::{
     collections::HashMap,
     env, fmt,
     sync::Arc,
@@ -7,16 +7,11 @@ use std::{
 
 use actix_cors::Cors;
 use actix_web::{http::header, middleware::Logger, web, App, HttpServer};
-use db::{
-    consumer_document::ConsumerDocument, manager_document::ManagerDocument,
-    prosumer_document::ProsumerDocument, tickets_document::TicketDocuments,
-};
 use dotenv::dotenv;
 use env_logger::Env;
-use futures::{future::join_all, lock::Mutex, Future};
-use handlers::network_handler::{self};
+use futures::lock::Mutex;
 use models::{appstructure::AppStructure, network_types::SendFormat};
-use mongodb::{bson::doc, options::ClientOptions, Client, Database};
+use mongodb::{bson::doc, options::ClientOptions, Client};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 use crate::{
@@ -152,7 +147,7 @@ async fn main() -> std::io::Result<()> {
         }
         Err(_) => 5000,
     };
-    let binding = format!("127.0.0.1:{}", port);
+    let binding = format!("0.0.0.0:{}", port);
     println!(
         "Starting server on {}, start time {}s",
         binding,
@@ -163,7 +158,6 @@ async fn main() -> std::io::Result<()> {
 
     let server = HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("*")
             .allowed_methods(vec!["GET", "POST", "PUT"])
             .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
             .allowed_header(header::CONTENT_TYPE)
@@ -240,22 +234,18 @@ async fn main() -> std::io::Result<()> {
                 }
             }
             for (n, sr) in send_map.iter() {
-                let rmq = rmq_ref.clone();
+                rmq.lock()
+                    .await
+                    .create_channel(n.to_string())
+                    .await
+                    .expect("failed to create channel");
 
-                let res = rmq
-                    .lock()
+                let rmq = rmq_ref.clone();
+                rmq.lock()
                     .await
-                    .send_rpc(n.to_string(), sr.to_vec())
+                    .send_normal(n.to_string(), sr.to_vec())
                     .await
-                    .ok();
-                if let Some(res) = res {
-                    println!("response rmq: {:?}", res);
-                    if res.len() > 0 {
-                        TicketDocuments::insert(db_ref.clone(), &res).await.ok();
-                    }
-                } else {
-                    println!("failed to call rpc...");
-                }
+                    .expect("Failed to send rabbitmq");
             }
             // === Update Database of current state ===
 

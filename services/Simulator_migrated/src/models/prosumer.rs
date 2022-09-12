@@ -1,13 +1,10 @@
-
 use mongodb::Database;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use crate::{handlers::weather_handler::{WeatherReport}, db::prosumer_document::ProsumerDocument};
+use crate::{db::prosumer_document::ProsumerDocument, handlers::weather_handler::WeatherReport};
 
-use super::{
-    node::{Asset, Node},
-};
+use super::node::{Asset, Node};
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Turbine {
     max_production: f64,
@@ -60,11 +57,11 @@ impl Battery {
         // self.current -= take;
         take
     }
-    pub fn modify(&mut self, give: f64){
+    pub fn modify(&mut self, give: f64) {
         self.current += give;
     }
 }
-#[derive(Clone, Default,Debug, Serialize, Deserialize)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 
 pub struct Prosumer {
     pub id: String,
@@ -116,7 +113,10 @@ impl Prosumer {
     //     self.batteries = batteries;
     // }
 
-    pub async fn document(&self, db: Database) -> Result<mongodb::results::UpdateResult, mongodb::error::Error> {
+    pub async fn document(
+        &self,
+        db: Database,
+    ) -> Result<mongodb::results::UpdateResult, mongodb::error::Error> {
         ProsumerDocument::update(db, &self.id.to_string(), self).await
     }
 }
@@ -139,7 +139,9 @@ impl Node<Prosumer> for Prosumer {
         }
         let bs: &mut Vec<Battery> = &mut self.batteries;
         for b in bs {
-            let inp = b.input(self.input_ratio * elapsed).clamp(0., self.total_production);
+            let inp = b
+                .input(self.input_ratio * elapsed)
+                .clamp(0., self.total_production);
             let out = b.output(self.output_ratio * elapsed);
             self.total_production += out - inp;
             if self.total_production < 0. {
@@ -173,41 +175,47 @@ fn test_prosumer_no_output() {
         format!(""),
     ));
 
-
-
-    p.tick(1.,WeatherReport {
-        temp: 300.,
-        wind_speed: 11.,
-    });
+    p.tick(
+        1.,
+        WeatherReport {
+            temp: 300.,
+            wind_speed: 11.,
+        },
+    );
     assert!(p.total_production < p.turbines[0].max_production);
     assert!(p.total_stored > 0.);
 
-
     let cur = p.total_stored;
     p.output_ratio = 1.0;
-    p.tick(1.,WeatherReport {
-        temp: 300.,
-        wind_speed: 0.,
-    });
-    
-    assert_eq!(
-        p.total_production,
-        p.batteries[0].max_output
+    p.tick(
+        1.,
+        WeatherReport {
+            temp: 300.,
+            wind_speed: 0.,
+        },
     );
+
+    assert_eq!(p.total_production, p.batteries[0].max_output);
 
     assert!(p.total_stored < cur);
     p.output_ratio = 0.;
-    
-    p.tick(1., WeatherReport {
-        temp: 300.,
-        wind_speed: 25.,
-    });
+
+    p.tick(
+        1.,
+        WeatherReport {
+            temp: 300.,
+            wind_speed: 25.,
+        },
+    );
     assert_eq!(p.total_production, 0.);
     assert_eq!(p.total_stored, 0.);
-    p.tick(1., WeatherReport {
-        temp: 300.,
-        wind_speed: 2.,
-    });
+    p.tick(
+        1.,
+        WeatherReport {
+            temp: 300.,
+            wind_speed: 2.,
+        },
+    );
 
     assert_eq!(p.total_production, 0.);
     // assert!(p.total_stored > 0.);
