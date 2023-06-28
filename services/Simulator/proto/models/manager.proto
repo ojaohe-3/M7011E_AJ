@@ -1,0 +1,13 @@
+// pub id: String, // hash 128bit
+// pub max_production: f64, // in kw
+// pub current: f64, // [0, 1] range  
+// pub ratio: f64, // [0, 1] range  
+// pub price: f64, // price in kr
+// pub status: bool, // active or not
+// pub network: String, // Network instant that is to be supplied
+// #[serde(skip)]
+// pub last: f64, // seconds as f64
+// #[serde(skip)]
+// pub acc: f64, // accumilated acceleration
+syntax="proto3";
+package sim.models;

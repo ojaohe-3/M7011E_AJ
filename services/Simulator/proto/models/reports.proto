@@ -1,0 +1,7 @@
+// pub id: String,
+// pub output: f64,
+// pub time_stamp: f64,
+// pub ratio: f64,
+// time_date: i64, 
+syntax="proto3";
+package sim.models;

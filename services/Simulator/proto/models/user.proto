@@ -1,0 +1,12 @@
+// pub id: String,
+// pub name: String
+// pub type: String
+// pub type: Role
+syntax="proto3";
+package sim.models;
+
+message UserMessage{
+    required string id = 1;
+    string name = 2;
+    string email = 3;
+}

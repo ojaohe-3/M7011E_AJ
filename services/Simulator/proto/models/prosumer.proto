@@ -1,0 +1,15 @@
+// pub id: String,
+// pub status: bool,
+// pub batteries: Vec<Battery>,
+// pub turbines: Vec<Turbine>,
+// pub input_ratio: f64,
+// pub output_ratio: f64,
+// #[serde(skip)]
+// pub timeout: f64,
+// #[serde(skip)]
+// pub total_production: f64,
+// pub total_stored: f64,
+// pub demand: f64,
+// pub network: String,
+syntax="proto3";
+package sim.models;

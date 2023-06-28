@@ -1,0 +1,31 @@
+syntax="proto3";
+package sim.models;
+
+
+
+message ConsumerMessage{
+    optional string id = 1;
+    repeated float timefn = 2;
+    float64 profile = 3;
+    String asset = 4;
+    String network = 5;
+}
+
+
+message ConsumeGetReply{
+    required string id = 1;
+}
+
+message ConsumerQuerryMessage{
+    optional string query = 2;
+}
+    
+message ConsumeGetReply{
+    ResponseMessage msg = 1;
+    ConsumerMessage consumer = 2;
+}
+
+message ConsumerQuerryReply{
+    ResponseMessage msg = 1;
+    repeated ConsumerMessage consumer = 2;
+}
