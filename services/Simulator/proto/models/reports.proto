@@ -5,3 +5,11 @@
 // time_date: i64, 
 syntax="proto3";
 package sim.models;
+
+message ReportMessage{
+    string id = 1;
+    float64 output = 2;
+    float64 time_stamp = 2;
+    float64 ratio = 2;
+    float64 time_date = 2;
+}

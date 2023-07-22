@@ -9,23 +9,16 @@ message ConsumerMessage{
     float64 profile = 3;
     String asset = 4;
     String network = 5;
+    bool active = 6;
 }
 
-
-message ConsumeGetReply{
-    required string id = 1;
-}
-
-message ConsumerQuerryMessage{
-    optional string query = 2;
-}
     
-message ConsumeGetReply{
+message ConsumerGetReply{
     ResponseMessage msg = 1;
-    ConsumerMessage consumer = 2;
+    optional ConsumerMessage content = 2;
 }
 
 message ConsumerQuerryReply{
-    ResponseMessage msg = 1;
-    repeated ConsumerMessage consumer = 2;
+    querryReply msg = 1;
+    repeated ConsumerMessage content = 2;
 }

@@ -13,3 +13,16 @@
 // pub network: String,
 syntax="proto3";
 package sim.models;
+
+
+message BatteryMessage{
+
+}
+message TurbineMessage{
+    
+}
+message ProsumerMessage{
+    string id = 1;
+    bool status = 2;
+    repeated batteries
+}

@@ -1,0 +1,24 @@
+syntax="proto3";
+package sim;
+
+message ResponseMessage{
+    string id = 1;
+    string msg = 2;
+    optional string error = 3;
+    optional string trace = 4;
+}
+
+message getMessage{
+    string id = 1;
+}
+
+message querryMessage{
+    repeated string querys = 1;
+}
+
+message querryReply{
+    ResponseMessage msg = 1;
+    int32 page_size = 2;
+    string page_id = 3;
+    string next_page = 4;
+}

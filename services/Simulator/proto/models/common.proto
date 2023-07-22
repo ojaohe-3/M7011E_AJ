@@ -1,9 +1,0 @@
-syntax="proto3";
-package sim.models;
-
-message ResponseMessage{
-    string id = 1;
-    string msg = 2;
-    optional string error = 3;
-    optional string trace = 4;
-}

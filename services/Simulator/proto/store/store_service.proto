@@ -1,0 +1,32 @@
+syntax="proto3";
+package sim.store;
+
+import "../models/consumer.proto";
+import "../models/manager.proto";
+import "../models/prosumer.proto";
+import "../models/reports.proto.proto";
+
+
+service StoreConsumerService{
+    rpc createConsumer (ConsumerMessage) returns (ResponseMessage);
+    rpc updateConsumer (ConsumerMessage) returns (ResponseMessage);
+    rpc getConsumer(getMessage) returns (ConsumerGetReply);
+    rpc querryConsumer(querryMessage) returns (ConsumerQuerryReply);
+}
+
+service StoreManagerService{
+    rpc createManager (ManagerMessage) returns (ResponseMessage);
+    rpc updateManager (ManagerMessage) returns (ResponseMessage);
+    rpc getManager(getMessage) returns (ManagerGetReply);
+    rpc querryManager(querryMessage) returns (ManagerQuerryReply);
+}
+service StoreProsumerService{
+    rpc createProsumer (ProsumerMessage) returns (ResponseMessage);
+    rpc updateProsumer (ProsumerMessage) returns (ResponseMessage);
+    rpc getProsumer(getMessage) returns (ProsumerGetReply);
+    rpc querryProsumer(querryMessage) returns (ProsumerQuerryReply);
+}
+service StoreReportService{
+    rpc createConsumer (ReportMessage) returns (ResponseMessage);
+    rpc querryConsumer(querryMessage) returns (ReportQuerryReply);
+}

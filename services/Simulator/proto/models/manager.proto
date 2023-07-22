@@ -1,13 +1,22 @@
-// pub id: String, // hash 128bit
-// pub max_production: f64, // in kw
-// pub current: f64, // [0, 1] range  
-// pub ratio: f64, // [0, 1] range  
-// pub price: f64, // price in kr
-// pub status: bool, // active or not
-// pub network: String, // Network instant that is to be supplied
-// #[serde(skip)]
-// pub last: f64, // seconds as f64
-// #[serde(skip)]
-// pub acc: f64, // accumilated acceleration
 syntax="proto3";
 package sim.models;
+
+message ManagerMessage{
+    string id = 1;
+    float64 max_production = 2;
+    float64 current = 3;
+    float64 ratio = 4;
+    float64 price = 5;
+    bool status = 6;
+    string network = 7;
+}
+
+message ManagerGetReply{
+    ResponseMessage msg = 1;
+    optional ManagerMessage content = 2;
+}
+
+message ManagerQuerryReply{
+    querryReply msg = 1;
+    repeated ManagerMessage content = 2;
+}
